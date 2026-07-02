@@ -1,6 +1,5 @@
 package it.ispwproject.findyourbook.controller.applicativo;
 
-import com.google.gson.*;
 import it.ispwproject.findyourbook.bean.BookBean;
 import it.ispwproject.findyourbook.service.BookService;
 import it.ispwproject.findyourbook.dao.db.BookDAODB;      // Suggerimento: rinomina in BookDAODB
@@ -9,8 +8,7 @@ import it.ispwproject.findyourbook.model.Book;
 import it.ispwproject.findyourbook.dao.DAOFactory;// Suggerimento: rinomina in Book
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
 import it.ispwproject.findyourbook.service.GoogleBooksService;
-import it.ispwproject.findyourbook.service.OpenLibraryService;
-
+import it.ispwproject.findyourbook.util.logger.AppLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +28,7 @@ public class BookController {
 
             // 2. IL TUO CICLO FOR! Scarica i libri di ogni autore e li unisce
             for (String autore : famosiAutori) {
-                System.out.println("🔮 [Google Books] Scarico bestseller di: " + autore);
+                AppLogger.logInfo("🔮 [Google Books] Scarico bestseller di: " + autore);
                 List<BookBean> libriAutore = googleService.searchBooks("inauthor:\"" + autore + "\"");
                 allResults.addAll(libriAutore);
             }
@@ -42,11 +40,11 @@ public class BookController {
             // 3. Sincronizziamo i voti e gli stati con il Database
             new it.ispwproject.findyourbook.controller.applicativo.UserLibraryController().syncBooksWithDatabase(allResults);
 
-            System.out.println("✅ Totale libri caricati nella vetrina: " + allResults.size());
+            AppLogger.logInfo("✅ Totale libri caricati nella vetrina: " + allResults.size());
             return allResults;
 
         } catch (Exception e) {
-            System.out.println("⚠️ Ricerca generi fallita: " + e.getMessage() + " -> Fallback su DB...");
+            AppLogger.logWarning("⚠️ Ricerca generi fallita: " + e.getMessage() + " -> Fallback su DB...");
             return getBooksFromDb(genre);
         }
     }
@@ -73,9 +71,9 @@ public class BookController {
             for (Book b : dbBooks) {
                 results.add(new BookBean(b.getTitolo(), b.getAutore(), b.getGenere(), b.getImmagineUrl()));
             }
-            System.out.println("✅ Data loaded from local Database.");
+            AppLogger.logInfo("✅ Data loaded from local Database.");
         } catch (Exception e) {
-            System.err.println("❌ Critical Error: DB not responding! " + e.getMessage());
+            AppLogger.logError("❌ Critical Error: DB not responding! " + e.getMessage());
         }
         return results;
     }
@@ -88,11 +86,10 @@ public class BookController {
             // 2. Il nuovo DAO ci restituisce già direttamente i BookBean pronti per la GUI!
             results = DAOFactory.getFavoritesDAO().getLibriByStato(username, readingStatus);
 
-            System.out.println("✅ Caricati " + results.size() + " libri nello stato: " + readingStatus);
+            AppLogger.logInfo("✅ Caricati " + results.size() + " libri nello stato: " + readingStatus);
 
         } catch (Exception e) {
-            System.err.println("❌ Errore nel recupero dei libri preferiti: " + e.getMessage());
-            e.printStackTrace();
+            AppLogger.logError("❌ Errore nel recupero dei libri preferiti: " + e.getMessage());
         }
 
         return results;
@@ -102,7 +99,7 @@ public class BookController {
     public List<BookBean> searchBooks(String query) {
         List<BookBean> results = new ArrayList<>();
         try {
-            System.out.println("🔍 [Ricerca Libera] Ricerca in corso per: " + query);
+            AppLogger.logInfo("🔍 [Ricerca Libera] Ricerca in corso per: " + query);
             GoogleBooksService googleService = new GoogleBooksService();
 
             // 1. Scarica i libri da Google
@@ -114,7 +111,7 @@ public class BookController {
             }
 
         } catch (Exception e) {
-            System.err.println("❌ Errore durante la ricerca libera: " + e.getMessage());
+            AppLogger.logError("❌ Errore durante la ricerca libera: " + e.getMessage());
         }
         return results;
     }
@@ -124,9 +121,9 @@ public class BookController {
             String username = SessionManager.getInstance().getLoggedUser().getUsername();
             // Richiama il DAO che hai già scritto!
             DAOFactory.getFavoritesDAO().updateValutazione(username, book.getTitle(), rating);
-            System.out.println("✅ Valutazione salvata!");
+            AppLogger.logInfo("✅ Valutazione salvata!");
         } catch (Exception e) {
-            e.printStackTrace();
+            AppLogger.logError("❌ Errore durante l'aggiornamento della valutazione: " + e.getMessage());
         }
     }
 
