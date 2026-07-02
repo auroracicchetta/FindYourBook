@@ -6,6 +6,7 @@ import it.ispwproject.findyourbook.enumerator.Role;
 import it.ispwproject.findyourbook.exception.DAOException;
 import it.ispwproject.findyourbook.exception.RegistrationException;
 import it.ispwproject.findyourbook.view.gui.RegistrationGUIView;
+import it.ispwproject.findyourbook.util.logger.AppLogger;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
@@ -49,9 +50,9 @@ public class RegistrationGUI {
         }
 
         try {
-            System.out.println("--- INIZIO REGISTRAZIONE ---");
+            AppLogger.logInfo("--- INIZIO REGISTRAZIONE ---");
             registrationController.register(bean);
-            System.out.println("--- UTENTE SALVATO NEL DATABASE ---");
+            AppLogger.logInfo("--- UTENTE SALVATO NEL DATABASE ---");
 
             // 1. Mostra il popup di successo
             view.showInformationSuccess(
@@ -66,8 +67,7 @@ public class RegistrationGUI {
             new LoginGUI(stage).show();
 
         } catch (Exception e) {
-            System.out.println("--- ERRORE DURANTE LA REGISTRAZIONE ---");
-            e.printStackTrace(); // Questo ci mostrerà il vero errore rosso nella console di IntelliJ!
+            AppLogger.logError("--- ERRORE DURANTE LA REGISTRAZIONE --- " + e.getMessage());
             view.setError(e.getMessage());
         }
     }

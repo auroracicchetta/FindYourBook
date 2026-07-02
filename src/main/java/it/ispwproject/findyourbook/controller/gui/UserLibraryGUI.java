@@ -4,6 +4,7 @@ import it.ispwproject.findyourbook.bean.BookBean;
 import it.ispwproject.findyourbook.controller.applicativo.BookController;
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
 import it.ispwproject.findyourbook.view.gui.UserLibraryGUIView;
+import it.ispwproject.findyourbook.util.logger.AppLogger;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -63,7 +64,7 @@ public class UserLibraryGUI {
     // --- IL METODO CHE CARICA I LIBRI DAL DATABASE ---
     private void loadBooksByStatus(String status) {
         this.currentFilter = status; // Salva la tab attuale!
-        System.out.println("Richiesti libri per lo stato: " + status);
+        AppLogger.logInfo("Richiesti libri per lo stato: " + status);
 
         // Usiamo un Thread per non bloccare la grafica mentre interroghiamo il DB
         new Thread(() -> {
@@ -96,7 +97,7 @@ public class UserLibraryGUI {
                             () -> new it.ispwproject.findyourbook.controller.gui.BookDetailGUI(stage, book, status,
                                     () -> new UserLibraryGUI(stage).show() // <--- Torna alla libreria!
                             ).show()
-                );
+                    );
                     bookCards.add(card);
                 }
 
@@ -106,8 +107,7 @@ public class UserLibraryGUI {
                 });
 
             } catch (Exception e) {
-                Platform.runLater(() -> System.err.println("Errore caricamento libreria: " + e.getMessage()));
-                e.printStackTrace();
+                Platform.runLater(() -> AppLogger.logError("Errore caricamento libreria: " + e.getMessage()));
             }
         }).start();
     }
@@ -115,7 +115,7 @@ public class UserLibraryGUI {
     // --- METODI DI SUPPORTO ---
 
     private void changeBookStatus(BookBean book, String newStatus) {
-        System.out.println("Richiesto spostamento del libro '" + book.getTitle() + "' in " + newStatus);
+        AppLogger.logInfo("Richiesto spostamento del libro '" + book.getTitle() + "' in " + newStatus);
 
         // Usiamo un Thread per non bloccare la grafica mentre il DB lavora
         new Thread(() -> {
@@ -127,11 +127,11 @@ public class UserLibraryGUI {
                 if ("RIMUOVI".equals(newStatus)) {
                     // 1. Logica di rimozione
                     appController.removeBookFromLibrary(book);
-                    System.out.println("✅ Libro rimosso definitivamente dal Database.");
+                    AppLogger.logInfo("✅ Libro rimosso definitivamente dal Database.");
                 } else {
                     // 2. Logica di salvataggio/aggiornamento
                     appController.saveBookToLibrary(book, newStatus);
-                    System.out.println("✅ Stato del libro aggiornato con successo a: " + newStatus);
+                    AppLogger.logInfo("✅ Stato del libro aggiornato con successo a: " + newStatus);
                 }
 
 
@@ -142,14 +142,13 @@ public class UserLibraryGUI {
 
 
             } catch (Exception e) {
-                System.err.println("❌ Errore durante la comunicazione con il Database: " + e.getMessage());
-                e.printStackTrace();
+                AppLogger.logError("❌ Errore durante la comunicazione con il Database: " + e.getMessage());
             }
         }).start();
     }
 
     private void handleSearch(String query) {
-        System.out.println("Ricerca avviata da MyBooks per: " + query);
+        AppLogger.logInfo("Ricerca avviata da MyBooks per: " + query);
         if (query == null || query.trim().isEmpty()) return;
 
         new Thread(() -> {
@@ -163,7 +162,7 @@ public class UserLibraryGUI {
                     new SearchResultsGUI(stage, risultati, query).show();
                 });
             } catch (Exception e) {
-                Platform.runLater(() -> System.err.println("Errore ricerca: " + e.getMessage()));
+                Platform.runLater(() -> AppLogger.logError("Errore ricerca: " + e.getMessage()));
             }
         }).start();
     }
