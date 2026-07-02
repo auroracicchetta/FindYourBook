@@ -5,19 +5,19 @@ import it.ispwproject.findyourbook.controller.gui.MainGUI;
 import it.ispwproject.findyourbook.dao.ConnectionFactory;
 import it.ispwproject.findyourbook.pattern.state.CLIStateMachineImpl;
 import it.ispwproject.findyourbook.view.cli.CLIRenderer;
-import java.util.Scanner;
+import it.ispwproject.findyourbook.util.logger.AppLogger;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        System.out.println("🚀 Avvio di FindYourBook in corso...");
+        AppLogger.logInfo("🚀 Avvio di FindYourBook in corso...");
         // Mantengo il tuo test del DB (ottima pratica)
         try {
             ConnectionFactory.getConnection();
-            System.out.println("✅ Connessione al database riuscita!");
+            AppLogger.logInfo("✅ Connessione al database riuscita!");
         } catch (Exception e) {
-            System.err.println("⚠️ Attenzione: Impossibile connettersi al database!");
+            AppLogger.logError("⚠️ Attenzione: Impossibile connettersi al database!");
         }
 
         // 1. Selezione Modalità Database
@@ -26,7 +26,6 @@ public class Main {
         if (!proceed) return;
 
         // 2. Selezione Interfaccia
-        Scanner scanner = new Scanner(System.in);
         String scelta = "";
 
         while (!scelta.equals("1") && !scelta.equals("2")) {
