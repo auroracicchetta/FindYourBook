@@ -107,7 +107,9 @@ public class RegistrationGUIView {
         HBox header = new HBox();
         header.setAlignment(Pos.CENTER_LEFT);
         header.setMaxWidth(900);
-        header.getChildren().addAll(brand, new Pane() {{ HBox.setHgrow(this, Priority.ALWAYS); }}, backBtn);
+        Pane spacer = new Pane();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        header.getChildren().addAll(brand, spacer, backBtn);
 
         Label title = new Label("Registrazione");
         title.getStyleClass().add("title-label");
