@@ -9,6 +9,7 @@ import it.ispwproject.findyourbook.dao.DAOFactory;// Suggerimento: rinomina in B
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
 import it.ispwproject.findyourbook.service.GoogleBooksService;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
+import java.util.NoSuchElementException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class BookController {
             }
 
             if (allResults.isEmpty()) {
-                throw new Exception("Nessun libro trovato per questo genere.");
+                throw new NoSuchElementException("Nessun libro trovato per questo genere.");
             }
 
             // 3. Sincronizziamo i voti e gli stati con il Database

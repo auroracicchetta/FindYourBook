@@ -15,7 +15,9 @@ public class RegistrationBean {
     private Role role;
     private String descrizione;
 
-    public RegistrationBean() {}
+    public RegistrationBean() {
+        //Costruttore vuoto di default
+    }
 
     // Metodi Get e Set
     public String getName() { return name; }

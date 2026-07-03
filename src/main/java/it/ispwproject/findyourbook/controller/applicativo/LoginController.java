@@ -5,6 +5,7 @@ import it.ispwproject.findyourbook.dao.DAOFactory;
 import it.ispwproject.findyourbook.model.Credentials;
 import it.ispwproject.findyourbook.model.User;
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
+import it.ispwproject.findyourbook.exception.DAOException;
 
 public class LoginController {
 
@@ -13,13 +14,22 @@ public class LoginController {
         SUCCESSO_CASA_EDITRICE
     }
 
-    public LoginResult login(String username, String password) throws Exception {
+    public LoginResult login(String username, String password) throws DAOException {
 
-        // 1. Il LoginDAO controlla se username e password corrispondono
-        Credentials credentials = DAOFactory.getLoginDAO().execute(username, password);
+        Credentials credentials;
+        User user;
 
-        // 2. Lo UserDAO recupera tutti i dati completi dell'utente appena loggato
-        User user = DAOFactory.getUserDAO().findByUsername(username);
+        try {
+            // 1. Il LoginDAO controlla se username e password corrispondono
+            credentials = DAOFactory.getLoginDAO().execute(username, password);
+
+            // 2. Lo UserDAO recupera tutti i dati completi dell'utente appena loggato
+            user = DAOFactory.getUserDAO().findByUsername(username);
+
+        } catch (Exception e) {
+            // Catturiamo l'eccezione generica dei DAO e la trasformiamo nella nostra DAOException specifica!
+            throw new DAOException("Errore di accesso al database durante il login: " + e.getMessage());
+        }
 
         // 3. Salviamo l'utente e il bean alleggerito nel SessionManager
         SessionManager.getInstance().setLoggedUser(user);
@@ -31,7 +41,7 @@ public class LoginController {
         return switch (credentials.getRole()) {
             case LETTORE -> LoginResult.SUCCESSO_LETTORE;
             case CASA_EDITRICE -> LoginResult.SUCCESSO_CASA_EDITRICE;
-            default -> throw new Exception("Ruolo utente non riconosciuto.");
+            default -> throw new IllegalStateException("Ruolo non riconosciuto");
         };
     }
 }
