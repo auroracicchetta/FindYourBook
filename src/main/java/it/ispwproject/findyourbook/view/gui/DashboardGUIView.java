@@ -216,19 +216,23 @@ public abstract class DashboardGUIView {
         Label star = new Label(starValue <= clickedRating[0] ? "★" : "☆");
         star.setStyle("-fx-font-size: 18px; -fx-text-fill: #E6B800; -fx-cursor: hand;");
 
-        star.setOnMouseEntered(e -> updateStars(stars, starValue, false));
-        star.setOnMouseExited(e -> updateStars(stars, clickedRating[0], false));
+        // Rimosso il parametro 'false'
+        star.setOnMouseEntered(e -> updateStars(stars, starValue));
+        // Rimosso il parametro 'false'
+        star.setOnMouseExited(e -> updateStars(stars, clickedRating[0]));
+
         star.setOnMouseClicked(e -> {
             e.consume();
             clickedRating[0] = starValue;
-            updateStars(stars, starValue, true);
+            // Rimosso il parametro 'true'
+            updateStars(stars, starValue);
             AppLogger.logInfo("Votato " + starValue + " stelle!");
             if (onRate != null) onRate.accept(starValue);
         });
         return star;
     }
 
-    private void updateStars(Label[] stars, int rating, boolean isClick) {
+    private void updateStars(Label[] stars, int rating) {
         for (int i = 0; i < 5; i++) {
             stars[i].setText(i < rating ? "★" : "☆");
         }
