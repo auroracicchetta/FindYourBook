@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookDAODB implements BookDAO {
-    private static final String SELECT_BY_GENRE = "SELECT * FROM libro WHERE genere = ?";
+    // Risolto il code smell del SELECT * inserendo le colonne esatte
+    private static final String SELECT_BY_GENRE = "SELECT id, titolo, autore, genere, immagine_url FROM libro WHERE genere = ?";
 
     @Override
     public List<Book> findByGenere(String genere) throws DAOException {

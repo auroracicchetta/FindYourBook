@@ -62,7 +62,8 @@ public class FavoritesDAODB implements FavoritesDAO {
     @Override
     public List<BookBean> getLibriByStato(String username, String statoLettura) throws DAOException {
         List<BookBean> lista = new ArrayList<>();
-        String query = "SELECT * FROM preferiti WHERE username = ? AND stato_lettura = ?";
+        // Risolto il code smell specificando le colonne esatte al posto di SELECT *
+        String query = "SELECT titolo, autore, immagine_url, valutazione FROM preferiti WHERE username = ? AND stato_lettura = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -90,5 +91,3 @@ public class FavoritesDAODB implements FavoritesDAO {
         return lista; // <-- Questa deve stare FUORI dal blocco try-catch
     }
 }
-
-

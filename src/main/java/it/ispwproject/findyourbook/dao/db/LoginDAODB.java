@@ -2,7 +2,6 @@ package it.ispwproject.findyourbook.dao.db;
 
 // import it.ispwproject.findyourbook.dao.ConnectionFactory; <-- Lo useremo quando configureremo il DB vero!
 import it.ispwproject.findyourbook.dao.LoginDAO;
-import it.ispwproject.findyourbook.enumerator.Role;
 import it.ispwproject.findyourbook.exception.LoginException;
 import it.ispwproject.findyourbook.model.Credentials;
 
