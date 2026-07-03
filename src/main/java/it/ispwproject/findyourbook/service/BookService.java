@@ -8,7 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.net.URLEncoder; // Aggiungi questo import
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 public class BookService {
@@ -26,7 +26,8 @@ public class BookService {
         }
     }
 
-    public String fetchBooksJson(String genre) throws Exception {
+    // Risolto il code smell: usiamo le eccezioni specifiche di rete invece di "Exception"
+    public String fetchBooksJson(String genre) throws IOException, InterruptedException {
         // Codifichiamo il genere per sicurezza (es. "Fantasy" diventa "Fantasy")
         String encodedGenre = URLEncoder.encode(genre, StandardCharsets.UTF_8);
 
@@ -42,7 +43,8 @@ public class BookService {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != 200) {
-            throw new Exception("Errore API: " + response.statusCode());
+            // Risolto code smell: lanciamo un'eccezione specifica
+            throw new IOException("Errore API: " + response.statusCode());
         }
 
         return response.body();

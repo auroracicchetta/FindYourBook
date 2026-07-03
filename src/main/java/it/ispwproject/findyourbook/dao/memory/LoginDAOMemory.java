@@ -5,7 +5,8 @@ import it.ispwproject.findyourbook.dao.LoginDAO;
 import it.ispwproject.findyourbook.exception.LoginException;
 import it.ispwproject.findyourbook.model.Credentials;
 import it.ispwproject.findyourbook.model.User;
-import it.ispwproject.findyourbook.util.PasswordUtils; // IMPORTANTE
+import it.ispwproject.findyourbook.util.PasswordUtils;
+import it.ispwproject.findyourbook.util.logger.AppLogger;
 
 public class LoginDAOMemory implements LoginDAO {
 
@@ -22,7 +23,7 @@ public class LoginDAOMemory implements LoginDAO {
         String hashedInput = PasswordUtils.hash(plainPassword);
 
         if (plainPassword == null || !hashedInput.equals(user.getPassword())) {
-            System.out.println("Errore: Password non corrispondente!");
+            AppLogger.logError("Errore: Password non corrispondente!");
             throw new LoginException("Password errata.");
         }
 
