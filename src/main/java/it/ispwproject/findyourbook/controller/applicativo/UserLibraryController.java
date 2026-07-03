@@ -8,6 +8,12 @@ import it.ispwproject.findyourbook.util.logger.AppLogger;
 
 public class UserLibraryController {
 
+    // --- COSTANTI PER GLI STATI DEI LIBRI ---
+    private static final String STATUS_LETTO = "LETTO";
+    private static final String STATUS_DA_LEGGERE = "DA_LEGGERE";
+    private static final String STATUS_IN_LETTURA = "IN_LETTURA";
+    private static final String STATUS_RIMUOVI = "RIMUOVI";
+
     // --- METODO 1: SALVA O AGGIORNA UN LIBRO ---
     public void saveBookToLibrary(BookBean book, String status) {
         User currentUser = SessionManager.getInstance().getLoggedUser();
@@ -59,9 +65,9 @@ public class UserLibraryController {
 
         try {
             // 1. LA MAGIA: Se valuti un libro che non è ancora salvato, lo inseriamo automaticamente in "Letto"!
-            if (book.getStatus() == null || book.getStatus().trim().isEmpty() || book.getStatus().equals("RIMUOVI")) {
-                book.setStatus("LETTO");
-                DAOFactory.getFavoritesDAO().addLibroPreferito(currentUser.getUsername(), book, "LETTO");
+            if (book.getStatus() == null || book.getStatus().trim().isEmpty() || book.getStatus().equals(STATUS_RIMUOVI)) {
+                book.setStatus(STATUS_LETTO);
+                DAOFactory.getFavoritesDAO().addLibroPreferito(currentUser.getUsername(), book, STATUS_LETTO);
                 AppLogger.logInfo("📖 Libro aggiunto automaticamente a 'Letto' perché è stato valutato.");
             }
 
@@ -81,14 +87,14 @@ public class UserLibraryController {
 
         try {
             // Scarichiamo le tue tre liste dal Database
-            java.util.List<BookBean> daLeggere = DAOFactory.getFavoritesDAO().getLibriByStato(currentUser.getUsername(), "DA_LEGGERE");
-            java.util.List<BookBean> inLettura = DAOFactory.getFavoritesDAO().getLibriByStato(currentUser.getUsername(), "IN_LETTURA");
-            java.util.List<BookBean> letti = DAOFactory.getFavoritesDAO().getLibriByStato(currentUser.getUsername(), "LETTO");
+            java.util.List<BookBean> daLeggere = DAOFactory.getFavoritesDAO().getLibriByStato(currentUser.getUsername(), STATUS_DA_LEGGERE);
+            java.util.List<BookBean> inLettura = DAOFactory.getFavoritesDAO().getLibriByStato(currentUser.getUsername(), STATUS_IN_LETTURA);
+            java.util.List<BookBean> letti = DAOFactory.getFavoritesDAO().getLibriByStato(currentUser.getUsername(), STATUS_LETTO);
 
             for (BookBean googleBook : searchResults) {
-                checkAndSync(googleBook, daLeggere, "DA_LEGGERE");
-                checkAndSync(googleBook, inLettura, "IN_LETTURA");
-                checkAndSync(googleBook, letti, "LETTO");
+                checkAndSync(googleBook, daLeggere, STATUS_DA_LEGGERE);
+                checkAndSync(googleBook, inLettura, STATUS_IN_LETTURA);
+                checkAndSync(googleBook, letti, STATUS_LETTO);
             }
         } catch (Exception e) {
             AppLogger.logError("Errore durante la sincronizzazione: " + e.getMessage());
