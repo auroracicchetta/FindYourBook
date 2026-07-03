@@ -1,5 +1,6 @@
 package it.ispwproject.findyourbook.view.gui;
 
+import it.ispwproject.findyourbook.util.logger.AppLogger;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -8,10 +9,15 @@ import javafx.scene.layout.*;
 
 public class RegistrationGUIView {
 
+    // --- COSTANTI PER EVITARE DUPLICAZIONE STRINGHE ---
+    private static final String CSS_TEXT_FIELD = "text-field";
+    private static final String CSS_CHECK_BOX = "check-box";
+    private static final String CSS_FIELD_LABEL = "field-label";
+
     public final TextField nameField = new TextField();
     public final TextField surnameField = new TextField();
     public final TextField usernameField = new TextField();
-    public final TextField emailField = new TextField(); // <-- NUOVO CAMPO EMAIL
+    public final TextField emailField = new TextField();
     public final DatePicker dataNascita = new DatePicker();
     public final TextField descrizioneField = new TextField();
 
@@ -29,29 +35,28 @@ public class RegistrationGUIView {
     public final CheckBox showPasswordCheck = new CheckBox("Mostra password");
 
     public RegistrationGUIView() {
-        // Applichiamo le classi del tuo nuovo CSS
-        nameField.getStyleClass().add("text-field");
-        surnameField.getStyleClass().add("text-field");
-        usernameField.getStyleClass().add("text-field");
-        emailField.getStyleClass().add("text-field"); // <-- NUOVO
+        // Applichiamo le costanti CSS
+        nameField.getStyleClass().add(CSS_TEXT_FIELD);
+        surnameField.getStyleClass().add(CSS_TEXT_FIELD);
+        usernameField.getStyleClass().add(CSS_TEXT_FIELD);
+        emailField.getStyleClass().add(CSS_TEXT_FIELD);
         passwordField.getStyleClass().add("password-field");
         confirmPasswordField.getStyleClass().add("password-field");
-        descrizioneField.getStyleClass().add("text-field");
+        descrizioneField.getStyleClass().add(CSS_TEXT_FIELD);
 
-        visiblePasswordField.getStyleClass().add("text-field");
-        visibleConfirmPasswordField.getStyleClass().add("text-field");
+        visiblePasswordField.getStyleClass().add(CSS_TEXT_FIELD);
+        visibleConfirmPasswordField.getStyleClass().add(CSS_TEXT_FIELD);
 
         registerBtn.getStyleClass().add("button");
         errorLabel.getStyleClass().add("error-label");
-        lettoreRadio.getStyleClass().add("check-box");
-        casaEditriceRadio.getStyleClass().add("check-box");
-        showPasswordCheck.getStyleClass().add("check-box");
+        lettoreRadio.getStyleClass().add(CSS_CHECK_BOX);
+        casaEditriceRadio.getStyleClass().add(CSS_CHECK_BOX);
+        showPasswordCheck.getStyleClass().add(CSS_CHECK_BOX);
 
         lettoreRadio.setToggleGroup(roleGroup);
         casaEditriceRadio.setToggleGroup(roleGroup);
         lettoreRadio.setSelected(true);
 
-        // Setup per mostrare/nascondere le password (Unchanged)
         visiblePasswordField.setVisible(false);
         visiblePasswordField.managedProperty().bind(visiblePasswordField.visibleProperty());
         passwordField.managedProperty().bind(passwordField.visibleProperty());
@@ -75,11 +80,11 @@ public class RegistrationGUIView {
         root.setPadding(new Insets(30, 50, 30, 50));
         root.setAlignment(Pos.CENTER);
 
-        // Carichiamo il CSS
         try {
             root.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
         } catch (Exception e) {
-            System.err.println("CSS non trovato nella Registrazione");
+            // Risolto code smell: Logger invece di System.err
+            AppLogger.logError("CSS non trovato nella Registrazione");
         }
 
         root.getStyleClass().add("fyb-background");
