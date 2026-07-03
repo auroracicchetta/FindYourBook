@@ -3,7 +3,7 @@ package it.ispwproject.findyourbook.view.cli;
 import java.util.Scanner;
 
 /**
- * Utility di rendering condivisa per tutte le view CLI di BrainBank.
+ * Utility di rendering condivisa per tutte le view CLI di FindYourBook.
  * Centralizza:
  *  - costanti visive (larghezze, simboli, stili)
  *  - metodi di stampa (intestazioni, separatori, messaggi)
@@ -37,12 +37,7 @@ public final class CLIRenderer {
 
 
     //  Intestazioni e separatori
-    /**
-     * Intestazione principale di schermata con bordo doppio e titolo centrato.
-     * ════════════════════════════════════════════════════════════
-     *   BrainBank – Titolo della schermata
-     * ════════════════════════════════════════════════════════════
-     */
+
     public static void intestazione(String titolo) {
         System.out.println();
         System.out.println(LINE_DECO);
@@ -50,12 +45,7 @@ public final class CLIRenderer {
         System.out.println(LINE_DECO);
     }
 
-    /**
-     * Intestazione di benvenuto con ruolo evidenziato.
-     * ════════════════════════════════════════════════════════════
-     *   Bentornato, Mario!                           [ Studente ]
-     * ════════════════════════════════════════════════════════════
-     */
+
     public static void intestazioneBenvenuto(String nome, String ruolo) {
         String left  = "  Bentornato, " + nome + "!";
         String right = "[ " + ruolo + " ]";
@@ -116,10 +106,7 @@ public final class CLIRenderer {
 
     //  Input interattivi
 
-    /**
-     * Chiede all'utente di selezionare un numero intero nell'intervallo [min, max].
-     * Ripete finché l'input non è valido.
-     */
+
     public static int chiediScelta(String prompt, int min, int max) {
         while (true) {
             System.out.printf("%n  %s [%d–%d]: ", prompt, min, max);
@@ -138,7 +125,7 @@ public final class CLIRenderer {
      * Variante stringa (per menu che restituisce String)
      */
     public static String chiediSceltaStringa(String prompt) {
-        System.out.printf("\n  %s: ", prompt);
+        System.out.printf("%n  %s: ", prompt);
         return SCANNER.nextLine().trim();
     }
 
