@@ -3,6 +3,7 @@ package it.ispwproject.findyourbook.controller.gui;
 import it.ispwproject.findyourbook.bean.BookBean;
 import it.ispwproject.findyourbook.controller.applicativo.BookController;
 import it.ispwproject.findyourbook.view.gui.SearchResultsGUIView;
+import it.ispwproject.findyourbook.util.logger.AppLogger;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -51,7 +52,8 @@ public class SearchResultsGUI {
 
                 Platform.runLater(() -> new SearchResultsGUI(stage, risultati, query).show());
             } catch (Exception e) {
-                Platform.runLater(() -> System.err.println("Errore ricerca: " + e.getMessage()));
+                // Risolto il code smell usando il logger al posto di System.err
+                Platform.runLater(() -> AppLogger.logError("Errore ricerca: " + e.getMessage()));
             }
         }).start();
     }

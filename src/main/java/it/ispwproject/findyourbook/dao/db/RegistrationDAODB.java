@@ -7,8 +7,6 @@ import it.ispwproject.findyourbook.model.Publisher;
 import it.ispwproject.findyourbook.model.Reader;
 import it.ispwproject.findyourbook.model.User;
 
-
-
 import java.sql.*;
 
 public class RegistrationDAODB implements RegistrationDAO {
@@ -33,7 +31,6 @@ public class RegistrationDAODB implements RegistrationDAO {
                     return rs.getInt(1) > 0;
                 }
             }
-            // CAMBIATO QUI SOTTO DA SQLException a Exception
         } catch (Exception e) {
             throw new DAOException("Errore verifica username: " + e.getMessage());
         }
@@ -51,14 +48,13 @@ public class RegistrationDAODB implements RegistrationDAO {
             ps.setString(3, user.getUsername());
             ps.setString(4, user.getPassword());
 
-            if (user instanceof Publisher) {
-                Publisher pub = (Publisher) user;
+            // Risolto il code smell applicando il pattern matching di Java 16+
+            if (user instanceof Publisher pub) {
                 ps.setString(5, "CASA_EDITRICE");
                 ps.setDate(6, java.sql.Date.valueOf(pub.getDataNascita()));
                 ps.setString(7, pub.getDescrizione());
 
-            } else if (user instanceof Reader) {
-                Reader reader = (Reader) user;
+            } else if (user instanceof Reader reader) {
                 ps.setString(5, "LETTORE");
                 ps.setDate(6, java.sql.Date.valueOf(reader.getDataNascita()));
                 ps.setNull(7, Types.VARCHAR);
@@ -66,7 +62,6 @@ public class RegistrationDAODB implements RegistrationDAO {
 
             ps.executeUpdate();
 
-            // CAMBIATO ANCHE QUI DA SQLException a Exception
         } catch (Exception e) {
             throw new DAOException("Errore durante la registrazione nel DB: " + e.getMessage());
         }
