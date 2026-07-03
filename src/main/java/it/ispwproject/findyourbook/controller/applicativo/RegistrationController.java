@@ -13,6 +13,7 @@ import it.ispwproject.findyourbook.model.User;
 import it.ispwproject.findyourbook.util.PasswordUtils;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.ZoneId;
 
 public class RegistrationController {
 
@@ -100,7 +101,7 @@ public class RegistrationController {
         }
 
         // Calcola l'età rispetto alla data di oggi
-        if (Period.between(birthDate, LocalDate.now()).getYears() < 14) {
+        if (Period.between(birthDate, LocalDate.now(ZoneId.systemDefault())).getYears() < 14) {
             throw new RegistrationException("Devi avere almeno 14 anni per registrarti.");
         }
     }
