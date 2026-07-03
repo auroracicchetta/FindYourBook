@@ -7,6 +7,8 @@ import it.ispwproject.findyourbook.pattern.state.CLIStateMachine;
 import it.ispwproject.findyourbook.view.cli.RegistrationView;
 import it.ispwproject.findyourbook.enumerator.Role;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import it.ispwproject.findyourbook.util.logger.AppLogger;
 
 public class RegistrationCLI extends AbstractCLIState {
 
@@ -17,7 +19,7 @@ public class RegistrationCLI extends AbstractCLIState {
     public void entry(CLIStateMachine context) {
         view.showHeader();
         // Aggiungi un piccolo suggerimento nella view o nel log se preferisci
-        System.out.println("(Digita '0' in qualsiasi campo per annullare e tornare indietro)");
+        AppLogger.logInfo("(Digita '0' in qualsiasi campo per annullare e tornare indietro)");
     }
 
     @Override
@@ -57,11 +59,9 @@ public class RegistrationCLI extends AbstractCLIState {
             if (role == Role.LETTORE) {
                 String dataString = view.askField("Data di nascita (formato: AAAA-MM-GG)");
                 if (isBackChoice(dataString)) { goBack(context); return; }
-                try {
-                    bean.setDataNascita(LocalDate.parse(dataString));
-                } catch (Exception e) {
-                    view.showError("Formato data non valido.");
-                    goNext(context, this);
+
+                // Richiamo il nuovo metodo estratto per evitare il try annidato
+                if (!impostaDataDiNascita(bean, dataString, context)) {
                     return;
                 }
             } else {
@@ -79,6 +79,18 @@ public class RegistrationCLI extends AbstractCLIState {
         } catch (Exception e) {
             view.showError("Errore: " + e.getMessage());
             goNext(context, this);
+        }
+    }
+
+    // --- METODO ESTRATTO (Per fare felice SonarCloud ed evitare le matrioske) ---
+    private boolean impostaDataDiNascita(RegistrationBean bean, String dataString, CLIStateMachine context) {
+        try {
+            bean.setDataNascita(LocalDate.parse(dataString));
+            return true;
+        } catch (DateTimeParseException e) {
+            view.showError("Formato data non valido.");
+            goNext(context, this);
+            return false;
         }
     }
 }
