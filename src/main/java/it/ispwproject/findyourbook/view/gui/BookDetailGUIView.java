@@ -131,34 +131,37 @@ public class BookDetailGUIView extends DashboardGUIView {
         valutaTesto.setStyle("-fx-font-family: 'Georgia'; -fx-font-size: 14px; -fx-text-fill: " + TEXT_DARK + ";");
         ratingBox.getChildren().add(valutaTesto);
 
-        Label[] stars = new Label[5];
         final int[] clickedRating = {book.getRating()};
+        Label[] stars = new Label[5];
 
         for (int i = 0; i < 5; i++) {
-            final int starValue = i + 1;
-            stars[i] = new Label(starValue <= clickedRating[0] ? "★" : "☆");
-            stars[i].setStyle("-fx-font-size: 22px; -fx-text-fill: #E6B800; -fx-cursor: hand;");
-
-            stars[i].setOnMouseEntered(e -> {
-                for (int j = 0; j < 5; j++) stars[j].setText(j < starValue ? "★" : "☆");
-            });
-            stars[i].setOnMouseExited(e -> {
-                for (int j = 0; j < 5; j++) stars[j].setText(j < clickedRating[0] ? "★" : "☆");
-            });
-
-            stars[i].setOnMouseClicked(e -> {
-                clickedRating[0] = starValue;
-                for (int j = 0; j < 5; j++) stars[j].setText(j < clickedRating[0] ? "★" : "☆");
-
-                it.ispwproject.findyourbook.controller.applicativo.UserLibraryController appController =
-                        new it.ispwproject.findyourbook.controller.applicativo.UserLibraryController();
-                appController.rateBook(book, starValue);
-                book.setRating(starValue);
-            });
-
+            stars[i] = createStar(i, clickedRating, stars, book);
             ratingBox.getChildren().add(stars[i]);
         }
         return ratingBox;
+    }
+
+    private Label createStar(int index, int[] clickedRating, Label[] stars, BookBean book) {
+        int starValue = index + 1;
+        Label star = new Label(starValue <= clickedRating[0] ? "★" : "☆");
+        star.setStyle("-fx-font-size: 22px; -fx-text-fill: #E6B800; -fx-cursor: hand;");
+
+        star.setOnMouseEntered(e -> updateStars(stars, starValue));
+        star.setOnMouseExited(e -> updateStars(stars, clickedRating[0]));
+        star.setOnMouseClicked(e -> {
+            clickedRating[0] = starValue;
+            updateStars(stars, starValue);
+
+            new it.ispwproject.findyourbook.controller.applicativo.UserLibraryController().rateBook(book, starValue);
+            book.setRating(starValue);
+        });
+        return star;
+    }
+
+    private void updateStars(Label[] stars, int rating) {
+        for (int i = 0; i < 5; i++) {
+            stars[i].setText(i < rating ? "★" : "☆");
+        }
     }
 
     private VBox createRightColumn(BookBean book) {
