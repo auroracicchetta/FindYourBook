@@ -1,5 +1,6 @@
 package it.ispwproject.findyourbook.view.gui;
 
+import it.ispwproject.findyourbook.util.logger.AppLogger; // Import aggiunto
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -23,8 +24,6 @@ public class LoginGUIView {
         loginBtn.getStyleClass().add("button");
         errorLabel.getStyleClass().add("error-label");
 
-        // RIMOSSO LO STILE FORZATO - USIAMO IL CSS!
-        // Trova la riga di registerBtn nel costruttore e metti questa:
         registerBtn.getStyleClass().clear();
         registerBtn.getStyleClass().add("secondary-button");
 
@@ -44,13 +43,13 @@ public class LoginGUIView {
         VBox root = new VBox(10);
         root.setPadding(new Insets(30, 50, 50, 50));
 
-        // CORRETTO: Aggiungiamo lo stylesheet e usiamo la nuova classe
         try {
             root.getStylesheets().add(getClass().getResource("/styles/style.css").toExternalForm());
         } catch (Exception e) {
-            System.err.println("CSS non trovato nel Login");
+            // Risolto code smell: Usato il logger al posto di System.err
+            AppLogger.logError("CSS non trovato nel Login");
         }
-        root.getStyleClass().add("fyb-background"); // NUOVO NOME!
+        root.getStyleClass().add("fyb-background");
 
         Label brand = new Label("FindYourBook");
         brand.getStyleClass().add("brand-label");
@@ -73,7 +72,6 @@ public class LoginGUIView {
 
         CheckBox showPasswordCheck = new CheckBox("Mostra password");
         showPasswordCheck.getStyleClass().add("check-box");
-        // CORRETTO: Margine positivo per allontanare, non negativo!
         showPasswordCheck.setPadding(new Insets(10, 0, 0, 0));
 
         showPasswordCheck.selectedProperty().addListener((obs, oldVal, show) -> {
@@ -86,7 +84,6 @@ public class LoginGUIView {
 
         Label divider = new Label("───  Sei nuovo su FindYourBook ?  ───");
         divider.setStyle("-fx-font-size: 16px; -fx-text-fill: #3A352F; -fx-font-weight: bold;");
-        // Margin per allontanare il divisore
         VBox.setMargin(divider, new Insets(15, 0, 10, 0));
 
         loginBtn.setOnAction(e -> onLogin.run());
