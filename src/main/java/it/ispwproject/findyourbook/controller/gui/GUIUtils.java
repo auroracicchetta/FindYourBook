@@ -2,6 +2,7 @@ package it.ispwproject.findyourbook.controller.gui;
 
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import it.ispwproject.findyourbook.util.logger.AppLogger;
 
 public final class GUIUtils {
 
@@ -22,20 +23,9 @@ public final class GUIUtils {
             String cssPath = GUIUtils.class.getResource("/styles/style.css").toExternalForm();
             scene.getStylesheets().add(cssPath);
         } catch (NullPointerException e) {
-            System.err.println("ATTENZIONE: File style.css non trovato nella cartella /css/");
+            AppLogger.logError("ATTENZIONE: File style.css non trovato nella cartella /css/");
         }
 
         return scene;
     }
-
-    // Ho commentato i font del collega per evitare crash.
-    // Se in futuro vorrai aggiungere font speciali, li riattiveremo qui.
-    /*
-    private static void loadFonts() {
-        Font.loadFont(GUIUtils.class.getResourceAsStream("/fonts/Poppins-Regular.ttf"), 14);
-        Font.loadFont(GUIUtils.class.getResourceAsStream("/fonts/Poppins-Bold.ttf"), 14);
-        Font.loadFont(GUIUtils.class.getResourceAsStream("/fonts/Poppins-Italic.ttf"), 14);
-        Font.loadFont(GUIUtils.class.getResourceAsStream("/fonts/Poppins-BoldItalic.ttf"), 14);
-    }
-    */
 }

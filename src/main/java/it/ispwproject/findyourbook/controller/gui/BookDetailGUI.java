@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import it.ispwproject.findyourbook.util.logger.AppLogger;
 
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class BookDetailGUI {
                     new SearchResultsGUI(stage, risultati, query).show();
                 });
             } catch (Exception e) {
-                Platform.runLater(() -> System.err.println("Errore ricerca: " + e.getMessage()));
+                Platform.runLater(() -> AppLogger.logError("Errore ricerca: " + e.getMessage()));
             }
         }).start();
     }

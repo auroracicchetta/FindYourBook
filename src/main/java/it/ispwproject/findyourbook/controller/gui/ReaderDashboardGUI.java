@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.stage.Stage;
 import java.util.List;
 import it.ispwproject.findyourbook.bean.BookBean;
+import it.ispwproject.findyourbook.util.logger.AppLogger;
 
 public class ReaderDashboardGUI {
 
@@ -31,7 +32,7 @@ public class ReaderDashboardGUI {
     }
 
     private void handleGenreSelection(String genere) {
-        System.out.println("Ricerca per genere: " + genere);
+        AppLogger.logInfo("Ricerca per genere: " + genere);
 
         new Thread(() -> {
             try {
@@ -41,20 +42,20 @@ public class ReaderDashboardGUI {
 
                 // 2. Aggiorna la UI sul Thread grafico
                 Platform.runLater(() -> {
-                    System.out.println("Generi caricati! Trovati " + risultati.size() + " libri.");
+                    AppLogger.logInfo("Generi caricati! Trovati " + risultati.size() + " libri.");
                     new SearchResultsGUI(stage, risultati, genere).show();
                 });
 
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    System.err.println("Errore nel recupero genere: " + e.getMessage());
+                    AppLogger.logError("Errore nel recupero genere: " + e.getMessage());
                 });
             }
         }).start();
     }
 
     private void handleSearch(String query) {
-        System.out.println("Ricerca avviata per: " + query);
+        AppLogger.logInfo("Ricerca avviata per: " + query);
 
         if (query == null || query.trim().isEmpty()) {
             return;
@@ -68,14 +69,13 @@ public class ReaderDashboardGUI {
 
                 // 2. Aggiorniamo la UI passando i risultati
                 Platform.runLater(() -> {
-                    System.out.println("Ricerca completata! Trovati " + risultati.size() + " libri.");
+                    AppLogger.logInfo("Ricerca completata! Trovati " + risultati.size() + " libri.");
                     new SearchResultsGUI(stage, risultati, query).show();
                 });
 
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    System.err.println("Errore durante la ricerca: " + e.getMessage());
-                    e.printStackTrace();
+                    AppLogger.logError("Errore durante la ricerca: " + e.getMessage());
                 });
             }
         }).start();
