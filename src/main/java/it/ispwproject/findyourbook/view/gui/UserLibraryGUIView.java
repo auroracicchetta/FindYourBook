@@ -10,57 +10,55 @@ import java.util.function.Consumer;
 
 public class UserLibraryGUIView extends DashboardGUIView {
 
-    private FlowPane booksGrid; // La griglia dinamica dove metteremo le card
+    private FlowPane booksGrid;
 
-    public VBox buildRoot(Runnable onHomeClick, Runnable onLogout, Consumer<String> onSearch, Consumer<String> onFilterClick) {
+    // --- FIRMA MODIFICATA: Aggiunti 'username' e 'readBooksCount' ---
+    public VBox buildRoot(String username, int readBooksCount, Runnable onHomeClick, Runnable onLogout, Consumer<String> onSearch, Consumer<String> onFilterClick) {
         VBox root = new VBox(30);
         root.setPadding(new Insets(20, 50, 40, 50));
         root.setStyle("-fx-background-color: " + BG_COLOR + ";");
 
-        // 1. NAVBAR (Passiamo onHomeClick invece di onMyBooksClick)
         HBox navbar = super.buildNavbar(null, onLogout, onSearch);
 
-        // Modifichiamo l'aspetto della navbar per far capire che siamo in "I miei libri"
-        // (Nota: Per farlo perfetto bisognerebbe invertire le classi CSS nella classe padre, ma per ora lo facciamo al volo qui)
         Label homeLabel = (Label) navbar.getChildren().get(1);
         homeLabel.getStyleClass().clear();
-        homeLabel.getStyleClass().add("nav-link"); // Home diventa link normale
+        homeLabel.getStyleClass().add("nav-link");
         homeLabel.setOnMouseClicked(e -> onHomeClick.run());
 
         Label myBooksLabel = (Label) navbar.getChildren().get(2);
         myBooksLabel.getStyleClass().clear();
-        myBooksLabel.getStyleClass().add("nav-link-active"); // MyBooks diventa attivo
+        myBooksLabel.getStyleClass().add("nav-link-active");
 
-        // Separatore
         Region sep = new Region();
         sep.setMinHeight(2);
         sep.setStyle("-fx-background-color: #FFFFFF;");
 
-        // 2. HEADER: PROFILO UTENTE (Stile Mockup Editoriale)
-        VBox headerBox = new VBox(35); // Più spazio tra il profilo e i bottoni
+        VBox headerBox = new VBox(35);
         headerBox.setAlignment(Pos.CENTER);
 
-        // --- Sezione superiore: Avatar e Statistiche ---
         HBox profileBox = new HBox(40);
-        profileBox.setAlignment(Pos.CENTER); // Centriamo tutto orizzontalmente
+        profileBox.setAlignment(Pos.CENTER);
 
-        // Avatar (cerchio con omino)
-        Label avatarIcon = new Label("👤");
-        avatarIcon.setStyle("-fx-font-size: 60px; -fx-text-fill: " + TEXT_DARK + "; -fx-border-color: " + TEXT_DARK + "; -fx-border-width: 3; -fx-border-radius: 100; -fx-padding: 15 25;");
+        // --- AVATAR NOCCIOLA GIGANTE ---
+        String initial = (username != null && !username.isEmpty()) ? username.substring(0, 1).toUpperCase() : "U";
+        Label avatarIcon = new Label(initial);
+        avatarIcon.setMinSize(100, 100);
+        avatarIcon.setMaxSize(100, 100);
+        avatarIcon.setAlignment(Pos.CENTER);
+        avatarIcon.setStyle("-fx-background-color: #A67B5B; -fx-text-fill: white; -fx-font-family: 'Arial'; -fx-font-size: 45px; -fx-font-weight: bold; -fx-background-radius: 100;");
 
-        // Info a destra dell'Avatar
         VBox profileInfo = new VBox(15);
         profileInfo.setAlignment(Pos.CENTER_LEFT);
 
-        // Nome (Potresti prendere il nome reale qui, ma lasciamo il segnaposto per ora)
-        Label nameLabel = new Label("Il tuo profilo");
+        // --- BENVENUTO PERSONALIZZATO ---
+        Label nameLabel = new Label("Bentornata, " + username + "!");
         nameLabel.setStyle("-fx-font-family: 'Georgia'; -fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: " + TEXT_DARK + ";");
 
-        // Statistiche con i separatori verticali
         HBox statsBox = new HBox(20);
         statsBox.setAlignment(Pos.CENTER_LEFT);
 
-        Label stat1 = new Label("14\nLibri letti");
+        // --- CONTEGGIO DINAMICO DEI LIBRI ---
+        Label stat1 = new Label(readBooksCount + "\nLibri letti");
         stat1.setStyle("-fx-font-family: 'Georgia'; -fx-text-alignment: center; -fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: " + TEXT_DARK + ";");
 
         Label sep1 = new Label("|");
@@ -80,7 +78,6 @@ public class UserLibraryGUIView extends DashboardGUIView {
 
         profileBox.getChildren().addAll(avatarIcon, profileInfo);
 
-        // --- Sezione inferiore: Bottoni di Filtro ---
         HBox filterBox = new HBox(20);
         filterBox.setAlignment(Pos.CENTER);
 
@@ -90,13 +87,11 @@ public class UserLibraryGUIView extends DashboardGUIView {
 
         filterBox.getChildren().addAll(btnToRead, btnReading, btnRead);
 
-        // Assembliamo l'intero Header!
         headerBox.getChildren().addAll(profileBox, filterBox);
 
-        // 3. GRIGLIA DEI LIBRI (FlowPane)
         booksGrid = new FlowPane();
-        booksGrid.setHgap(30); // Spazio orizzontale tra i libri
-        booksGrid.setVgap(30); // Spazio verticale
+        booksGrid.setHgap(30);
+        booksGrid.setVgap(30);
         booksGrid.setAlignment(Pos.CENTER);
 
         ScrollPane scrollPane = new ScrollPane(booksGrid);
@@ -104,7 +99,6 @@ public class UserLibraryGUIView extends DashboardGUIView {
         scrollPane.setStyle("-fx-background-color: transparent; -fx-background: " + BG_COLOR + ";");
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        // Togliamo il bordo del fastidioso ScrollPane di default
         scrollPane.getStyleClass().add("transparent-pane");
 
         root.getChildren().addAll(navbar, sep, headerBox, scrollPane);
@@ -112,20 +106,17 @@ public class UserLibraryGUIView extends DashboardGUIView {
         return root;
     }
 
-    // Metodo helper per creare i bottoni dei filtri
     private Button createFilterButton(String text, Runnable action) {
         Button btn = new Button(text);
         btn.setStyle("-fx-background-color: #FFFFFF; -fx-text-fill: " + TEXT_DARK + "; -fx-font-size: 16px; -fx-font-family: 'Arial'; -fx-font-weight: bold; -fx-padding: 10 30; -fx-background-radius: 20; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
 
         btn.setOnAction(e -> action.run());
 
-        // Effetto Hover
         btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: " + TEXT_DARK + "; -fx-text-fill: #FFFFFF; -fx-font-size: 16px; -fx-font-family: 'Arial'; -fx-font-weight: bold; -fx-padding: 10 30; -fx-background-radius: 20; -fx-cursor: hand;"));
         btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: #FFFFFF; -fx-text-fill: " + TEXT_DARK + "; -fx-font-size: 16px; -fx-font-family: 'Arial'; -fx-font-weight: bold; -fx-padding: 10 30; -fx-background-radius: 20; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"));
         return btn;
     }
 
-    // Metodo per svuotare e riempire la griglia
     public void populateGrid(java.util.List<javafx.scene.layout.VBox> bookCards) {
         booksGrid.getChildren().clear();
         if (bookCards.isEmpty()) {

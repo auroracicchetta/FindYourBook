@@ -80,18 +80,21 @@ public class UserLibraryController {
     }
 
     private void checkAndSync(BookBean googleBook, java.util.List<BookBean> dbBooks, String status) {
-        if (dbBooks == null || dbBooks.isEmpty()) return;
+        // Se la lista dei libri salvati nel DB è vuota, resettiamo i campi del libro
+        if (dbBooks == null || dbBooks.isEmpty()) {
+            googleBook.setRating(0);
+            googleBook.setStatus(null);
+            return;
+        }
 
         String gTitle = googleBook.getTitle().toLowerCase().trim();
+        boolean trovato = false; // Flag per tracciare se abbiamo trovato il libro
 
         for (BookBean dbBook : dbBooks) {
-            // Risolto Code Smell: rimosso il "continue", usiamo un if per assicurarci che il libro sia valido
             if (dbBook != null && dbBook.getTitle() != null) {
                 String dbTitle = dbBook.getTitle().toLowerCase().trim();
 
-                // Match infallibile: basta che uno contenga l'altro
                 if (gTitle.equals(dbTitle) || gTitle.contains(dbTitle) || dbTitle.contains(gTitle)) {
-
                     googleBook.setRating(dbBook.getRating());
                     googleBook.setStatus(status);
 
@@ -100,9 +103,17 @@ public class UserLibraryController {
                     }
 
                     AppLogger.logInfo("✅ Sincronizzato con successo: " + googleBook.getTitle());
-                    break; // Ora c'è solo un break, SonarCloud è felice!
+                    trovato = true;
+                    break;
                 }
             }
+        }
+
+        // Se dopo aver controllato TUTTA la lista non l'abbiamo trovato,
+        // resettiamo i dati del libro (cancella il "fantasma")
+        if (!trovato) {
+            googleBook.setRating(0);
+            googleBook.setStatus(null);
         }
     }
 }
