@@ -18,7 +18,8 @@ public class FavoritesDAOMemory implements FavoritesDAO {
         String genre;
         String imageUrl;
         String status;
-        int rating; // Salviamo le stelline qui dentro al sicuro
+        int rating;
+        String description; // <--- CORREZIONE: AGGIUNTO IL CAMPO PER SALVARE LA TRAMA
 
         MemoryRecord(String u, BookBean b, String s) {
             this.username = u;
@@ -28,6 +29,9 @@ public class FavoritesDAOMemory implements FavoritesDAO {
             this.imageUrl = b.getImageUrl();
             this.status = s;
             this.rating = b.getRating();
+
+            // Salviamo la trama in cassaforte, gestendo il caso in cui sia vuota
+            this.description = b.getDescription() != null ? b.getDescription() : "Trama non disponibile.";
         }
     }
 
@@ -37,10 +41,15 @@ public class FavoritesDAOMemory implements FavoritesDAO {
     public void addLibroPreferito(String username, BookBean book, String statoLettura) throws DAOException {
         AppLogger.logInfo("💾 [MEMORY DAO] Richiesta salvataggio per: '" + book.getTitle() + "' in stato: " + statoLettura);
 
-        // Rinominato 'record' in 'item' per evitare il conflitto con la parola riservata di Java
         for (MemoryRecord item : DB_FINTO) {
             if (item.username.equals(username) && item.title.trim().equalsIgnoreCase(book.getTitle().trim())) {
                 item.status = statoLettura;
+
+                // Se Google ci passa una trama nuova, la aggiorniamo
+                if (book.getDescription() != null) {
+                    item.description = book.getDescription();
+                }
+
                 AppLogger.logInfo("   -> Libro già presente. Aggiornato stato a: " + statoLettura);
                 return;
             }
@@ -74,8 +83,8 @@ public class FavoritesDAOMemory implements FavoritesDAO {
 
         for (MemoryRecord item : DB_FINTO) {
             if (item.username.equals(username) && item.status.equals(statoLettura)) {
-                // Ricreiamo un BookBean NUOVO E PULITO attingendo dai dati blindati
-                BookBean b = new BookBean(item.title, item.author, item.genre, item.imageUrl);
+                // CORREZIONE: Ricreiamo il BookBean usando il costruttore completo che accetta la trama!
+                BookBean b = new BookBean(item.title, item.author, item.genre, item.imageUrl, item.description);
                 b.setRating(item.rating);
                 b.setStatus(item.status);
                 risultati.add(b);

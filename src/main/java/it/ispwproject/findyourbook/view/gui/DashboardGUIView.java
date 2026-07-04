@@ -145,11 +145,15 @@ public abstract class DashboardGUIView {
     }
 
     private MenuButton createReadMenu(String currentStatus, Consumer<String> onStatusChange, String bookTitle) {
-        String btnText = LBL_DA_LEGGERE;
+        // CORREZIONE FONDAMENTALE: Se il libro non è nel DB, deve dire "Aggiungi a..."!
+        String btnText = "Aggiungi a...";
+
         if (DB_LETTO.equals(currentStatus)) {
             btnText = LBL_LETTO;
         } else if (DB_IN_LETTURA.equals(currentStatus)) {
             btnText = LBL_IN_LETTURA;
+        } else if (DB_DA_LEGGERE.equals(currentStatus)) {
+            btnText = LBL_DA_LEGGERE;
         }
 
         MenuButton readBtn = new MenuButton(btnText);
@@ -181,7 +185,6 @@ public abstract class DashboardGUIView {
             alert.getButtonTypes().setAll(btnAnnulla, btnOk);
 
             alert.showAndWait().ifPresent(type -> {
-                // Risolto code smell: Merge di due if consecutivi
                 if (type == btnOk && onStatusChange != null) {
                     onStatusChange.accept("RIMUOVI");
                 }

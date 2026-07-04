@@ -11,13 +11,13 @@ public class Main {
 
     public static void main(String[] args) {
 
-        AppLogger.logInfo("🚀 Avvio di FindYourBook in corso...");
+        AppLogger.logInfo("Avvio di FindYourBook in corso...");
         // Mantengo il tuo test del DB (ottima pratica)
         try {
             ConnectionFactory.getConnection();
-            AppLogger.logInfo("✅ Connessione al database riuscita!");
+            AppLogger.logInfo("Connessione al database riuscita!");
         } catch (Exception e) {
-            AppLogger.logError("⚠️ Attenzione: Impossibile connettersi al database!");
+            AppLogger.logError(" Attenzione: Impossibile connettersi al database!");
         }
 
         // 1. Selezione Modalità Database

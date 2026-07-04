@@ -15,9 +15,9 @@ public class FavoritesDAODB implements FavoritesDAO {
 
     @Override
     public void addLibroPreferito(String username, BookBean book, String statoLettura) throws DAOException {
-        // Salviamo tutti i dettagli del libro. La chiave primaria/unica dovrebbe essere (username, titolo)
-        String query = "INSERT INTO preferiti (username, titolo, autore, immagine_url, stato_lettura) VALUES (?, ?, ?, ?, ?) " +
-                "ON DUPLICATE KEY UPDATE stato_lettura = ?";
+        // CORREZIONE: Inserita la colonna 'descrizione' per salvare la trama permanentemente
+        String query = "INSERT INTO preferiti (username, titolo, autore, immagine_url, stato_lettura, descrizione) VALUES (?, ?, ?, ?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE stato_lettura = ?, descrizione = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -27,7 +27,13 @@ public class FavoritesDAODB implements FavoritesDAO {
             stmt.setString(3, book.getAuthor());
             stmt.setString(4, book.getImageUrl());
             stmt.setString(5, statoLettura);
-            stmt.setString(6, statoLettura); // Se esiste già, aggiorna solo lo stato!
+
+            // Salviamo la trama in modo sicuro
+            String desc = book.getDescription() != null ? book.getDescription() : "Trama non disponibile.";
+            stmt.setString(6, desc);
+
+            stmt.setString(7, statoLettura);
+            stmt.setString(8, desc);
 
             stmt.executeUpdate();
 
@@ -62,8 +68,8 @@ public class FavoritesDAODB implements FavoritesDAO {
     @Override
     public List<BookBean> getLibriByStato(String username, String statoLettura) throws DAOException {
         List<BookBean> lista = new ArrayList<>();
-        // Risolto il code smell specificando le colonne esatte al posto di SELECT *
-        String query = "SELECT titolo, autore, immagine_url, valutazione FROM preferiti WHERE username = ? AND stato_lettura = ?";
+        // CORREZIONE: Aggiunta la colonna 'descrizione' alla query di caricamento
+        String query = "SELECT titolo, autore, immagine_url, valutazione, descrizione FROM preferiti WHERE username = ? AND stato_lettura = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -73,14 +79,19 @@ public class FavoritesDAODB implements FavoritesDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
+                    // Usiamo il costruttore completo (il primo in BookBean) per agganciare subito la trama
                     BookBean book = new BookBean(
                             rs.getString("titolo"),
                             rs.getString("autore"),
                             "",
-                            rs.getString("immagine_url")
-
+                            rs.getString("immagine_url"),
+                            rs.getString("descrizione")
                     );
                     book.setRating(rs.getInt("valutazione"));
+
+                    // CRITICO: Assegniamo esplicitamente lo stato al Bean per non rompere la UI!
+                    book.setStatus(statoLettura);
+
                     lista.add(book);
                 }
             }
@@ -88,6 +99,6 @@ public class FavoritesDAODB implements FavoritesDAO {
             throw new DAOException("Errore durante il recupero dei libri: " + e.getMessage());
         }
 
-        return lista; // <-- Questa deve stare FUORI dal blocco try-catch
+        return lista;
     }
 }

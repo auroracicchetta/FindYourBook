@@ -29,7 +29,7 @@ public class BookController {
 
             // 2. IL TUO CICLO FOR! Scarica i libri di ogni autore e li unisce
             for (String autore : famosiAutori) {
-                AppLogger.logInfo("🔮 [Google Books] Scarico bestseller di: " + autore);
+                AppLogger.logInfo("[Google Books] Scarico bestseller di: " + autore);
                 List<BookBean> libriAutore = googleService.searchBooks("inauthor:\"" + autore + "\"");
                 allResults.addAll(libriAutore);
             }
@@ -41,11 +41,11 @@ public class BookController {
             // 3. Sincronizziamo i voti e gli stati con il Database
             new it.ispwproject.findyourbook.controller.applicativo.UserLibraryController().syncBooksWithDatabase(allResults);
 
-            AppLogger.logInfo("✅ Totale libri caricati nella vetrina: " + allResults.size());
+            AppLogger.logInfo("Totale libri caricati nella vetrina: " + allResults.size());
             return allResults;
 
         } catch (Exception e) {
-            AppLogger.logWarning("⚠️ Ricerca generi fallita: " + e.getMessage() + " -> Fallback su DB...");
+            AppLogger.logWarning("Ricerca generi fallita: " + e.getMessage() + " -> Fallback su DB...");
             return getBooksFromDb(genre);
         }
     }
@@ -72,9 +72,9 @@ public class BookController {
             for (Book b : dbBooks) {
                 results.add(new BookBean(b.getTitolo(), b.getAutore(), b.getGenere(), b.getImmagineUrl()));
             }
-            AppLogger.logInfo("✅ Data loaded from local Database.");
+            AppLogger.logInfo("Data loaded from local Database.");
         } catch (Exception e) {
-            AppLogger.logError("❌ Critical Error: DB not responding! " + e.getMessage());
+            AppLogger.logError("Critical Error: DB not responding! " + e.getMessage());
         }
         return results;
     }
@@ -87,10 +87,10 @@ public class BookController {
             // 2. Il nuovo DAO ci restituisce già direttamente i BookBean pronti per la GUI!
             results = DAOFactory.getFavoritesDAO().getLibriByStato(username, readingStatus);
 
-            AppLogger.logInfo("✅ Caricati " + results.size() + " libri nello stato: " + readingStatus);
+            AppLogger.logInfo("Caricati " + results.size() + " libri nello stato: " + readingStatus);
 
         } catch (Exception e) {
-            AppLogger.logError("❌ Errore nel recupero dei libri preferiti: " + e.getMessage());
+            AppLogger.logError("Errore nel recupero dei libri preferiti: " + e.getMessage());
         }
 
         return results;
@@ -100,20 +100,22 @@ public class BookController {
     public List<BookBean> searchBooks(String query) {
         List<BookBean> results = new ArrayList<>();
         try {
-            AppLogger.logInfo("🔍 [Ricerca Libera] Ricerca in corso per: " + query);
+            AppLogger.logInfo("[Ricerca Libera] Ricerca in corso per: " + query);
             GoogleBooksService googleService = new GoogleBooksService();
 
             // 1. Scarica i libri da Google
             results = googleService.searchBooks(query);
 
             if (!results.isEmpty()) {
-                // 2. LA MAGIA: Sincronizziamo i risultati con il Database/Memoria prima di mostrarli!
+                // 2. Forza la sincronizzazione con il database dell'utente loggato
+                // Questo popola le informazioni di 'rating' e 'status' in ogni BookBean della lista
                 new it.ispwproject.findyourbook.controller.applicativo.UserLibraryController().syncBooksWithDatabase(results);
             }
 
         } catch (Exception e) {
-            AppLogger.logError("❌ Errore durante la ricerca libera: " + e.getMessage());
+            AppLogger.logError("Errore durante la ricerca libera: " + e.getMessage());
         }
+        // IMPORTANTE: Ora 'results' contiene i dati sincronizzati (voti/stato)
         return results;
     }
 
@@ -124,7 +126,7 @@ public class BookController {
             DAOFactory.getFavoritesDAO().updateValutazione(username, book.getTitle(), rating);
             AppLogger.logInfo("✅ Valutazione salvata!");
         } catch (Exception e) {
-            AppLogger.logError("❌ Errore durante l'aggiornamento della valutazione: " + e.getMessage());
+            AppLogger.logError("Errore durante l'aggiornamento della valutazione: " + e.getMessage());
         }
     }
 
