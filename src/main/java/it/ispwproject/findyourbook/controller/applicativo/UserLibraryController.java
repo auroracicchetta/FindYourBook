@@ -85,22 +85,23 @@ public class UserLibraryController {
         String gTitle = googleBook.getTitle().toLowerCase().trim();
 
         for (BookBean dbBook : dbBooks) {
-            if (dbBook == null || dbBook.getTitle() == null) continue;
+            // Risolto Code Smell: rimosso il "continue", usiamo un if per assicurarci che il libro sia valido
+            if (dbBook != null && dbBook.getTitle() != null) {
+                String dbTitle = dbBook.getTitle().toLowerCase().trim();
 
-            String dbTitle = dbBook.getTitle().toLowerCase().trim();
+                // Match infallibile: basta che uno contenga l'altro
+                if (gTitle.equals(dbTitle) || gTitle.contains(dbTitle) || dbTitle.contains(gTitle)) {
 
-            // Match infallibile: basta che uno contenga l'altro
-            if (gTitle.equals(dbTitle) || gTitle.contains(dbTitle) || dbTitle.contains(gTitle)) {
+                    googleBook.setRating(dbBook.getRating());
+                    googleBook.setStatus(status);
 
-                googleBook.setRating(dbBook.getRating());
-                googleBook.setStatus(status);
+                    if (dbBook.getDescription() != null && !dbBook.getDescription().trim().isEmpty()) {
+                        googleBook.setDescription(dbBook.getDescription());
+                    }
 
-                if (dbBook.getDescription() != null && !dbBook.getDescription().trim().isEmpty()) {
-                    googleBook.setDescription(dbBook.getDescription());
+                    AppLogger.logInfo("✅ Sincronizzato con successo: " + googleBook.getTitle());
+                    break; // Ora c'è solo un break, SonarCloud è felice!
                 }
-
-                AppLogger.logInfo("✅ Sincronizzato con successo: " + googleBook.getTitle());
-                break;
             }
         }
     }
