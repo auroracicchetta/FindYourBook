@@ -119,22 +119,22 @@ public abstract class DashboardGUIView {
         return infoBox;
     }
 
-    private MenuButton createReadMenu(String currentStatus, Consumer<String> onStatusChange, String bookTitle, HBox ratingBox, IntConsumer onRate) {
-        String btnText = "Aggiungi a...";
-
+    private String resolveStatusText(String currentStatus) {
         if (ReadingStatus.READ.name().equals(currentStatus)) {
-            btnText = ReadingStatus.READ.getDisplayName();
+            return ReadingStatus.READ.getDisplayName();
         } else if (ReadingStatus.READING.name().equals(currentStatus)) {
-            btnText = ReadingStatus.READING.getDisplayName();
+            return ReadingStatus.READING.getDisplayName();
         } else if (ReadingStatus.TO_READ.name().equals(currentStatus)) {
-            btnText = ReadingStatus.TO_READ.getDisplayName();
+            return ReadingStatus.TO_READ.getDisplayName();
         }
+        return "Aggiungi a...";
+    }
 
-        MenuButton readBtn = new MenuButton(btnText);
+    private MenuButton createReadMenu(String currentStatus, Consumer<String> onStatusChange, String bookTitle, HBox ratingBox, IntConsumer onRate) {
+        MenuButton readBtn = new MenuButton(resolveStatusText(currentStatus));
         readBtn.setOnMouseClicked(e -> e.consume());
         readBtn.setStyle("-fx-background-color: " + BTN_GREEN + "; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;");
 
-// Usiamo i nomi grafici dell'Enum per le tendine
         MenuItem optWantToRead = new MenuItem(ReadingStatus.TO_READ.getDisplayName());
         MenuItem optReading = new MenuItem(ReadingStatus.READING.getDisplayName());
         MenuItem optRead = new MenuItem(ReadingStatus.READ.getDisplayName());
@@ -145,6 +145,13 @@ public abstract class DashboardGUIView {
 
         readBtn.getItems().addAll(optWantToRead, optReading, optRead, separator, optRemove);
 
+        setupMenuActions(readBtn, optWantToRead, optReading, optRead, optRemove, onStatusChange, bookTitle, ratingBox, onRate);
+
+        return readBtn;
+    }
+
+    private void setupMenuActions(MenuButton readBtn, MenuItem optWantToRead, MenuItem optReading, MenuItem optRead, MenuItem optRemove,
+                                  Consumer<String> onStatusChange, String bookTitle, HBox ratingBox, IntConsumer onRate) {
         optWantToRead.setOnAction(e -> {
             readBtn.setText(ReadingStatus.TO_READ.getDisplayName());
             if (onStatusChange != null) onStatusChange.accept(ReadingStatus.TO_READ.name());
@@ -160,29 +167,30 @@ public abstract class DashboardGUIView {
             if (onStatusChange != null) onStatusChange.accept(ReadingStatus.READ.name());
         });
 
-        optRemove.setOnAction(e -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Rimuovi Libro");
-            alert.setHeaderText("Vuoi rimuovere '" + bookTitle + "' dalla tua libreria?");
-            alert.setContentText("Questa azione rimuoverà permanentemente il libro, incluse le tue valutazioni.");
+        optRemove.setOnAction(e -> handleRemoveAction(readBtn, onStatusChange, bookTitle, ratingBox, onRate));
+    }
 
-            ButtonType btnAnnulla = new ButtonType("Annulla", ButtonBar.ButtonData.CANCEL_CLOSE);
-            ButtonType btnOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-            alert.getButtonTypes().setAll(btnAnnulla, btnOk);
+    private void handleRemoveAction(MenuButton readBtn, Consumer<String> onStatusChange, String bookTitle, HBox ratingBox, IntConsumer onRate) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Rimuovi Libro");
+        alert.setHeaderText("Vuoi rimuovere '" + bookTitle + "' dalla tua libreria?");
+        alert.setContentText("Questa azione rimuoverà permanentemente il libro, incluse le tue valutazioni.");
 
-            alert.showAndWait().ifPresent(type -> {
-                if (type == btnOk) {
-                    if (onStatusChange != null) onStatusChange.accept("RIMUOVI");
-                    readBtn.setText("Aggiungi a...");
+        ButtonType btnAnnulla = new ButtonType("Annulla", ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType btnOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        alert.getButtonTypes().setAll(btnAnnulla, btnOk);
 
-                    for (int i = 1; i <= 5; i++) ((Label) ratingBox.getChildren().get(i)).setText("☆");
-                    int[] clickedRating = (int[]) ratingBox.getProperties().get("clickedRating");
-                    if (clickedRating != null) clickedRating[0] = 0;
-                    if (onRate != null) onRate.accept(0);
-                }
-            });
+        alert.showAndWait().ifPresent(type -> {
+            if (type == btnOk) {
+                if (onStatusChange != null) onStatusChange.accept("RIMUOVI");
+                readBtn.setText("Aggiungi a...");
+
+                for (int i = 1; i <= 5; i++) ((Label) ratingBox.getChildren().get(i)).setText("☆");
+                int[] clickedRating = (int[]) ratingBox.getProperties().get("clickedRating");
+                if (clickedRating != null) clickedRating[0] = 0;
+                if (onRate != null) onRate.accept(0);
+            }
         });
-        return readBtn;
     }
 
     private HBox createRatingBox(int initialRating, IntConsumer onRate) {
@@ -275,7 +283,6 @@ public abstract class DashboardGUIView {
 
         MenuButton profileMenu = new MenuButton(initial);
 
-// STESSO STILE PER TUTTI: nocciola chiaro con testo bianco
         profileMenu.setStyle(
                 "-fx-background-color: #C1A68D; " +
                         "-fx-text-fill: white; " +
@@ -287,7 +294,6 @@ public abstract class DashboardGUIView {
         );
         profileMenu.setPrefSize(45, 45);
 
-// Voci del menu (uguali per tutti)
         MenuItem profileInfo = new MenuItem("I miei dati");
         MenuItem logoutItem = new MenuItem("Logout");
 
@@ -308,10 +314,9 @@ public abstract class DashboardGUIView {
         return profileMenu;
     }
 
-    /**
-     * Metodo STATICO per creare l'avatar - garantito che funzioni sempre!
-     * Usato come fallback se buildProfileMenu non funziona.
-     */
+    private static final String AVATAR_BASE_STYLE = "-fx-background-color: #C1A68D; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 50; -fx-alignment: center; -fx-padding: 0; -fx-cursor: hand;";
+    private static final String AVATAR_HOVER_STYLE = "-fx-background-color: #9F856D; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 50; -fx-alignment: center; -fx-padding: 0; -fx-cursor: hand;";
+
     public static Button createAvatar(String username, Runnable onLogout) {
         String initial = (username != null && !username.isEmpty())
                 ? username.substring(0, 1).toUpperCase()
@@ -319,19 +324,15 @@ public abstract class DashboardGUIView {
 
         Button profileBtn = new Button(initial);
 
-        String AVATAR_BASE = "-fx-background-color: #C1A68D; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 50; -fx-alignment: center; -fx-padding: 0; -fx-cursor: hand;";
-        String AVATAR_HOVER = "-fx-background-color: #9F856D; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 50; -fx-alignment: center; -fx-padding: 0; -fx-cursor: hand;";
+        profileBtn.setStyle(AVATAR_BASE_STYLE);
 
-        profileBtn.setStyle(AVATAR_BASE);
-
-        profileBtn.setOnMouseEntered(e -> profileBtn.setStyle(AVATAR_HOVER));
-        profileBtn.setOnMouseExited(e -> profileBtn.setStyle(AVATAR_BASE));
+        profileBtn.setOnMouseEntered(e -> profileBtn.setStyle(AVATAR_HOVER_STYLE));
+        profileBtn.setOnMouseExited(e -> profileBtn.setStyle(AVATAR_BASE_STYLE));
 
         profileBtn.setMinSize(45, 45);
         profileBtn.setPrefSize(45, 45);
         profileBtn.setMaxSize(45, 45);
 
-        // Creiamo il menu a tendina separato (ContextMenu)
         ContextMenu contextMenu = new ContextMenu();
 
         MenuItem profileInfo = new MenuItem("I miei dati");
@@ -352,7 +353,6 @@ public abstract class DashboardGUIView {
 
         contextMenu.getItems().addAll(profileInfo, logoutItem);
 
-        // Quando clicchi il bottone, facciamo apparire il menu esattamente sotto
         profileBtn.setOnMouseClicked(e -> {
             contextMenu.show(profileBtn, javafx.geometry.Side.BOTTOM, 0, 5);
         });

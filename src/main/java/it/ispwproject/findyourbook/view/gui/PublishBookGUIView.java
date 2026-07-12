@@ -16,8 +16,10 @@ public class PublishBookGUIView extends DashboardGUIView {
     private static final String BG_COLOR = "#EFE8D8";
     private static final String CARD_BG = "#FFFFFF";
     private static final String TEXT_DARK = "#3A352F";
-    private static final String ACCENT_GREEN = "#8AAB8F";
     private static final String STYLE_BG_COLOR = "-fx-background-color: ";
+
+    private static final String BTN_BASE_STYLE = "-fx-background-color: #8AAB8F; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 30; -fx-cursor: hand;";
+    private static final String BTN_HOVER_STYLE = "-fx-background-color: #6C8B70; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 30; -fx-cursor: hand;";
 
     public VBox buildRoot(String companyName, Runnable onCancel, Runnable onPublish, Runnable onLogout) {
         VBox root = new VBox(20);
@@ -92,7 +94,8 @@ public class PublishBookGUIView extends DashboardGUIView {
                 "Poesia",
                 "Storici",
                 "Filosofici"
-        );genreBox.setPrefWidth(Double.MAX_VALUE);
+        );
+        genreBox.setPrefWidth(Double.MAX_VALUE);
         genreBox.setStyle("-fx-background-color: white; -fx-border-color: #D3C5B1; -fx-border-radius: 8; -fx-padding: 2;");
 
         Label descLabel = createFieldLabel("Trama:");
@@ -110,20 +113,16 @@ public class PublishBookGUIView extends DashboardGUIView {
 
         formContainer.getChildren().addAll(leftCol, rightCol);
 
-
         HBox buttonBox = new HBox(20);
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
         buttonBox.setMaxWidth(800);
         VBox.setMargin(buttonBox, new Insets(20, 0, 0, 0));
 
-        String BTN_BASE = "-fx-background-color: #8AAB8F; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 30; -fx-cursor: hand;";
-        String BTN_HOVER = "-fx-background-color: #6C8B70; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 30; -fx-cursor: hand;";
-
         Button publishBtn = new Button("Pubblica Libro");
-        publishBtn.setStyle(BTN_BASE);
+        publishBtn.setStyle(BTN_BASE_STYLE);
 
-        publishBtn.setOnMouseEntered(e -> publishBtn.setStyle(BTN_HOVER));
-        publishBtn.setOnMouseExited(e -> publishBtn.setStyle(BTN_BASE));
+        publishBtn.setOnMouseEntered(e -> publishBtn.setStyle(BTN_HOVER_STYLE));
+        publishBtn.setOnMouseExited(e -> publishBtn.setStyle(BTN_BASE_STYLE));
 
         publishBtn.setOnAction(e -> onPublish.run());
 

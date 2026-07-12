@@ -121,7 +121,6 @@ public class PublisherCatalogGUIView extends DashboardGUIView {
 
         infoBox.getChildren().addAll(titleLbl, authLbl);
 
-        // Sezione Vendite
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
 

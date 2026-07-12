@@ -30,8 +30,7 @@ class LoginControllerTest {
 
     @Test
     void testLoginConCredenzialiErrate() {
-        // Tenta il login con un utente/email non registrata
-        // Deve lanciare LoginException
+
         assertThrows(LoginException.class, () ->
                 loginController.login("nonregistrato@demo", "password123")
         );

@@ -36,7 +36,7 @@ class RegistrationControllerTest {
 
     @Test
     void testRegistrazioneConUsernameDuplicato() throws DAOException, RegistrationException {
-        // Prima registrazione — deve andare a buon fine
+
         RegistrationBean bean = new RegistrationBean();
         bean.setName("Mario");
         bean.setSurname("Rossi");
@@ -49,7 +49,6 @@ class RegistrationControllerTest {
 
         registrationController.register(bean);
 
-        // Seconda registrazione con lo stesso username — deve lanciare RegistrationException
         RegistrationBean duplicato = new RegistrationBean();
         duplicato.setName("Luigi");
         duplicato.setSurname("Verdi");

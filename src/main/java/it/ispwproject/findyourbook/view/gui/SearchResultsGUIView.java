@@ -11,6 +11,7 @@ import javafx.scene.layout.HBox;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.BiConsumer;
+import java.util.function.ObjIntConsumer;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
@@ -21,19 +22,18 @@ public class SearchResultsGUIView extends DashboardGUIView {
                           Runnable onLogout, Runnable onMyBooksClick,
                           Consumer<BookBean> onBookClick,
                           BiConsumer<BookBean, ReadingStatus> onStatusChange,
-                          BiConsumer<BookBean, Integer> onRate) {
+                          ObjIntConsumer<BookBean> onRate) {
         VBox root = new VBox(20);
         root.setPadding(new Insets(20, 50, 20, 50));
         root.setStyle("-fx-background-color: " + BG_COLOR + ";");
 
         HBox navbar = super.buildNavbar(username, onMyBooksClick, onLogout, onSearch);
 
-         // --- MAGIA: Scriviamo la ricerca precedente nella barra! ---
         if (lastQuery != null) {
             TextField searchBar = (TextField) navbar.getChildren().get(3);
             searchBar.setText(lastQuery);
         }
-        // 2. Togliamo l'evidenziatura dalla "Home" e la rendiamo cliccabile per tornare indietro!
+
         Label homeLabel = (Label) navbar.getChildren().get(1);
         homeLabel.getStyleClass().clear();
         homeLabel.getStyleClass().add("nav-link");
@@ -54,28 +54,7 @@ public class SearchResultsGUIView extends DashboardGUIView {
                     null,
                     book,
                     book.getStatus() != null ? book.getStatus().name() : null,
-                    newStatusStr -> {
-                        ReadingStatus statusEnum = null;
-
-                        // Controllo robusto: gestisce sia i display name che i name() dell'Enum
-                        if (newStatusStr != null && !newStatusStr.equals("Rimuovi libro") && !newStatusStr.equals("RIMUOVI")) {
-                            if (newStatusStr.equals(ReadingStatus.TO_READ.getDisplayName()) || newStatusStr.equals(ReadingStatus.TO_READ.name())) {
-                                statusEnum = ReadingStatus.TO_READ;
-                            } else if (newStatusStr.equals(ReadingStatus.READING.getDisplayName()) || newStatusStr.equals(ReadingStatus.READING.name())) {
-                                statusEnum = ReadingStatus.READING;
-                            } else if (newStatusStr.equals(ReadingStatus.READ.getDisplayName()) || newStatusStr.equals(ReadingStatus.READ.name())) {
-                                statusEnum = ReadingStatus.READ;
-                            } else {
-                                // Fallback di sicurezza estrema
-                                try {
-                                    statusEnum = ReadingStatus.valueOf(newStatusStr);
-                                } catch (IllegalArgumentException ignored) {}
-                            }
-                        }
-
-                        onStatusChange.accept(book, statusEnum);
-                        book.setStatus(statusEnum);
-                    },
+                    newStatusStr -> handleBookStatusUpdate(book, newStatusStr, onStatusChange),
                     rating -> {
                         onRate.accept(book, rating);
                         book.setRating(rating);
@@ -93,4 +72,26 @@ public class SearchResultsGUIView extends DashboardGUIView {
         return root;
     }
 
+    private void handleBookStatusUpdate(BookBean book, String newStatusStr, BiConsumer<BookBean, ReadingStatus> onStatusChange) {
+        ReadingStatus statusEnum = null;
+
+        if (newStatusStr != null && !newStatusStr.equals("Rimuovi libro") && !newStatusStr.equals("RIMUOVI")) {
+            if (newStatusStr.equals(ReadingStatus.TO_READ.getDisplayName()) || newStatusStr.equals(ReadingStatus.TO_READ.name())) {
+                statusEnum = ReadingStatus.TO_READ;
+            } else if (newStatusStr.equals(ReadingStatus.READING.getDisplayName()) || newStatusStr.equals(ReadingStatus.READING.name())) {
+                statusEnum = ReadingStatus.READING;
+            } else if (newStatusStr.equals(ReadingStatus.READ.getDisplayName()) || newStatusStr.equals(ReadingStatus.READ.name())) {
+                statusEnum = ReadingStatus.READ;
+            } else {
+                try {
+                    statusEnum = ReadingStatus.valueOf(newStatusStr);
+                } catch (IllegalArgumentException ignored) {
+                    // Valore non corrispondente a nessuno stato valido, ignorato intenzionalmente come fallback
+                }
+            }
+        }
+
+        onStatusChange.accept(book, statusEnum);
+        book.setStatus(statusEnum);
+    }
 }

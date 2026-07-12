@@ -18,8 +18,8 @@ public class UserLibraryGUIView extends DashboardGUIView {
 
     private ReadingStatus currentActiveStatus = null;
 
-    private final String COLOR_INACTIVE = "-fx-background-color: #FFFFFF; -fx-text-fill: #3A352F; -fx-background-radius: 40; -fx-cursor: hand; -fx-font-family: 'Georgia'; -fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 12 40;";
-    private final String COLOR_ACTIVE = "-fx-background-color: #3A352F; -fx-text-fill: #FFFFFF; -fx-background-radius: 40; -fx-cursor: hand; -fx-font-family: 'Georgia'; -fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 12 40;";
+    private static final String COLOR_INACTIVE_STYLE = "-fx-background-color: #FFFFFF; -fx-text-fill: #3A352F; -fx-background-radius: 40; -fx-cursor: hand; -fx-font-family: 'Georgia'; -fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 12 40;";
+    private static final String COLOR_ACTIVE_STYLE = "-fx-background-color: #3A352F; -fx-text-fill: #FFFFFF; -fx-background-radius: 40; -fx-cursor: hand; -fx-font-family: 'Georgia'; -fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 12 40;";
 
     public VBox buildRoot(String username, int readBooksCount, Runnable onHomeClick, Runnable onLogout, Consumer<String> onSearch, Consumer<ReadingStatus> onFilterClick) {
         VBox root = new VBox(30);
@@ -41,11 +41,9 @@ public class UserLibraryGUIView extends DashboardGUIView {
         sep.setMinHeight(2);
         sep.setStyle("-fx-background-color: #FFFFFF;");
 
-        // Contenitore principale dell'intestazione
         VBox headerBox = new VBox(35);
         headerBox.setAlignment(Pos.CENTER);
 
-        // 1. ZONA PROFILO: Avatar e Nome
         HBox profileBox = new HBox(30);
         profileBox.setAlignment(Pos.CENTER);
 
@@ -61,7 +59,6 @@ public class UserLibraryGUIView extends DashboardGUIView {
 
         profileBox.getChildren().addAll(avatarIcon, nameLabel);
 
-        // 2. ZONA STATISTICHE: Solo "Libri letti", ingrandito e in corsivo
         HBox statsBox = new HBox(20);
         statsBox.setAlignment(Pos.CENTER);
 
@@ -70,8 +67,7 @@ public class UserLibraryGUIView extends DashboardGUIView {
 
         statsBox.getChildren().add(stat1);
 
-        // 3. ZONA FILTRI: Bottoni ancora più grandi e distanziati
-        HBox filterBox = new HBox(40); // Spazio tra i bottoni aumentato
+        HBox filterBox = new HBox(40);
         filterBox.setAlignment(Pos.CENTER);
 
         btnToRead = new Button("Da leggere");
@@ -84,14 +80,12 @@ public class UserLibraryGUIView extends DashboardGUIView {
         setupHover(btnReading, ReadingStatus.READING);
         setupHover(btnRead, ReadingStatus.READ);
 
-        // 2. Assegniamo gli eventi click: passano solo l'informazione al controller
         btnToRead.setOnAction(e -> onFilterClick.accept(ReadingStatus.TO_READ));
         btnReading.setOnAction(e -> onFilterClick.accept(ReadingStatus.READING));
         btnRead.setOnAction(e -> onFilterClick.accept(ReadingStatus.READ));
 
         filterBox.getChildren().addAll(btnToRead, btnReading, btnRead);
 
-        // Assembliamo l'headerBox impilando le tre righe
         headerBox.getChildren().addAll(profileBox, statsBox, filterBox);
 
         booksGrid = new FlowPane();
@@ -114,34 +108,33 @@ public class UserLibraryGUIView extends DashboardGUIView {
     private void setupHover(Button btn, ReadingStatus status) {
         btn.setOnMouseEntered(e -> {
             if (currentActiveStatus != status) {
-                btn.setStyle(COLOR_ACTIVE);
+                btn.setStyle(COLOR_ACTIVE_STYLE);
             }
         });
         btn.setOnMouseExited(e -> {
             if (currentActiveStatus != status) {
-                btn.setStyle(COLOR_INACTIVE);
+                btn.setStyle(COLOR_INACTIVE_STYLE);
             }
         });
     }
 
     private void resetButtonColors() {
-        btnToRead.setStyle(COLOR_INACTIVE);
-        btnReading.setStyle(COLOR_INACTIVE);
-        btnRead.setStyle(COLOR_INACTIVE);
+        btnToRead.setStyle(COLOR_INACTIVE_STYLE);
+        btnReading.setStyle(COLOR_INACTIVE_STYLE);
+        btnRead.setStyle(COLOR_INACTIVE_STYLE);
     }
 
     public void setActiveButton(ReadingStatus status) {
-
         this.currentActiveStatus = status;
         resetButtonColors();
         if (status == null) return;
 
         if (status == ReadingStatus.TO_READ) {
-            btnToRead.setStyle(COLOR_ACTIVE);
+            btnToRead.setStyle(COLOR_ACTIVE_STYLE);
         } else if (status == ReadingStatus.READING) {
-            btnReading.setStyle(COLOR_ACTIVE);
+            btnReading.setStyle(COLOR_ACTIVE_STYLE);
         } else if (status == ReadingStatus.READ) {
-            btnRead.setStyle(COLOR_ACTIVE);
+            btnRead.setStyle(COLOR_ACTIVE_STYLE);
         }
     }
 
@@ -155,5 +148,4 @@ public class UserLibraryGUIView extends DashboardGUIView {
             booksGrid.getChildren().addAll(bookCards);
         }
     }
-
 }

@@ -92,12 +92,9 @@ public class RegistrationGUIView {
         Label brand = new Label("FindYourBook");
         brand.getStyleClass().add("brand-label");
 
-        // Pulsante Indietro (Grafica a pillola sicura e testo corretto)
-        // Pulsante Indietro con effetto Sottolineatura al passaggio del mouse
 
         Button backBtn = new Button("< Indietro");
 
-// La tua classe CSS che fa già tutto (compresa la sottolineatura all'hover!)
         backBtn.getStyleClass().add("back-link-button");
 
         backBtn.setOnAction(e -> onBack.run());

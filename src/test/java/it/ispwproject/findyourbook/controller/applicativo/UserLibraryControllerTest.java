@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -30,8 +31,7 @@ class UserLibraryControllerTest {
         DemoDataStore.reset();
         DAOFactory.setPersistence(DAOFactory.MEMORY);
 
-        // Impostiamo un Reader finto loggato nella sessione per i test
-        Reader reader = new Reader(1, "Mario", "Rossi", "mario", "mario@test.it", "hash", LocalDate.now(), LocalDate.of(1995, 5, 20));
+        Reader reader = new Reader(1, "Mario", "Rossi", "mario", "mario@test.it", "hash", LocalDate.now(), LocalDate.of(1995, Month.MAY, 20));
         SessionManager.getInstance().setLoggedUser(reader);
 
         userLibraryController = new UserLibraryController();
@@ -41,7 +41,6 @@ class UserLibraryControllerTest {
     void testSalvataggioLibroInLibreria() {
         BookBean bookBean = new BookBean("Il Signore degli Anelli", "J.R.R. Tolkien", "fantasy", "url", "trama");
 
-        // Tentativo di salvare il libro nello stato "DA LEGGERE"
         assertDoesNotThrow(() ->
                 userLibraryController.saveBookToLibrary(bookBean, ReadingStatus.TO_READ)
         );
