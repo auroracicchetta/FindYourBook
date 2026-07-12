@@ -72,22 +72,7 @@ public class UserLibraryCLI extends AbstractCLIState {
             String action = view.askAction();
 
             switch (action) {
-                case "1" -> {
-                    ReadingStatus newStatus = view.askNewStatus();
-                    if (newStatus != null) {
-                        try {
-                            userLibraryController.saveBookToLibrary(book, newStatus);
-                            book.setStatus(newStatus);
-                            view.showMessage("Stato aggiornato a " + newStatus.getDisplayName());
-                            currentList.remove(book);
-                            back = true;
-                        } catch (Exception e) {
-                            view.showMessage("Errore aggiornamento: " + e.getMessage());
-                        }
-                    } else {
-                        view.showMessage("Stato non valido.");
-                    }
-                }
+                case "1" -> back = handleBookAction(book, currentList);
                 case "2" -> {
                     int rating = view.askRating();
                     if (rating >= 1 && rating <= 5) {
@@ -115,5 +100,23 @@ public class UserLibraryCLI extends AbstractCLIState {
                 default -> view.showMessage("Azione non riconosciuta.");
             }
         }
+    }
+
+    private boolean handleBookAction(BookBean book, List<BookBean> currentList) {
+        ReadingStatus newStatus = view.askNewStatus();
+        if (newStatus != null) {
+            try {
+                userLibraryController.saveBookToLibrary(book, newStatus);
+                book.setStatus(newStatus);
+                view.showMessage("Stato aggiornato a " + newStatus.getDisplayName());
+                currentList.remove(book);
+                return true;
+            } catch (Exception e) {
+                view.showMessage("Errore aggiornamento: " + e.getMessage());
+            }
+        } else {
+            view.showMessage("Stato non valido.");
+        }
+        return false;
     }
 }

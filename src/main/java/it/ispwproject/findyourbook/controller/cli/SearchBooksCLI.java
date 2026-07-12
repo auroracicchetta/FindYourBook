@@ -74,27 +74,7 @@ public class SearchBooksCLI extends AbstractCLIState {
             String action = view.askAction();
 
             switch (action) {
-                case "1" -> {
-                    String statusStr = view.askStatus();
-                    if (statusStr != null) {
-                        try {
-                            if (statusStr.equals("RIMUOVI")) {
-                                userLibraryController.removeBookFromLibrary(book);
-                                view.showMessage("Libro rimosso dalla tua libreria.");
-                                book.setStatus(null);
-                            } else {
-                                ReadingStatus newStatus = ReadingStatus.valueOf(statusStr);
-                                userLibraryController.saveBookToLibrary(book, newStatus);
-                                view.showMessage("Stato aggiornato con successo a: " + newStatus);
-                                book.setStatus(newStatus);
-                            }
-                        } catch (Exception e) {
-                            view.showMessage("Errore nell'aggiornamento: " + e.getMessage());
-                        }
-                    } else {
-                        view.showMessage("Stato non valido.");
-                    }
-                }
+                case "1" -> handleBookAction(book);
                 case "2" -> {
                     int rating = view.askRating();
                     if (rating >= 1 && rating <= 5) {
@@ -114,5 +94,27 @@ public class SearchBooksCLI extends AbstractCLIState {
         }
 
         goNext(context, this);
+    }
+
+    private void handleBookAction(BookBean book) {
+        String statusStr = view.askStatus();
+        if (statusStr != null) {
+            try {
+                if (statusStr.equals("RIMUOVI")) {
+                    userLibraryController.removeBookFromLibrary(book);
+                    view.showMessage("Libro rimosso dalla tua libreria.");
+                    book.setStatus(null);
+                } else {
+                    ReadingStatus newStatus = ReadingStatus.valueOf(statusStr);
+                    userLibraryController.saveBookToLibrary(book, newStatus);
+                    view.showMessage("Stato aggiornato con successo a: " + newStatus);
+                    book.setStatus(newStatus);
+                }
+            } catch (Exception e) {
+                view.showMessage("Errore nell'aggiornamento: " + e.getMessage());
+            }
+        } else {
+            view.showMessage("Stato non valido.");
+        }
     }
 }
