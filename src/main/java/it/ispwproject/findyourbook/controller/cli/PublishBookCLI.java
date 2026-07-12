@@ -35,7 +35,7 @@ public class PublishBookCLI extends AbstractCLIState {
 
         if (title.isEmpty() || author.isEmpty() || genre.isEmpty()) {
             view.showMessage("Errore: Titolo, Autore e Genere sono obbligatori.");
-            goNext(context, this); // Riavvia il form
+            goNext(context, this);
             return;
         }
 

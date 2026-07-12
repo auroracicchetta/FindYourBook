@@ -8,7 +8,7 @@ import it.ispwproject.findyourbook.view.cli.RegistrationCLIView;
 import it.ispwproject.findyourbook.enumerator.Role;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import it.ispwproject.findyourbook.util.logger.AppLogger;
+
 
 public class RegistrationCLI extends AbstractCLIState {
 

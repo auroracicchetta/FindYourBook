@@ -25,7 +25,7 @@ public class LoginCLI extends AbstractCLIState {
 
         if (username.isEmpty() || password.isEmpty()) {
             view.showInputError();
-            goNext(context, this); // Riprova
+            goNext(context, this);
             return;
         }
 
@@ -35,16 +35,15 @@ public class LoginCLI extends AbstractCLIState {
             String name = SessionManager.getInstance().getLoggedUser().getUsername();
             view.showSuccess(name);
 
-            switch (result) {
-                case SUCCESSO_READER ->
-                        goNext(context, new ReaderDashboardCLI());
-                case SUCCESSO_PUBLISHER ->
-                        goNext(context, new PublisherDashboardCLI());
+            if (result == LoginController.LoginResult.SUCCESSO_READER) {
+                goNext(context, new ReaderDashboardCLI());
+            } else if (result == LoginController.LoginResult.SUCCESSO_PUBLISHER) {
+                goNext(context, new PublisherDashboardCLI());
             }
 
         } catch (Exception e) {
             view.showError("Errore durante il login: " + e.getMessage());
-            goNext(context, this); // Riprova
+            goNext(context, this);
         }
     }
 }
