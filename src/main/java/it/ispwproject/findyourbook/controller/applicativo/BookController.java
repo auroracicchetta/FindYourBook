@@ -6,7 +6,6 @@ import it.ispwproject.findyourbook.dao.DAOFactory;
 import it.ispwproject.findyourbook.dao.ReaderDAO;
 import it.ispwproject.findyourbook.enumerator.ReadingStatus;
 import it.ispwproject.findyourbook.model.Book;
-import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
 import it.ispwproject.findyourbook.exception.DAOException;
 
@@ -43,13 +42,12 @@ public class BookController {
     public List<BookBean> getFavoriteBooks(String username, ReadingStatus status) {
         List<BookBean> results = new ArrayList<>();
         try {
-            // Passiamo status.name() al DAO che vuole la stringa per il DB
             List<Book> savedBooks = readerDAO.getBooksByStatus(username, status.name());
 
             for (Book b : savedBooks) {
                 BookBean bean = new BookBean(b.getTitle(), b.getAuthor(), b.getGenre(), b.getImageUrl(), b.getDescription());
                 bean.setRating(b.getRating());
-                bean.setStatus(b.getStatus()); // Ora getStatus() restituisce un ReadingStatus!
+                bean.setStatus(b.getStatus());
                 results.add(bean);
             }
 
@@ -62,7 +60,6 @@ public class BookController {
     public List<BookBean> searchBooks(String query) {
         List<BookBean> results = new ArrayList<>();
         try {
-            // Ricerca libera adattata al database locale (cerca per titolo o autore)
             List<Book> searchDb = bookDAO.searchByQuery(query);
             for (Book b : searchDb) {
                 results.add(new BookBean(b.getTitle(), b.getAuthor(), b.getGenre(), b.getImageUrl(), b.getDescription()));

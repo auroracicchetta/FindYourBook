@@ -11,7 +11,6 @@ import it.ispwproject.findyourbook.model.Publisher;
 import it.ispwproject.findyourbook.model.Reader;
 import it.ispwproject.findyourbook.model.User;
 import it.ispwproject.findyourbook.pattern.observer.RegistrationObserver;
-import it.ispwproject.findyourbook.service.NotificationService;
 import it.ispwproject.findyourbook.util.PasswordUtils;
 import java.time.LocalDate;
 import java.time.Period;
@@ -40,7 +39,7 @@ public class RegistrationController {
         }
 
         User user;
-        LocalDate regDate = LocalDate.now();
+        LocalDate regDate = LocalDate.now(java.time.ZoneId.systemDefault());
 
         String email = bean.getEmail();
 

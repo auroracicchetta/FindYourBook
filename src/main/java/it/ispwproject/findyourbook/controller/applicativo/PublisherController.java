@@ -8,8 +8,6 @@ import it.ispwproject.findyourbook.model.Book;
 import it.ispwproject.findyourbook.model.User;
 import it.ispwproject.findyourbook.pattern.observer.BookPublishedObserver;
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
-import it.ispwproject.findyourbook.service.NotificationService;
-import it.ispwproject.findyourbook.util.logger.AppLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +27,7 @@ public class PublisherController {
         String publisherEmail = loggedUser.getEmail();
         String publisherName = loggedUser.getName();
 
-        publisherDAO.publishBook(bookBean, publisherUsername); // Riga già presente
+        publisherDAO.publishBook(bookBean, publisherUsername);
 
         BookPublishedObserver observer = new BookPublishedObserver(
                 publisherEmail,

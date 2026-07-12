@@ -7,8 +7,8 @@ public class PublisherBean {
     private String name;
     private String surname;
     private String email;
-    private LocalDate registrationDate; // Allineato al modello
-    private String description; // Tradotto
+    private LocalDate registrationDate;
+    private String description;
 
     public PublisherBean() {}
 

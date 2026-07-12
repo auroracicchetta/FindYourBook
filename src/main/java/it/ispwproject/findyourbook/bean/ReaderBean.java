@@ -7,8 +7,8 @@ public class ReaderBean {
     private String name;
     private String surname;
     private String email;
-    private LocalDate birthDate; // Tradotto
-    private LocalDate registrationDate; // Aggiunto per il profilo GUI
+    private LocalDate birthDate;
+    private LocalDate registrationDate;
 
     public ReaderBean() {}
 

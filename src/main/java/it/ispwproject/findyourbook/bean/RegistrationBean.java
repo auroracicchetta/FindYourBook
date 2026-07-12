@@ -9,13 +9,15 @@ public class RegistrationBean {
     private String surname;
     private String username;
     private String email;
-    private LocalDate birthDate; // Tradotto
+    private LocalDate birthDate;
     private String password;
     private String confirmPassword;
     private Role role;
-    private String description; // Tradotto
+    private String description;
 
-    public RegistrationBean() {}
+    public RegistrationBean() {
+        // Costruttore di default vuoto necessario per l'istanziazione del Bean
+    }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

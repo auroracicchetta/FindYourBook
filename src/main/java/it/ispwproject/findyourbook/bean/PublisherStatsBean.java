@@ -6,8 +6,8 @@ public class PublisherStatsBean {
 
     private int totalBooksPublished;
     private int totalCopiesSold;
-    private Map<String, Integer> topSellingBooks; // Perfetto per il nostro BarChart!
-    private Map<String, Integer> salesByGenre;    // Ottimo se in futuro vorrai aggiungere un grafico a torta
+    private Map<String, Integer> topSellingBooks;
+    private Map<String, Integer> salesByGenre;
 
     public PublisherStatsBean(int totalBooksPublished, int totalCopiesSold,
                               Map<String, Integer> topSellingBooks, Map<String, Integer> salesByGenre) {

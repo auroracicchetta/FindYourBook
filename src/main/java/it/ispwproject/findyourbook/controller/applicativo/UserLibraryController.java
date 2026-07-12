@@ -10,16 +10,14 @@ import it.ispwproject.findyourbook.pattern.observer.BookCompletedObserver;
 import it.ispwproject.findyourbook.pattern.observer.ReadingReminderObserver;
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
 import it.ispwproject.findyourbook.exception.DAOException;
-import it.ispwproject.findyourbook.service.NotificationService;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public class UserLibraryController {
 
     private final ReaderDAO readerDAO;
-    private static boolean reminderAlreadySent = false;
+    private boolean reminderAlreadySent = false;
 
     public UserLibraryController() {
         this.readerDAO = DAOFactory.getReaderDAO();
@@ -40,7 +38,7 @@ public class UserLibraryController {
 
         readerDAO.addFavoriteBook(reader.getUsername(), book, status.name());
 
-        if (status == ReadingStatus.READ) { // <-- Se usi LETTO, cambia questo in ReadingStatus.LETTO
+        if (status == ReadingStatus.READ) {
 
             BookCompletedObserver observer = new BookCompletedObserver(
                     reader.getEmail(),
@@ -104,7 +102,7 @@ public class UserLibraryController {
 
         try {
             List<Book> readingBooks = readerDAO.getBooksByStatus(reader.getUsername(), ReadingStatus.READING.name());
-            java.time.LocalDate thirtyDaysAgo = java.time.LocalDate.now().minusDays(30);
+            java.time.LocalDate thirtyDaysAgo = java.time.LocalDate.now(java.time.ZoneId.systemDefault()).minusDays(30);
 
             for (Book book : readingBooks) {
                 if (book.getReadingStartDate() != null && book.getReadingStartDate().isBefore(thirtyDaysAgo)) {
