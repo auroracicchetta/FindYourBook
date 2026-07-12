@@ -10,5 +10,5 @@ public interface UserDAO {
 
     List<User> getAll() throws DAOException;
 
-    void updateEmail(String username, String newEmail) throws DAOException; // <--- AGGIUNTO QUI
+    void updateEmail(String username, String newEmail) throws DAOException;
 }

@@ -14,7 +14,6 @@ public class RegistrationDAODB implements RegistrationDAO {
     private static final String CHECK_USERNAME =
             "SELECT COUNT(*) FROM utenti WHERE username = ?";
 
-    // AGGIUNTA COLONNA email E UN '?' IN PIU' NEI VALUES
     private static final String INSERT_USER =
             "INSERT INTO utenti (nome, cognome, username, password, email, ruolo, data_nascita, descrizione) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -47,7 +46,6 @@ public class RegistrationDAODB implements RegistrationDAO {
             ps.setString(3, user.getUsername());
             ps.setString(4, user.getPassword());
 
-            // AGGIUNTO IL PASSAGGIO DELL'EMAIL COME QUINTO PARAMETRO
             ps.setString(5, user.getEmail());
 
             if (user instanceof Publisher pub) {

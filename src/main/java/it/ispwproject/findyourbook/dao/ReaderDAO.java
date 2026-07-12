@@ -6,10 +6,8 @@ import it.ispwproject.findyourbook.model.Reader;
 import java.util.List;
 
 public interface ReaderDAO {
-    // Metodo base per recuperare i dati specifici del lettore (come la data di nascita)
     Reader findById(int id) throws DAOException;
 
-    // --- AZIONI SPECIFICHE DEL LETTORE (Ex FavoritesDAO) ---
     void addFavoriteBook(String username, Book book, String readingStatus) throws DAOException;
 
     void removeFavoriteBook(String username, String bookTitle) throws DAOException;

@@ -15,7 +15,7 @@ import it.ispwproject.findyourbook.dao.memory.BookDAOMemory;
 import it.ispwproject.findyourbook.dao.db.BookDAODB;
 import it.ispwproject.findyourbook.dao.file.BookDAOFile;
 import it.ispwproject.findyourbook.dao.file.ReaderDAOFile;
-import it.ispwproject.findyourbook.model.Publisher;
+
 
 public class DAOFactory {
 

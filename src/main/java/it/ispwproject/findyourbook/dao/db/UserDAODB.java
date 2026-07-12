@@ -40,7 +40,7 @@ public class UserDAODB implements UserDAO {
                 String user = rs.getString("username");
                 String pass = rs.getString("password");
                 String email = rs.getString("email");
-                Role role = Role.fromString(rs.getString("ruolo")); // Usa il fromString allineato
+                Role role = Role.fromString(rs.getString("ruolo"));
 
                 java.sql.Date sqlRegDate = rs.getDate("data_registrazione");
                 LocalDate regDate = (sqlRegDate != null) ? sqlRegDate.toLocalDate() : LocalDate.now();

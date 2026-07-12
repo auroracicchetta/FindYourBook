@@ -19,7 +19,7 @@ public class ReaderDAODB implements ReaderDAO {
 
     @Override
     public Reader findById(int id) throws DAOException {
-        // CORREZIONE: 'LETTORE' diventa 'READER'
+
         String query = "SELECT id, nome, cognome, username, email, password, data_registrazione, data_nascita " +
                 "FROM utenti WHERE id = ? AND ruolo = 'READER'";
         try (Connection conn = ConnectionFactory.getConnection();
@@ -53,7 +53,7 @@ public class ReaderDAODB implements ReaderDAO {
 
     @Override
     public void addFavoriteBook(String username, Book book, String readingStatus) throws DAOException {
-        // Aggiungiamo data_inizio_lettura alla query
+
         String query = "INSERT INTO preferiti (username, titolo, autore, immagine_url, stato_lettura, descrizione, data_inizio_lettura) VALUES (?, ?, ?, ?, ?, ?, ?) " +
                 "ON DUPLICATE KEY UPDATE stato_lettura = ?, descrizione = ?, data_inizio_lettura = ?";
 
@@ -69,21 +69,18 @@ public class ReaderDAODB implements ReaderDAO {
             String desc = book.getDescription() != null ? book.getDescription() : "Trama non disponibile.";
             stmt.setString(6, desc);
 
-            // LA MAGIA DEL TEMPO: Se lo stato è "IN LETTURA" (READING), salviamo la data di oggi!
             java.sql.Date sqlDate = null;
             if ("READING".equalsIgnoreCase(readingStatus) || "IN LETTURA".equalsIgnoreCase(readingStatus)) {
                 sqlDate = java.sql.Date.valueOf(LocalDate.now());
             }
-            stmt.setDate(7, sqlDate); // Per l'INSERT
+            stmt.setDate(7, sqlDate);
 
-            // Aggiornamenti in caso di duplicato
             stmt.setString(8, readingStatus);
             stmt.setString(9, desc);
-            stmt.setDate(10, sqlDate); // Per l'UPDATE
+            stmt.setDate(10, sqlDate);
 
             stmt.executeUpdate();
 
-            // 3. Sincronizzazione automatica delle vendite se il libro viene segnato come LETTO
             if (ReadingStatus.READ.name().equalsIgnoreCase(readingStatus) || "LETTO".equalsIgnoreCase(readingStatus)) {
                 String updateSales = "UPDATE published_books SET copie_vendute = copie_vendute + 1 WHERE title = ?";
                 try (PreparedStatement updateStmt = conn.prepareStatement(updateSales)) {
@@ -136,7 +133,7 @@ public class ReaderDAODB implements ReaderDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Book book = new Book();
-                    // Assicurati che i nomi delle colonne coincidano con quelli del tuo DB
+
                     book.setTitle(rs.getString("titolo"));
                     book.setAuthor(rs.getString("autore"));
                     book.setImageUrl(rs.getString("immagine_url"));

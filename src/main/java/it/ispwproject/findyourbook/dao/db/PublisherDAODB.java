@@ -23,7 +23,7 @@ public class PublisherDAODB implements PublisherDAO {
 
     @Override
     public Publisher findById(int id) throws DAOException {
-        // CORREZIONE: 'CASA_EDITRICE' diventa 'PUBLISHER'
+
         String query = "SELECT id, nome, cognome, username, email, password, data_registrazione, descrizione " +
                 "FROM utenti WHERE id = ? AND ruolo = 'PUBLISHER'";
 
@@ -34,7 +34,7 @@ public class PublisherDAODB implements PublisherDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    LocalDate regDate = rs.getDate("data_registrazione") != null ? rs.getDate("data_registrazione").toLocalDate() : LocalDate.now();
+                    LocalDate regDate = rs.getDate("data_registrazione") != null ? rs.getDate("data_registrazione").toLocalDate() : LocalDate.now(java.time.ZoneId.systemDefault());
 
                     return new Publisher(
                             rs.getInt("id"),
@@ -54,7 +54,7 @@ public class PublisherDAODB implements PublisherDAO {
         return null;
     }
 
-    // --- NUOVI METODI PER IL CATALOGO ---
+
     @Override
     public void publishBook(BookBean book, String publisherUsername) throws DAOException {
         String query = "INSERT INTO published_books (title, author, genre, description, image_url, publisher_username) VALUES (?, ?, ?, ?, ?, ?)";
@@ -85,7 +85,6 @@ public class PublisherDAODB implements PublisherDAO {
     public List<Book> getCatalogByPublisher(String publisherUsername) throws DAOException {
         List<Book> books = new ArrayList<>();
 
-        // Query corretta: punta a published_books e usa i nomi delle colonne in inglese
         String query = "SELECT id, title, author, genre, description, image_url FROM published_books WHERE publisher_username = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
@@ -98,7 +97,6 @@ public class PublisherDAODB implements PublisherDAO {
                     Book b = new Book();
                     b.setId(rs.getInt("id"));
 
-                    // Nomi delle colonne aggiornati all'inglese
                     b.setTitle(rs.getString("title"));
                     b.setAuthor(rs.getString("author"));
                     b.setGenre(rs.getString("genre"));
@@ -118,7 +116,7 @@ public class PublisherDAODB implements PublisherDAO {
 
     @Override
     public void updateBook(BookBean book, String publisherUsername) throws DAOException {
-        // Permettiamo di aggiornare la trama e la copertina
+
         String query = "UPDATE published_books SET description = ?, image_url = ? WHERE title = ? AND publisher_username = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();

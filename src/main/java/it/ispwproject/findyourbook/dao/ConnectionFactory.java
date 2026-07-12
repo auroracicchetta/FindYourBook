@@ -1,6 +1,6 @@
 package it.ispwproject.findyourbook.dao;
 
-import java.io.FileInputStream;
+
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,7 +18,7 @@ public class ConnectionFactory {
     static {
         try (InputStream input = ConnectionFactory.class.getClassLoader().getResourceAsStream("db.properties")) {
             if (input == null) {
-                throw new Exception("File db.properties non trovato nel classpath!");
+                throw new IllegalStateException("File db.properties non trovato nel classpath!");
             }
             props.load(input);
         } catch (Exception e) {
@@ -26,7 +26,6 @@ public class ConnectionFactory {
         }
     }
 
-    // Sostituita l'eccezione generica con SQLException
     public static Connection getConnection() throws SQLException {
 
         return DriverManager.getConnection(

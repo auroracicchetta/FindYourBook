@@ -15,7 +15,8 @@ public class LoginDAODB implements LoginDAO {
 
     @Override
     public Credentials execute(String username, String plainPassword) throws LoginException {
-        String hashedPassword = plainPassword; // Questo è l'hash SHA-256 che arriva dal Controller
+        String hashedPassword = plainPassword;
+
 
         try (Connection conn = ConnectionFactory.getConnection();
              CallableStatement cs = conn.prepareCall("{call login(?, ?, ?, ?, ?, ?)}")) {

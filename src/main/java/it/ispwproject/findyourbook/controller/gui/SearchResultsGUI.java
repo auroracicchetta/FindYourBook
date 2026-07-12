@@ -36,8 +36,6 @@ public class SearchResultsGUI {
 
     public void show() {
 
-        String username = it.ispwproject.findyourbook.pattern.singleton.SessionManager.getInstance().getLoggedUser().getUsername();
-
         Parent root = view.buildRoot(
                 this.username,
                 this.results,

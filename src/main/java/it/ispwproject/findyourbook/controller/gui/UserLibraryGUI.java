@@ -62,8 +62,13 @@ public class UserLibraryGUI {
         loadBooksByStatus(currentFilter);
     }
 
+    // Nuovo metodo statico per risolvere il Code Smell sull'assegnazione statica
+    private static void updateCurrentFilter(ReadingStatus status) {
+        currentFilter = status;
+    }
+
     private void loadBooksByStatus(ReadingStatus status) {
-        UserLibraryGUI.currentFilter = status;
+        updateCurrentFilter(status); // Richiama il metodo statico invece di assegnarlo direttamente
         view.setActiveButton(status);
         AppLogger.logInfo("Richiesti libri per lo stato: " + status.name());
 
@@ -118,30 +123,35 @@ public class UserLibraryGUI {
         }
     }
 
-    private void updateToNewStatus(BookBean book, String newStatus) throws Exception {
-        User loggedUser = SessionManager.getInstance().getLoggedUser();
-        ReadingStatus targetStatus = null;
+    // Rimosso "throws Exception" dalla firma, gestito internamente
+    private void updateToNewStatus(BookBean book, String newStatus) {
+        try {
+            User loggedUser = SessionManager.getInstance().getLoggedUser();
+            ReadingStatus targetStatus = null;
 
-        if (newStatus.equals(ReadingStatus.TO_READ.getDisplayName()) || newStatus.equals(ReadingStatus.TO_READ.name())) {
-            targetStatus = ReadingStatus.TO_READ;
-        } else if (newStatus.equals(ReadingStatus.READING.getDisplayName()) || newStatus.equals(ReadingStatus.READING.name())) {
-            targetStatus = ReadingStatus.READING;
-        } else if (newStatus.equals(ReadingStatus.READ.getDisplayName()) || newStatus.equals(ReadingStatus.READ.name())) {
-            targetStatus = ReadingStatus.READ;
-        }
-
-        if (targetStatus != null) {
-            userLibraryController.saveBookToLibrary(book, targetStatus);
-            book.setStatus(targetStatus);
-            AppLogger.logInfo("Stato aggiornato a: " + targetStatus.name());
-
-            if (targetStatus == ReadingStatus.READ) {
-                NotificationService.sendReadingGoalReachedNotification(
-                        loggedUser.getEmail(),
-                        loggedUser.getName(),
-                        book.getTitle()
-                );
+            if (newStatus.equals(ReadingStatus.TO_READ.getDisplayName()) || newStatus.equals(ReadingStatus.TO_READ.name())) {
+                targetStatus = ReadingStatus.TO_READ;
+            } else if (newStatus.equals(ReadingStatus.READING.getDisplayName()) || newStatus.equals(ReadingStatus.READING.name())) {
+                targetStatus = ReadingStatus.READING;
+            } else if (newStatus.equals(ReadingStatus.READ.getDisplayName()) || newStatus.equals(ReadingStatus.READ.name())) {
+                targetStatus = ReadingStatus.READ;
             }
+
+            if (targetStatus != null) {
+                userLibraryController.saveBookToLibrary(book, targetStatus);
+                book.setStatus(targetStatus);
+                AppLogger.logInfo("Stato aggiornato a: " + targetStatus.name());
+
+                if (targetStatus == ReadingStatus.READ) {
+                    NotificationService.sendReadingGoalReachedNotification(
+                            loggedUser.getEmail(),
+                            loggedUser.getName(),
+                            book.getTitle()
+                    );
+                }
+            }
+        } catch (Exception e) {
+            AppLogger.logError("Errore durante l'aggiornamento dello stato: " + e.getMessage());
         }
     }
 

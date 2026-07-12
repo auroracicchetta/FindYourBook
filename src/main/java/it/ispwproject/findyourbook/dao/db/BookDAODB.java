@@ -11,7 +11,6 @@ import java.util.List;
 
 public class BookDAODB implements BookDAO {
 
-    // 1. CORREZIONE: Usiamo la tabella 'published_books' e le colonne in inglese!
     private static final String SELECT_BY_GENRE = "SELECT id, title, author, genre, image_url, description, publisher_username, copie_vendute FROM published_books WHERE genre = ?";
     private static final String SEARCH_QUERY = "SELECT id, title, author, genre, image_url, description, publisher_username, copie_vendute FROM published_books WHERE title LIKE ? OR author LIKE ?";
 
@@ -60,7 +59,6 @@ public class BookDAODB implements BookDAO {
     private Book mapToBook(ResultSet rs) throws SQLException {
         Book book = new Book();
 
-        // 2. CORREZIONE: Estraiamo i dati usando i nomi esatti delle colonne del DB
         book.setId(rs.getInt("id"));
         book.setTitle(rs.getString("title"));
         book.setAuthor(rs.getString("author"));
