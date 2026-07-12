@@ -35,38 +35,40 @@ The system supports three persistence mode:
 ## Getting started
 At startup, the application asks to select the persistence mode:
 
-Demo → simulated in-memory data
-Database → MySQL persistence
-File → JSON file persistence
-Then, the interface must be selected:
+** Demo → simulated in-memory data
+** Database → MySQL persistence
+** File → JSON file persistence
 
-CLI → text-based interface
-GUI → graphical interface
-To use the database mode, create and configure the following file: 
-`src/main/resources/db.properties` 
-with the following structure:
+** Then, the interface must be selected:
 
-CONNECTION_URL=jdbc:mysql://localhost:3306/findyourbookdb
-LOGIN_USER=root
-LOGIN_PASS=
-SENDGRID_API_KEY=TUA_API_KEY
-SENDGRID_FROM_EMAIL=findyourbook.support@gmail.com
+** CLI → text-based interface
+** GUI → graphical interface
+**To use the database mode, create and configure the following file: 
 
-⚠️ The db.properties file includes database credentials and a placeholder for the SendGrid API key. Email notifications in action can be seen in the project demo video.
+**`src/main/resources/db.properties` 
+** with the following structure:
 
-Demo credentials
-Role	        Username	              Password
-Reader	       mario	                qualsiasi
-Publisher	   mondadori              	qualsiasi
+** CONNECTION_URL=jdbc:mysql://localhost:3306/findyourbookdb
+** LOGIN_USER=root
+** LOGIN_PASS=
+** SENDGRID_API_KEY=TUA_API_KEY
+** SENDGRID_FROM_EMAIL=findyourbook.support@gmail.com
 
-Database credentials (modalità MySQL)
-Role	        Username	                Password
-Reader	       mario	                Password123!
-Publisher	    mondadori              	Password123!
+** ⚠️ The db.properties file includes database credentials and a placeholder for the SendGrid API key. Email notifications in action can be seen in the project demo video.
 
-Other test accounts available, see BrainBank_db.sql for the full list.
+** Demo credentials
+** Role	        Username	              Password
+** Reader	       mario	                qualsiasi
+** Publisher	   mondadori              	qualsiasi
 
-Author
+** Database credentials (modalità MySQL)
+** Role	        Username	                Password
+** Reader	       mario	                Password123!
+** Publisher	    mondadori              	Password123!
+
+**Other test accounts available, see BrainBank_db.sql for the full list.
+
+## Author
 Cicchetta Aurora
 
   
