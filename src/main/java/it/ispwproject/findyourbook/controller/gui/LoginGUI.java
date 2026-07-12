@@ -42,8 +42,7 @@ public class LoginGUI {
             switch (result) {
                 case SUCCESSO_READER -> MainGUI.showReaderDashboard();
                 case SUCCESSO_PUBLISHER -> MainGUI.showPublisherDashboard();
-                case SUCCESSO_ADMIN -> view.setError("Dashboard Admin in costruzione!");
-            }
+                }
 
         } catch (LoginException e) {
             view.setError(e.getMessage());

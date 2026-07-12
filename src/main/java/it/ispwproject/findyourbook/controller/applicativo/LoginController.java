@@ -15,7 +15,6 @@ public class LoginController {
     public enum LoginResult {
         SUCCESSO_READER,
         SUCCESSO_PUBLISHER,
-        SUCCESSO_ADMIN
     }
 
     public LoginResult login(String username, String password) throws LoginException, DAOException {
@@ -52,7 +51,6 @@ public class LoginController {
         return switch (credentials.getRole()) {
             case READER -> LoginResult.SUCCESSO_READER;
             case PUBLISHER -> LoginResult.SUCCESSO_PUBLISHER;
-            case ADMIN -> LoginResult.SUCCESSO_ADMIN;
             default -> throw new IllegalStateException("Ruolo non riconosciuto: " + credentials.getRole());
         };
     }
