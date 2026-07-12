@@ -45,14 +45,15 @@ At startup, the application asks to select the persistence mode:
 ** GUI → graphical interface
 **To use the database mode, create and configure the following file: 
 
-**`src/main/resources/db.properties` 
-** with the following structure:
+`src/main/resources/db.properties` 
+with the following structure:
 
-** CONNECTION_URL=jdbc:mysql://localhost:3306/findyourbookdb
-** LOGIN_USER=root
-** LOGIN_PASS=
-** SENDGRID_API_KEY=TUA_API_KEY
-** SENDGRID_FROM_EMAIL=findyourbook.support@gmail.com
+```properties
+CONNECTION_URL=jdbc:mysql://localhost:3306/findyourbookdb
+LOGIN_USER=root
+LOGIN_PASS=
+SENDGRID_API_KEY=TUA_API_KEY
+SENDGRID_FROM_EMAIL=findyourbook.support@gmail.com
 
 ** ⚠️ The db.properties file includes database credentials and a placeholder for the SendGrid API key. Email notifications in action can be seen in the project demo video.
 
