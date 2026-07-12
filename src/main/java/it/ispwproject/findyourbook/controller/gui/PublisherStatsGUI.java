@@ -4,6 +4,7 @@ import it.ispwproject.findyourbook.bean.PublisherStatsBean;
 import it.ispwproject.findyourbook.controller.applicativo.PublisherStatsController;
 import it.ispwproject.findyourbook.exception.DAOException;
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
+import it.ispwproject.findyourbook.util.logger.AppLogger;
 import it.ispwproject.findyourbook.view.gui.PublisherStatsGUIView;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -43,7 +44,7 @@ public class PublisherStatsGUI {
             PublisherStatsBean stats = controller.getStatistics(username);
             view.updateView(stats);
         } catch (DAOException e) {
-            System.err.println("Errore nel caricamento delle statistiche: " + e.getMessage());
+            AppLogger.logError("Errore nel caricamento delle statistiche: " + e.getMessage());
         }
     }
 }

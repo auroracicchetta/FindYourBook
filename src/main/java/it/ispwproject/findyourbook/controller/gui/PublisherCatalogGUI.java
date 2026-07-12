@@ -21,10 +21,9 @@ public class PublisherCatalogGUI {
     private final PublisherCatalogGUIView view = new PublisherCatalogGUIView();
     private final PublisherController appController = new PublisherController();
     private List<BookBean> allBooks = new ArrayList<>();
-    private final String companyName;  // <--- AGGIUNTO
-    private final Runnable onLogout;   // <--- AGGIUNTO
+    private final String companyName;
+    private final Runnable onLogout;
 
-    // ✅ AGGIUNGI companyName e onLogout al costruttore
     public PublisherCatalogGUI(Stage stage, String companyName, Runnable onLogout) {
         this.stage = stage;
         this.companyName = companyName;
@@ -32,7 +31,6 @@ public class PublisherCatalogGUI {
     }
 
     public void show() {
-        // ✅ PASSAGGIO PARAMETRI CORRETTO!
         Scene scene = GUIUtils.createScene(view.buildRoot(
                 companyName,
                 this::handleBack,

@@ -20,8 +20,8 @@ public class RegistrationGUI {
 
     public void show() {
         Parent root = view.buildRoot(
-                () -> new LoginGUI(stage).show(), // Azione per 'Indietro'
-                this::handleRegistration          // Azione per 'Completa registrazione'
+                () -> new LoginGUI(stage).show(),
+                this::handleRegistration
         );
 
         Scene scene = GUIUtils.createScene(root);
@@ -40,7 +40,7 @@ public class RegistrationGUI {
 
         bean.setBirthDate(view.dataNascita.getValue());
 
-        // 1. Uso dei ruoli corretti in inglese
+
         bean.setRole(view.casaEditriceRadio.isSelected() ? Role.PUBLISHER : Role.READER);
 
         if (view.casaEditriceRadio.isSelected()) {
@@ -61,11 +61,9 @@ public class RegistrationGUI {
             new LoginGUI(stage).show();
 
         } catch (RegistrationException e) {
-            // 2. Errore lato utente (es. email duplicata, password errata, under 14)
             AppLogger.logWarning("Errore di validazione: " + e.getMessage());
             view.setError(e.getMessage());
         } catch (DAOException e) {
-            // 3. Errore tecnico del sistema (DB disconnesso)
             AppLogger.logError("Errore di sistema: " + e.getMessage());
             view.setError("Errore di sistema durante la registrazione. Riprova più tardi.");
         }

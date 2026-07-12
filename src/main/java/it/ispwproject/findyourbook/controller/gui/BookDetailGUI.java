@@ -4,10 +4,8 @@ import it.ispwproject.findyourbook.bean.BookBean;
 import it.ispwproject.findyourbook.controller.applicativo.BookController;
 import it.ispwproject.findyourbook.controller.applicativo.UserLibraryController;
 import it.ispwproject.findyourbook.enumerator.ReadingStatus;
-import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
 import it.ispwproject.findyourbook.view.gui.BookDetailGUIView;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
-import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -39,38 +37,11 @@ public class BookDetailGUI {
     }
 
     public void show() {
-
         Parent root = view.buildRoot(
                 this.username,
                 this.book,
                 this.currentStatus,
-
-                selectedOption -> {
-                    try {
-                        if (selectedOption == null || selectedOption.equals("Rimuovi libro") || selectedOption.equals("RIMUOVI")) {
-                            userLibraryController.removeBookFromLibrary(this.book);
-                            this.book.setStatus(null);
-                        } else {
-                            ReadingStatus newStatus = null;
-                            if (selectedOption.equals(ReadingStatus.TO_READ.name()) || selectedOption.equals(ReadingStatus.TO_READ.getDisplayName())) {
-                                newStatus = ReadingStatus.TO_READ;
-                            } else if (selectedOption.equals(ReadingStatus.READING.name()) || selectedOption.equals(ReadingStatus.READING.getDisplayName())) {
-                                newStatus = ReadingStatus.READING;
-                            } else if (selectedOption.equals(ReadingStatus.READ.name()) || selectedOption.equals(ReadingStatus.READ.getDisplayName())) {
-                                newStatus = ReadingStatus.READ;
-                            } else {
-                                newStatus = ReadingStatus.valueOf(selectedOption); // Fallback
-                            }
-
-                            userLibraryController.saveBookToLibrary(this.book, newStatus);
-                            this.book.setStatus(newStatus);
-                        }
-                    } catch (Exception e) {
-                        AppLogger.logError("Errore aggiornamento libreria: " + e.getMessage());
-                    }
-                },
-
-                // 5. Azione valutazione
+                this::handleStatusChange,
                 rating -> {
                     try {
                         new UserLibraryController().rateBook(this.book, rating);
@@ -86,10 +57,34 @@ public class BookDetailGUI {
                 this::handleSearch
         );
 
-
         Scene scene = GUIUtils.createScene(root);
         stage.setScene(scene);
         stage.show();
+    }
+
+    private void handleStatusChange(String selectedOption) {
+        try {
+            if (selectedOption == null || selectedOption.equals("Rimuovi libro") || selectedOption.equals("RIMUOVI")) {
+                userLibraryController.removeBookFromLibrary(this.book);
+                this.book.setStatus(null);
+            } else {
+                ReadingStatus newStatus = null;
+                if (selectedOption.equals(ReadingStatus.TO_READ.name()) || selectedOption.equals(ReadingStatus.TO_READ.getDisplayName())) {
+                    newStatus = ReadingStatus.TO_READ;
+                } else if (selectedOption.equals(ReadingStatus.READING.name()) || selectedOption.equals(ReadingStatus.READING.getDisplayName())) {
+                    newStatus = ReadingStatus.READING;
+                } else if (selectedOption.equals(ReadingStatus.READ.name()) || selectedOption.equals(ReadingStatus.READ.getDisplayName())) {
+                    newStatus = ReadingStatus.READ;
+                } else {
+                    newStatus = ReadingStatus.valueOf(selectedOption);
+                }
+
+                userLibraryController.saveBookToLibrary(this.book, newStatus);
+                this.book.setStatus(newStatus);
+            }
+        } catch (Exception e) {
+            AppLogger.logError("Errore aggiornamento libreria: " + e.getMessage());
+        }
     }
 
     private void handleSearch(String query) {

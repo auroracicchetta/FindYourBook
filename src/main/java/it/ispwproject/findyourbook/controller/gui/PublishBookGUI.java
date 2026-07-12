@@ -13,8 +13,8 @@ public class PublishBookGUI {
 
     private final Stage stage;
     private final PublishBookGUIView view = new PublishBookGUIView();
-    private final String companyName;  // <--- AGGIUNTO
-    private final Runnable onLogout;   // <--- AGGIUNTO
+    private final String companyName;
+    private final Runnable onLogout;
 
     public PublishBookGUI(Stage stage, String companyName, Runnable onLogout) {
         this.stage = stage;

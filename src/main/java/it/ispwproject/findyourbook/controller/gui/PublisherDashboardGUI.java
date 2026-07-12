@@ -12,8 +12,8 @@ public class PublisherDashboardGUI {
 
     private final Stage stage;
     private final PublisherDashboardGUIView view = new PublisherDashboardGUIView();
-    private final String companyName;  // <--- AGGIUNTO
-    private final Runnable onLogout;   // <--- AGGIUNTO
+    private final String companyName;
+    private final Runnable onLogout;
 
     public PublisherDashboardGUI(Stage stage, String companyName, Runnable onLogout) {
         this.stage = stage;

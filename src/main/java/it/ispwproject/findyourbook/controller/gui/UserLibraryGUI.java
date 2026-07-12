@@ -9,7 +9,6 @@ import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
 import it.ispwproject.findyourbook.service.NotificationService;
 import it.ispwproject.findyourbook.view.gui.UserLibraryGUIView;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
-import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
@@ -38,11 +37,9 @@ public class UserLibraryGUI {
     }
 
     public void show() {
-        User loggedUser = SessionManager.getInstance().getLoggedUser();
-        String username = loggedUser.getUsername();
         int readCount = 0;
         try {
-            readCount = bookController.getFavoriteBooks(username, ReadingStatus.READ).size();
+            readCount = bookController.getFavoriteBooks(this.username, ReadingStatus.READ).size();
         } catch (Exception e) {
             AppLogger.logWarning("Impossibile recuperare il conteggio dei libri letti.");
         }
@@ -50,32 +47,28 @@ public class UserLibraryGUI {
         userLibraryController.checkInactiveReading();
 
         Parent root = view.buildRoot(
-                username,
+                this.username,
                 readCount,
-                () -> new ReaderDashboardGUI(stage, username, onLogout).show(),
+                () -> new ReaderDashboardGUI(stage, this.username, onLogout).show(),
                 onLogout,
                 this::handleSearch,
                 this::loadBooksByStatus
         );
-
 
         Scene scene = GUIUtils.createScene(root);
         stage.setScene(scene);
         stage.show();
 
         loadBooksByStatus(currentFilter);
-
     }
 
     private void loadBooksByStatus(ReadingStatus status) {
-
-        this.currentFilter = status;
+        UserLibraryGUI.currentFilter = status;
         view.setActiveButton(status);
         AppLogger.logInfo("Richiesti libri per lo stato: " + status.name());
 
         try {
-            String username = SessionManager.getInstance().getLoggedUser().getUsername();
-            List<BookBean> libriTrovati = bookController.getFavoriteBooks(username, status);
+            List<BookBean> libriTrovati = bookController.getFavoriteBooks(this.username, status);
             List<VBox> bookCards = new ArrayList<>();
 
             for (BookBean book : libriTrovati) {
@@ -92,8 +85,8 @@ public class UserLibraryGUI {
                                 AppLogger.logError("Errore nel salvataggio del voto.");
                             }
                         },
-                        () -> new BookDetailGUI(stage, username, onLogout, book, status,
-                                () -> new UserLibraryGUI(stage, username, onLogout).show()
+                        () -> new BookDetailGUI(stage, this.username, onLogout, book, status,
+                                () -> new UserLibraryGUI(stage, this.username, onLogout).show()
                         ).show()
                 );
                 bookCards.add(card);
@@ -110,41 +103,45 @@ public class UserLibraryGUI {
         AppLogger.logInfo("Richiesto spostamento del libro '" + book.getTitle() + "' in " + newStatus);
 
         try {
-            User loggedUser = SessionManager.getInstance().getLoggedUser();
-
             if ("Rimuovi libro".equals(newStatus) || "RIMUOVI".equals(newStatus)) {
                 userLibraryController.removeBookFromLibrary(book);
                 book.setStatus(null);
-                AppLogger.logInfo("✅ Libro rimosso definitivamente dal Database.");
+                AppLogger.logInfo("Libro rimosso definitivamente dal Database.");
             } else {
-                ReadingStatus targetStatus = null;
-                if (newStatus.equals(ReadingStatus.TO_READ.getDisplayName()) || newStatus.equals(ReadingStatus.TO_READ.name())) {
-                    targetStatus = ReadingStatus.TO_READ;
-                } else if (newStatus.equals(ReadingStatus.READING.getDisplayName()) || newStatus.equals(ReadingStatus.READING.name())) {
-                    targetStatus = ReadingStatus.READING;
-                } else if (newStatus.equals(ReadingStatus.READ.getDisplayName()) || newStatus.equals(ReadingStatus.READ.name())) {
-                    targetStatus = ReadingStatus.READ;
-                }
-
-                if (targetStatus != null) {
-                    userLibraryController.saveBookToLibrary(book, targetStatus);
-                    book.setStatus(targetStatus);
-                    AppLogger.logInfo("✅ Stato aggiornato a: " + targetStatus.name());
-
-                    if (targetStatus == ReadingStatus.READ) {
-                        NotificationService.sendReadingGoalReachedNotification(
-                                loggedUser.getEmail(),
-                                loggedUser.getName(),
-                                book.getTitle()
-                        );
-                    }
-                }
+                updateToNewStatus(book, newStatus);
             }
 
             this.show();
 
         } catch (Exception e) {
             AppLogger.logError("Errore durante la comunicazione con il Database: " + e.getMessage());
+        }
+    }
+
+    private void updateToNewStatus(BookBean book, String newStatus) throws Exception {
+        User loggedUser = SessionManager.getInstance().getLoggedUser();
+        ReadingStatus targetStatus = null;
+
+        if (newStatus.equals(ReadingStatus.TO_READ.getDisplayName()) || newStatus.equals(ReadingStatus.TO_READ.name())) {
+            targetStatus = ReadingStatus.TO_READ;
+        } else if (newStatus.equals(ReadingStatus.READING.getDisplayName()) || newStatus.equals(ReadingStatus.READING.name())) {
+            targetStatus = ReadingStatus.READING;
+        } else if (newStatus.equals(ReadingStatus.READ.getDisplayName()) || newStatus.equals(ReadingStatus.READ.name())) {
+            targetStatus = ReadingStatus.READ;
+        }
+
+        if (targetStatus != null) {
+            userLibraryController.saveBookToLibrary(book, targetStatus);
+            book.setStatus(targetStatus);
+            AppLogger.logInfo("Stato aggiornato a: " + targetStatus.name());
+
+            if (targetStatus == ReadingStatus.READ) {
+                NotificationService.sendReadingGoalReachedNotification(
+                        loggedUser.getEmail(),
+                        loggedUser.getName(),
+                        book.getTitle()
+                );
+            }
         }
     }
 
@@ -156,7 +153,7 @@ public class UserLibraryGUI {
         try {
             List<BookBean> risultati = bookController.searchBooks(query);
             userLibraryController.syncBooksWithDatabase(risultati);
-            new SearchResultsGUI(stage, username, onLogout, risultati, query).show();
+            new SearchResultsGUI(stage, this.username, onLogout, risultati, query).show();
 
         } catch (Exception e) {
             AppLogger.logError("Errore ricerca: " + e.getMessage());

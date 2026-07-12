@@ -17,10 +17,9 @@ public class LoginGUI {
     public LoginGUI(Stage stage) { this.stage = stage; }
 
     public void show() {
-        // Creiamo il layout
+
         javafx.scene.layout.VBox root = view.buildRoot(this::handleLogin, () -> new RegistrationGUI(stage).show());
 
-        // Usiamo il nostro GUIUtils che contiene il CSS
         Scene scene = GUIUtils.createScene(root);
 
         stage.setScene(scene);
@@ -39,7 +38,7 @@ public class LoginGUI {
         try {
             LoginResult result = loginController.login(username, password);
 
-            // Allineato ai nuovi Enum in Inglese!
+
             switch (result) {
                 case SUCCESSO_READER -> MainGUI.showReaderDashboard();
                 case SUCCESSO_PUBLISHER -> MainGUI.showPublisherDashboard();
@@ -47,10 +46,8 @@ public class LoginGUI {
             }
 
         } catch (LoginException e) {
-            // Gestione Specifica 1: L'utente ha sbagliato i dati
             view.setError(e.getMessage());
         } catch (DAOException e) {
-            // Gestione Specifica 2: Il DB o il sistema ha un problema
             view.setError("Errore di sistema. Riprova più tardi.");
         }
     }

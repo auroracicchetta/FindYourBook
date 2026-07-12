@@ -45,7 +45,7 @@ public class MainGUI extends Application {
         String displayName = loggedUser.getUsername();
 
         if (displayName == null || displayName.isEmpty()) {
-            displayName = loggedUser.getName();  // Fallback
+            displayName = loggedUser.getName();
         }
         if (displayName == null || displayName.isEmpty()) {
             displayName = "Lettore";

@@ -3,7 +3,6 @@ package it.ispwproject.findyourbook.controller.gui;
 import it.ispwproject.findyourbook.bean.BookBean;
 import it.ispwproject.findyourbook.controller.applicativo.BookController;
 import it.ispwproject.findyourbook.controller.applicativo.UserLibraryController;
-import it.ispwproject.findyourbook.enumerator.ReadingStatus;import it.ispwproject.findyourbook.enumerator.ReadingStatus;
 import it.ispwproject.findyourbook.view.gui.SearchResultsGUIView;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
 import javafx.application.Platform;
@@ -40,15 +39,15 @@ public class SearchResultsGUI {
         String username = it.ispwproject.findyourbook.pattern.singleton.SessionManager.getInstance().getLoggedUser().getUsername();
 
         Parent root = view.buildRoot(
-                username,
+                this.username,
                 this.results,
                 this.lastQuery,
-                () -> new ReaderDashboardGUI(stage, username, onLogout).show(),
+                () -> new ReaderDashboardGUI(stage, this.username, onLogout).show(),
                 this::handleSearch,
                 onLogout,
-                () -> new UserLibraryGUI(stage, username, onLogout).show(),
-                book -> new BookDetailGUI(stage, username, onLogout, book, book.getStatus(),
-                        () -> new SearchResultsGUI(stage, username, onLogout, this.results, this.lastQuery).show()
+                () -> new UserLibraryGUI(stage, this.username, onLogout).show(),
+                book -> new BookDetailGUI(stage, this.username, onLogout, book, book.getStatus(),
+                        () -> new SearchResultsGUI(stage, this.username, onLogout, this.results, this.lastQuery).show()
                 ).show(),
 
                 (book, newStatus) -> {
@@ -58,11 +57,10 @@ public class SearchResultsGUI {
                             libController.removeBookFromLibrary(book);
                             book.setStatus(null);
                         } else {
-                            // newStatus è già un ReadingStatus, lo passiamo direttamente senza valueOf!
                             libController.saveBookToLibrary(book, newStatus);
                             book.setStatus(newStatus);
                         }
-                        AppLogger.logInfo("✅ Stato griglia aggiornato per: " + book.getTitle());
+                        AppLogger.logInfo("Stato griglia aggiornato per: " + book.getTitle());
                     } catch (Exception e) {
                         AppLogger.logError("Errore salvataggio stato da griglia: " + e.getMessage());
                     }
@@ -71,8 +69,8 @@ public class SearchResultsGUI {
                 (book, rating) -> {
                     try {
                         userLibraryController.rateBook(book, rating);
-                        book.setRating(rating); // <-- AGGIORNAMENTO ISTANTANEO DEL VOTO
-                        AppLogger.logInfo("⭐ Voto griglia aggiornato per: " + book.getTitle());
+                        book.setRating(rating);
+                        AppLogger.logInfo("Voto griglia aggiornato per: " + book.getTitle());
                     } catch (Exception e) {
                         AppLogger.logError("Errore valutazione da griglia: " + e.getMessage());
                     }
@@ -91,7 +89,7 @@ public class SearchResultsGUI {
             List<BookBean> risultati = bookController.searchBooks(query);
             new UserLibraryController().syncBooksWithDatabase(risultati);
 
-            new SearchResultsGUI(stage, username, onLogout, risultati, query).show();
+            new SearchResultsGUI(stage, this.username, onLogout, risultati, query).show();
         } catch (Exception e) {
             AppLogger.logError("Errore ricerca: " + e.getMessage());
         }
