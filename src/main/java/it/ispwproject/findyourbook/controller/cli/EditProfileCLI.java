@@ -1,0 +1,54 @@
+package it.ispwproject.findyourbook.controller.cli;
+
+import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
+import it.ispwproject.findyourbook.pattern.state.AbstractCLIState;
+import it.ispwproject.findyourbook.pattern.state.CLIStateMachine;
+
+import it.ispwproject.findyourbook.controller.applicativo.UserController;
+import it.ispwproject.findyourbook.exception.DAOException;
+import it.ispwproject.findyourbook.view.cli.EditProfileView;
+
+public class EditProfileCLI extends AbstractCLIState {
+
+    private final UserController userController = new UserController();
+    private final EditProfileView view = new EditProfileView();
+
+    @Override
+    public void entry(CLIStateMachine context) {
+        view.mostraIntestazione();
+        var user = SessionManager.getInstance().getLoggedUser();
+        view.mostraDatiAttuali(user.getName(), user.getEmail());
+    }
+
+    @Override
+    public void action(CLIStateMachine context) {
+        String scelta = "";
+
+        while (!scelta.equals("0")) {
+            view.mostraMenu();
+            scelta = view.chiediScelta();
+
+            switch (scelta) {
+                case "1" -> editEmail();
+                case "0" -> { /* esce dal while */ }
+                default  -> view.mostraErrore("Scelta non valida.");
+            }
+        }
+
+        goBack(context);
+    }
+
+    private void editEmail() {
+        String newEmail = view.chiediCampo("Nuova email");
+        if (!view.chiediConferma("Confermare il cambio email a " + newEmail + "?")) {
+            view.mostraMessaggio("Operazione annullata.");
+            return;
+        }
+        try {
+            userController.updateEmail(newEmail);
+            view.mostraSuccesso("Email aggiornata con successo.");
+        } catch (DAOException e) {
+            view.mostraErrore(e.getMessage());
+        }
+    }
+}

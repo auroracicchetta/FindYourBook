@@ -10,7 +10,6 @@ public class CLIStateMachineImpl implements CLIStateMachine {
     private final Deque<AbstractCLIState> stateHistory = new ArrayDeque<>();
 
     public CLIStateMachineImpl() {
-        // Partirà dalla schermata iniziale (Login/Registrazione)
         this.currentState = new InitialCLI();
     }
 

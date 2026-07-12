@@ -12,7 +12,6 @@ public class SessionManager {
 
     private SessionManager() {}
 
-    // Il pattern "Holder" esatto del tuo collega
     private static class Holder {
         private static final SessionManager INSTANCE = new SessionManager();
     }
@@ -43,11 +42,11 @@ public class SessionManager {
 
     // Metodi di controllo ruolo adattati al tuo progetto
     public boolean isLettore() {
-        return isLoggedIn() && loggedUser.getRole() == Role.LETTORE;
+        return isLoggedIn() && loggedUser.getRole() == Role.READER;
     }
 
     public boolean isCasaEditrice() {
-        return isLoggedIn() && loggedUser.getRole() == Role.CASA_EDITRICE;
+        return isLoggedIn() && loggedUser.getRole() == Role.PUBLISHER;
     }
 
     public void clearSession() {

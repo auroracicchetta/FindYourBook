@@ -1,0 +1,14 @@
+{
+  "mario": [
+    {
+      "id": 5,
+      "title": "Il Signore degli Anelli",
+      "author": "J.R.R. Tolkien",
+      "genre": "fantasy",
+      "description": "L'epico e insuperabile viaggio della Compagnia dell'Anello, formata da uomini, un elfo, un nano, hobbit e lo stregone Gandalf, determinati a percorrere la Terra di Mezzo fino alle terre oscure di Mordor per distruggere l'Unico Anello nel fuoco del Monte Fato e sconfiggere per sempre il potere dell'Oscuro Signore Sauron, in un racconto fondativo della letteratura fantastica moderna.",
+      "imageUrl": "https://m.media-amazon.com/images/I/6190PaQZkrL._SL1500_.jpg",
+      "status": "READING",
+      "rating": 0
+    }
+  ]
+}

@@ -4,6 +4,7 @@ import it.ispwproject.findyourbook.controller.applicativo.LoginController;
 import it.ispwproject.findyourbook.controller.applicativo.LoginController.LoginResult;
 import it.ispwproject.findyourbook.view.gui.LoginGUIView;
 import it.ispwproject.findyourbook.exception.DAOException;
+import it.ispwproject.findyourbook.exception.LoginException;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -19,15 +20,14 @@ public class LoginGUI {
         // Creiamo il layout
         javafx.scene.layout.VBox root = view.buildRoot(this::handleLogin, () -> new RegistrationGUI(stage).show());
 
-        // LA MAGIA È QUI: Invece di fare 'new Scene', usiamo il nostro GUIUtils che contiene il CSS!
-        Scene scene = it.ispwproject.findyourbook.controller.gui.GUIUtils.createScene(root);
+        // Usiamo il nostro GUIUtils che contiene il CSS
+        Scene scene = GUIUtils.createScene(root);
 
         stage.setScene(scene);
         stage.show();
     }
 
     private void handleLogin() {
-        // CORREZIONE: Leggiamo l'username, non l'email!
         String username = view.usernameField.getText().trim();
         String password = view.passwordField.getText().trim();
 
@@ -38,12 +38,20 @@ public class LoginGUI {
 
         try {
             LoginResult result = loginController.login(username, password);
+
+            // Allineato ai nuovi Enum in Inglese!
             switch (result) {
-                case SUCCESSO_LETTORE -> MainGUI.showReaderDashboard();
-                case SUCCESSO_CASA_EDITRICE -> MainGUI.showPublisherDashboard();
+                case SUCCESSO_READER -> MainGUI.showReaderDashboard();
+                case SUCCESSO_PUBLISHER -> MainGUI.showPublisherDashboard();
+                case SUCCESSO_ADMIN -> view.setError("Dashboard Admin in costruzione!");
             }
-        } catch (DAOException e) { // <-- Risolto il code smell dell'eccezione generica!
-            view.setError("Login fallito: " + e.getMessage());
+
+        } catch (LoginException e) {
+            // Gestione Specifica 1: L'utente ha sbagliato i dati
+            view.setError(e.getMessage());
+        } catch (DAOException e) {
+            // Gestione Specifica 2: Il DB o il sistema ha un problema
+            view.setError("Errore di sistema. Riprova più tardi.");
         }
     }
 }

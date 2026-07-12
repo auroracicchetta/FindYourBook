@@ -94,18 +94,13 @@ public class RegistrationGUIView {
 
         // Pulsante Indietro (Grafica a pillola sicura e testo corretto)
         // Pulsante Indietro con effetto Sottolineatura al passaggio del mouse
+
         Button backBtn = new Button("< Indietro");
 
-        // Definiamo lo stile normale (Trasparente, solo testo scuro)
-        String stileBase = "-fx-background-color: transparent; -fx-padding: 8 15; -fx-cursor: hand; -fx-text-fill: #4A3F35; -fx-font-weight: bold; -fx-font-size: 14px;";
-        // Definiamo lo stile quando ci passi sopra (Aggiunge la sottolineatura)
-        String stileHover = stileBase + " -fx-underline: true;";
+// La tua classe CSS che fa già tutto (compresa la sottolineatura all'hover!)
+        backBtn.getStyleClass().add("back-link-button");
 
-        backBtn.setStyle(stileBase);
-
-        // Creiamo l'animazione / effetto visivo
-        backBtn.setOnMouseEntered(e -> backBtn.setStyle(stileHover)); // Mouse entra -> Sottolineato
-        backBtn.setOnMouseExited(e -> backBtn.setStyle(stileBase));   // Mouse esce -> Normale
+        backBtn.setOnAction(e -> onBack.run());
 
         backBtn.setOnAction(e -> onBack.run());
 
@@ -156,7 +151,7 @@ public class RegistrationGUIView {
         // --- AGGIUNTA ISTRUZIONI PASSWORD ---
         VBox passwordInstructionsBox = new VBox(5);
         Label instructionsHeader = new Label("La password deve contenere:");
-        instructionsHeader.setStyle("-fx-font-size: 13px; -fx-text-fill: #4A3F35; -fx-font-weight: bold;");
+        instructionsHeader.setStyle("-fx-font-size: 13px; -fx-text-fill: #3A352F; -fx-font-weight: bold;"); // Sostituito #4A3F35 con #3A352F
 
         Label instruction1 = new Label("• Almeno 8 caratteri");
         Label instruction2 = new Label("• Almeno un carattere numerico");

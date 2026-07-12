@@ -2,118 +2,128 @@ package it.ispwproject.findyourbook.controller.applicativo;
 
 import it.ispwproject.findyourbook.bean.BookBean;
 import it.ispwproject.findyourbook.dao.DAOFactory;
+import it.ispwproject.findyourbook.dao.ReaderDAO;
+import it.ispwproject.findyourbook.enumerator.ReadingStatus;
+import it.ispwproject.findyourbook.model.Book;
+import it.ispwproject.findyourbook.model.Reader;
+import it.ispwproject.findyourbook.pattern.observer.BookCompletedObserver;
+import it.ispwproject.findyourbook.pattern.observer.ReadingReminderObserver;
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
-import it.ispwproject.findyourbook.model.User;
+import it.ispwproject.findyourbook.exception.DAOException;
+import it.ispwproject.findyourbook.service.NotificationService;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
+
+import java.time.LocalDate;
+import java.util.List;
 
 public class UserLibraryController {
 
-    private static final String STATUS_LETTO = "LETTO";
-    private static final String STATUS_DA_LEGGERE = "DA_LEGGERE";
-    private static final String STATUS_IN_LETTURA = "IN_LETTURA";
-    private static final String STATUS_RIMUOVI = "RIMUOVI";
+    private final ReaderDAO readerDAO;
+    private static boolean reminderAlreadySent = false;
 
-    public void saveBookToLibrary(BookBean book, String status) {
-        User currentUser = SessionManager.getInstance().getLoggedUser();
-        if (currentUser == null) return;
+    public UserLibraryController() {
+        this.readerDAO = DAOFactory.getReaderDAO();
+    }
 
-        try {
-            DAOFactory.getFavoritesDAO().addLibroPreferito(currentUser.getUsername(), book, status);
-            if (book.getRating() > 0) {
-                DAOFactory.getFavoritesDAO().updateValutazione(currentUser.getUsername(), book.getTitle(), book.getRating());
-            }
-            AppLogger.logInfo("✅ Salvato il libro: '" + book.getTitle() + "' nello stato: " + status);
-        } catch (Exception e) {
-            AppLogger.logError("❌ Errore durante il salvataggio: " + e.getMessage());
+    public void saveBookToLibrary(BookBean bookBean, ReadingStatus status) throws DAOException {
+        Reader reader = (Reader) SessionManager.getInstance().getLoggedUser();
+        if (reader == null) throw new DAOException("Utente non loggato");
+
+        Book book = new Book();
+        book.setTitle(bookBean.getTitle());
+        book.setAuthor(bookBean.getAuthor());
+        book.setGenre(bookBean.getGenre());
+        book.setImageUrl(bookBean.getImageUrl());
+        book.setDescription(bookBean.getDescription());
+        book.setRating(bookBean.getRating());
+        book.setStatus(status);
+
+        readerDAO.addFavoriteBook(reader.getUsername(), book, status.name());
+
+        if (status == ReadingStatus.READ) { // <-- Se usi LETTO, cambia questo in ReadingStatus.LETTO
+
+            BookCompletedObserver observer = new BookCompletedObserver(
+                    reader.getEmail(),
+                    reader.getUsername(),
+                    book.getTitle()
+            );
+            book.attach(observer);
+            book.markAsRead();
+            book.detach(observer);
         }
     }
 
-    public void removeBookFromLibrary(BookBean book) {
-        User currentUser = SessionManager.getInstance().getLoggedUser();
-        if (currentUser == null) return;
+    public void removeBookFromLibrary(BookBean bookBean) throws DAOException {
+        Reader reader = (Reader) SessionManager.getInstance().getLoggedUser();
+        readerDAO.removeFavoriteBook(reader.getUsername(), bookBean.getTitle());
+    }
 
-        try {
-            DAOFactory.getFavoritesDAO().removeLibroPreferito(currentUser.getUsername(), book.getTitle());
-            AppLogger.logInfo("🗑️ Rimosso il libro: '" + book.getTitle() + "'");
-        } catch (Exception e) {
-            AppLogger.logError("❌ Errore durante la rimozione: " + e.getMessage());
+    public void rateBook(BookBean bookBean, int rating) throws DAOException {
+        Reader reader = (Reader) SessionManager.getInstance().getLoggedUser();
+
+        readerDAO.updateRating(reader.getUsername(), bookBean.getTitle(), rating);
+        bookBean.setRating(rating);
+    }
+
+    public void syncBooksWithDatabase(List<BookBean> searchResults) throws DAOException {
+        Reader reader = (Reader) SessionManager.getInstance().getLoggedUser();
+        if (reader == null) return;
+
+        List<Book> savedBooks = readerDAO.getBooksByStatus(reader.getUsername(), ReadingStatus.READ.name());
+        savedBooks.addAll(readerDAO.getBooksByStatus(reader.getUsername(), ReadingStatus.TO_READ.name()));
+        savedBooks.addAll(readerDAO.getBooksByStatus(reader.getUsername(), ReadingStatus.READING.name()));
+
+        for (BookBean bean : searchResults) {
+            checkAndSync(bean, savedBooks);
         }
     }
 
-    public void rateBook(BookBean book, int rating) {
-        User currentUser = SessionManager.getInstance().getLoggedUser();
-        if (currentUser == null) return;
+    private void checkAndSync(BookBean bean, List<Book> savedBooks) {
 
-        try {
-            if (book.getStatus() == null || book.getStatus().trim().isEmpty() || book.getStatus().equals(STATUS_RIMUOVI)) {
-                book.setStatus(STATUS_LETTO);
-                DAOFactory.getFavoritesDAO().addLibroPreferito(currentUser.getUsername(), book, STATUS_LETTO);
-            }
-            DAOFactory.getFavoritesDAO().updateValutazione(currentUser.getUsername(), book.getTitle(), rating);
-            AppLogger.logInfo("⭐ Voto salvato: " + rating + " stelle per '" + book.getTitle() + "'");
-        } catch (Exception e) {
-            AppLogger.logError("❌ Errore durante il salvataggio del voto: " + e.getMessage());
+        Book match = savedBooks.stream()
+                .filter(b -> b.getTitle().equalsIgnoreCase(bean.getTitle()))
+                .findFirst()
+                .orElse(null);
+
+        if (match != null) {
+            bean.setRating(match.getRating());
+            bean.setStatus(match.getStatus());
+            bean.setDescription(match.getDescription());
+        } else {
+
+            bean.setRating(0);
+            bean.setStatus(null);
         }
     }
 
-    // --- SINCRONIZZAZIONE BLINDATA ---
-    public void syncBooksWithDatabase(java.util.List<BookBean> searchResults) {
+    public void checkInactiveReading() {
+        if (reminderAlreadySent) return;
+
+        Reader reader = (Reader) SessionManager.getInstance().getLoggedUser();
+        if (reader == null) return;
+
         try {
-            User currentUser = SessionManager.getInstance().getLoggedUser();
-            if (currentUser == null) return;
+            List<Book> readingBooks = readerDAO.getBooksByStatus(reader.getUsername(), ReadingStatus.READING.name());
+            java.time.LocalDate thirtyDaysAgo = java.time.LocalDate.now().minusDays(30);
 
-            java.util.List<BookBean> daLeggere = DAOFactory.getFavoritesDAO().getLibriByStato(currentUser.getUsername(), STATUS_DA_LEGGERE);
-            java.util.List<BookBean> inLettura = DAOFactory.getFavoritesDAO().getLibriByStato(currentUser.getUsername(), STATUS_IN_LETTURA);
-            java.util.List<BookBean> letti = DAOFactory.getFavoritesDAO().getLibriByStato(currentUser.getUsername(), STATUS_LETTO);
+            for (Book book : readingBooks) {
+                if (book.getReadingStartDate() != null && book.getReadingStartDate().isBefore(thirtyDaysAgo)) {
 
-            for (BookBean googleBook : searchResults) {
-                // Se Google restituisce un libro rotto, saltiamo al prossimo senza far crashare tutto
-                if (googleBook == null || googleBook.getTitle() == null) continue;
+                    ReadingReminderObserver observer = new ReadingReminderObserver(
+                            reader.getEmail(),
+                            reader.getName(),
+                            book.getTitle()
+                    );
+                    book.attach(observer);
+                    book.triggerReminder();
+                    book.detach(observer);
 
-                checkAndSync(googleBook, daLeggere, STATUS_DA_LEGGERE);
-                checkAndSync(googleBook, inLettura, STATUS_IN_LETTURA);
-                checkAndSync(googleBook, letti, STATUS_LETTO);
-            }
-        } catch (Exception e) {
-            AppLogger.logError("❌ Errore critico durante la sincronizzazione: " + e.getMessage());
-        }
-    }
-
-    private void checkAndSync(BookBean googleBook, java.util.List<BookBean> dbBooks, String status) {
-        // Se la lista dei libri salvati nel DB è vuota, resettiamo i campi del libro
-        if (dbBooks == null || dbBooks.isEmpty()) {
-            googleBook.setRating(0);
-            googleBook.setStatus(null);
-            return;
-        }
-
-        String gTitle = googleBook.getTitle().toLowerCase().trim();
-        boolean trovato = false; // Flag per tracciare se abbiamo trovato il libro
-
-        for (BookBean dbBook : dbBooks) {
-            if (dbBook != null && dbBook.getTitle() != null) {
-                String dbTitle = dbBook.getTitle().toLowerCase().trim();
-
-                if (gTitle.equals(dbTitle) || gTitle.contains(dbTitle) || dbTitle.contains(gTitle)) {
-                    googleBook.setRating(dbBook.getRating());
-                    googleBook.setStatus(status);
-
-                    if (dbBook.getDescription() != null && !dbBook.getDescription().trim().isEmpty()) {
-                        googleBook.setDescription(dbBook.getDescription());
-                    }
-
-                    AppLogger.logInfo("✅ Sincronizzato con successo: " + googleBook.getTitle());
-                    trovato = true;
+                    reminderAlreadySent = true;
                     break;
                 }
             }
-        }
-
-        // Se dopo aver controllato TUTTA la lista non l'abbiamo trovato,
-        // resettiamo i dati del libro (cancella il "fantasma")
-        if (!trovato) {
-            googleBook.setRating(0);
-            googleBook.setStatus(null);
+        } catch (Exception e) {
+            AppLogger.logError("Errore durante il controllo delle letture inattive: " + e.getMessage());
         }
     }
 }

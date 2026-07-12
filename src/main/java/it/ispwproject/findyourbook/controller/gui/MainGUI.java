@@ -1,5 +1,8 @@
 package it.ispwproject.findyourbook.controller.gui;
 
+import it.ispwproject.findyourbook.model.User;
+import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
+import it.ispwproject.findyourbook.util.logger.AppLogger;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -31,15 +34,55 @@ public class MainGUI extends Application {
         new LoginGUI(primaryStage).show();
     }
 
-    // Niente showRegistration per ora, la faremo dopo!
-
-    // Ecco il cambio di nome esatto come il collega!
     public static void showReaderDashboard() {
-        new ReaderDashboardGUI(primaryStage).show();
+        User loggedUser = SessionManager.getInstance().getLoggedUser();
+        if (loggedUser == null) {
+            AppLogger.logError(" ERRORE: loggedUser è NULL! Reindirizzo al login.");
+            showLogin();
+            return;
+        }
+
+        String displayName = loggedUser.getUsername();
+
+        if (displayName == null || displayName.isEmpty()) {
+            displayName = loggedUser.getName();  // Fallback
+        }
+        if (displayName == null || displayName.isEmpty()) {
+            displayName = "Lettore";
+        }
+
+        Runnable onLogout = () -> {
+            SessionManager.getInstance().clearSession();
+            showLogin();
+        };
+
+        new ReaderDashboardGUI(primaryStage, displayName, onLogout).show();
     }
 
     public static void showPublisherDashboard() {
-        new PublisherDashboardGUI(primaryStage).show();
+
+        User loggedUser = SessionManager.getInstance().getLoggedUser();
+        if (loggedUser == null) {
+            AppLogger.logError("ERRORE: loggedUser è NULL! Reindirizzo al login.");
+            showLogin();
+            return;
+        }
+
+        String displayName = loggedUser.getUsername();
+
+        if (displayName == null || displayName.isEmpty()) {
+            displayName = loggedUser.getName();  // Fallback
+        }
+        if (displayName == null || displayName.isEmpty()) {
+            displayName = "Casa Editrice";
+        }
+
+        Runnable onLogout = () -> {
+            SessionManager.getInstance().clearSession();
+            showLogin();
+        };
+
+        new PublisherDashboardGUI(primaryStage, displayName, onLogout).show();
     }
 
     public static void launch(String[] args) {

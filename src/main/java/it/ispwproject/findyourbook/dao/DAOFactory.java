@@ -1,18 +1,29 @@
 package it.ispwproject.findyourbook.dao;
 
 import it.ispwproject.findyourbook.dao.db.LoginDAODB;
+import it.ispwproject.findyourbook.dao.db.PublisherDAODB;
+import it.ispwproject.findyourbook.dao.db.ReaderDAODB;
+import it.ispwproject.findyourbook.dao.db.RegistrationDAODB;
 import it.ispwproject.findyourbook.dao.db.UserDAODB;
+import it.ispwproject.findyourbook.dao.file.PublisherDAOFile;
 import it.ispwproject.findyourbook.dao.memory.LoginDAOMemory;
-import it.ispwproject.findyourbook.dao.memory.UserDAOMemory;
+import it.ispwproject.findyourbook.dao.memory.PublisherDAOMemory;
+import it.ispwproject.findyourbook.dao.memory.ReaderDAOMemory;
 import it.ispwproject.findyourbook.dao.memory.RegistrationDAOMemory;
+import it.ispwproject.findyourbook.dao.memory.UserDAOMemory;
+import it.ispwproject.findyourbook.dao.memory.BookDAOMemory;
+import it.ispwproject.findyourbook.dao.db.BookDAODB;
+import it.ispwproject.findyourbook.dao.file.BookDAOFile;
+import it.ispwproject.findyourbook.dao.file.ReaderDAOFile;
+import it.ispwproject.findyourbook.model.Publisher;
 
 public class DAOFactory {
 
     public static final String DATABASE = "database";
     public static final String MEMORY   = "memory";
+    public static final String FILE     = "file";
 
-    // Modifica questa riga per cambiare da DB vero a DB finto!
-    private static String persistence = MEMORY;
+    private static String persistence = DATABASE;
 
     private DAOFactory() {}
 
@@ -38,16 +49,31 @@ public class DAOFactory {
 
     public static RegistrationDAO getRegistrationDAO() {
         if (MEMORY.equalsIgnoreCase(persistence)) return new RegistrationDAOMemory();
-
-        // Ora restituisce il VERO DAO per il database MySQL!
-        return new it.ispwproject.findyourbook.dao.db.RegistrationDAODB();
+        return new RegistrationDAODB();
     }
 
-    public static FavoritesDAO getFavoritesDAO() {
-        if (MEMORY.equalsIgnoreCase(persistence)) {
-            // Ritorneremo la memoria (lo creiamo al prossimo step!)
-            return new it.ispwproject.findyourbook.dao.memory.FavoritesDAOMemory();
-        }
-        return new it.ispwproject.findyourbook.dao.db.FavoritesDAODB();
+    public static ReaderDAO getReaderDAO() {
+        return switch (persistence.toLowerCase()) {
+            case FILE   -> new ReaderDAOFile();
+            case MEMORY -> new ReaderDAOMemory();
+            default     -> new ReaderDAODB();
+        };
     }
+
+    public static PublisherDAO getPublisherDAO() {
+        return switch (persistence.toLowerCase()) {
+            case FILE   -> new PublisherDAOFile();
+            case MEMORY -> new PublisherDAOMemory();
+            default     -> new PublisherDAODB();
+        };
+    }
+
+    public static BookDAO getBookDAO() {
+        return switch (persistence.toLowerCase()) {
+            case FILE   -> new BookDAOFile();
+            case MEMORY -> new BookDAOMemory();
+            default     -> new BookDAODB();
+        };
+    }
+
 }

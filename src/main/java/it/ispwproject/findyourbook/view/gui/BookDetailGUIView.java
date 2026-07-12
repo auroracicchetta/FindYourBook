@@ -1,35 +1,30 @@
 package it.ispwproject.findyourbook.view.gui;
 
 import it.ispwproject.findyourbook.bean.BookBean;
+import it.ispwproject.findyourbook.enumerator.ReadingStatus;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
+
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 public class BookDetailGUIView extends DashboardGUIView {
 
-    // --- COSTANTI PER RISOLVERE IL CODE SMELL DELLE STRINGHE DUPLICATE ---
-    private static final String LBL_DA_LEGGERE = "Da leggere";
-    private static final String LBL_IN_LETTURA = "In lettura";
-    private static final String LBL_LETTO = "Letto";
-
-    private static final String DB_DA_LEGGERE = "DA_LEGGERE";
-    private static final String DB_IN_LETTURA = "IN_LETTURA";
-    private static final String DB_LETTO = "LETTO";
-
-    public VBox buildRoot(BookBean book, String currentStatus, Runnable onBack, Runnable onHomeClick, Runnable onMyBooksClick, Runnable onLogout, java.util.function.Consumer<String> onSearch) {
+    public VBox buildRoot(String username, BookBean book, ReadingStatus currentStatus,
+                          Consumer<String> onStatusChange, IntConsumer onRate,
+                          Runnable onBack, Runnable onHomeClick,
+                          Runnable onMyBooksClick, Runnable onLogout, Consumer<String> onSearch) {
         VBox root = new VBox(20);
         root.setPadding(new Insets(20, 50, 20, 50));
         root.setStyle("-fx-background-color: " + BG_COLOR + ";");
 
         // 1. Navbar superiore
-        HBox navbar = super.buildNavbar(onMyBooksClick, onLogout, onSearch);
+        HBox navbar = super.buildNavbar(username, onMyBooksClick, onLogout, onSearch);
         Label homeLabel = (Label) navbar.getChildren().get(1);
         homeLabel.getStyleClass().clear();
         homeLabel.getStyleClass().add("nav-link");
@@ -44,8 +39,8 @@ public class BookDetailGUIView extends DashboardGUIView {
         mainContent.setAlignment(Pos.TOP_LEFT);
         mainContent.setPadding(new Insets(20, 0, 0, 0));
 
-        // Risolto code smell di Complessità Cognitiva estraendo la costruzione delle colonne in metodi separati
-        VBox leftColumn = createLeftColumn(book, currentStatus);
+        // Costruzione delle colonne
+        VBox leftColumn = createLeftColumn(book, currentStatus, onStatusChange, onRate);
         VBox rightColumn = createRightColumn(book);
 
         mainContent.getChildren().addAll(leftColumn, rightColumn);
@@ -54,23 +49,15 @@ public class BookDetailGUIView extends DashboardGUIView {
         return root;
     }
 
-    // --- METODI ESTRATTI PER ABBATTERE LA COMPLESSITÀ COGNITIVA ---
-
     private Button createBackButton(Runnable onBack) {
         Button backBtn = new Button("< Indietro");
-        String stileBase = "-fx-background-color: transparent; -fx-padding: 8 15; -fx-cursor: hand; -fx-text-fill: #4A3F35; -fx-font-weight: bold; -fx-font-size: 14px;";
-        String stileHover = stileBase + " -fx-underline: true;";
-
-        backBtn.setStyle(stileBase);
-        backBtn.setOnMouseEntered(e -> backBtn.setStyle(stileHover));
-        backBtn.setOnMouseExited(e -> backBtn.setStyle(stileBase));
+        backBtn.getStyleClass().add("back-link-button");
         backBtn.setOnAction(e -> onBack.run());
-
         return backBtn;
     }
 
-    private VBox createLeftColumn(BookBean book, String currentStatus) {
-        VBox leftColumn = new VBox(15);
+    private VBox createLeftColumn(BookBean book, ReadingStatus currentStatus, Consumer<String> onStatusChange, IntConsumer onRate) {
+       VBox leftColumn = new VBox(15);
         leftColumn.setAlignment(Pos.TOP_CENTER);
         leftColumn.setPrefWidth(200);
 
@@ -82,8 +69,8 @@ public class BookDetailGUIView extends DashboardGUIView {
             coverView.setImage(new Image(book.getImageUrl(), 180, 270, true, true, true));
         }
 
-        MenuButton statusBtn = createStatusButton(book, currentStatus);
-        HBox ratingBox = createRatingBox(book);
+        HBox ratingBox = createRatingBox(book, onRate);
+        MenuButton statusBtn = createStatusButton(book, currentStatus, onStatusChange, ratingBox, onRate);
 
         VBox actionBox = new VBox(20, statusBtn, ratingBox);
         actionBox.setAlignment(Pos.CENTER);
@@ -93,37 +80,69 @@ public class BookDetailGUIView extends DashboardGUIView {
         return leftColumn;
     }
 
-    private MenuButton createStatusButton(BookBean book, String currentStatus) {
+    private MenuButton createStatusButton(BookBean book, ReadingStatus currentStatus, Consumer<String> onStatusChange, HBox ratingBox, IntConsumer onRate) {
         String statusText = "Aggiungi a...";
-        if (DB_DA_LEGGERE.equals(currentStatus)) statusText = LBL_DA_LEGGERE;
-        else if (DB_IN_LETTURA.equals(currentStatus)) statusText = LBL_IN_LETTURA;
-        else if (DB_LETTO.equals(currentStatus)) statusText = LBL_LETTO;
+        if (currentStatus == ReadingStatus.TO_READ) statusText = ReadingStatus.TO_READ.getDisplayName();
+        else if (currentStatus == ReadingStatus.READING) statusText = ReadingStatus.READING.getDisplayName();
+        else if (currentStatus == ReadingStatus.READ) statusText = ReadingStatus.READ.getDisplayName();
 
         MenuButton statusBtn = new MenuButton(statusText);
         statusBtn.setStyle("-fx-background-color: #85A38D; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand; -fx-padding: 5 15;");
 
-        MenuItem optWantToRead = new MenuItem(LBL_DA_LEGGERE);
-        MenuItem optReading = new MenuItem(LBL_IN_LETTURA);
-        MenuItem optRead = new MenuItem(LBL_LETTO);
+        // Usiamo i nomi display dell'Enum per le opzioni
+        MenuItem optWantToRead = new MenuItem(ReadingStatus.TO_READ.getDisplayName());
+        MenuItem optReading = new MenuItem(ReadingStatus.READING.getDisplayName());
+        MenuItem optRead = new MenuItem(ReadingStatus.READ.getDisplayName());
 
+        SeparatorMenuItem separator = new SeparatorMenuItem();
+        MenuItem optRemove = new MenuItem("Rimuovi libro");
+        optRemove.setStyle("-fx-text-fill: #C0392B;");
+
+        // Azioni: aggiornano il testo e passano al controller la stringa corretta
         optWantToRead.setOnAction(e -> {
-            statusBtn.setText(LBL_DA_LEGGERE);
-            new it.ispwproject.findyourbook.controller.applicativo.UserLibraryController().saveBookToLibrary(book, DB_DA_LEGGERE);
-        });
-        optReading.setOnAction(e -> {
-            statusBtn.setText(LBL_IN_LETTURA);
-            new it.ispwproject.findyourbook.controller.applicativo.UserLibraryController().saveBookToLibrary(book, DB_IN_LETTURA);
-        });
-        optRead.setOnAction(e -> {
-            statusBtn.setText(LBL_LETTO);
-            new it.ispwproject.findyourbook.controller.applicativo.UserLibraryController().saveBookToLibrary(book, DB_LETTO);
+            statusBtn.setText(ReadingStatus.TO_READ.getDisplayName());
+            onStatusChange.accept(ReadingStatus.TO_READ.getDisplayName());
         });
 
-        statusBtn.getItems().addAll(optWantToRead, optReading, optRead);
+        optReading.setOnAction(e -> {
+            statusBtn.setText(ReadingStatus.READING.getDisplayName());
+            onStatusChange.accept(ReadingStatus.READING.getDisplayName());
+        });
+
+        optRead.setOnAction(e -> {
+            statusBtn.setText(ReadingStatus.READ.getDisplayName());
+            onStatusChange.accept(ReadingStatus.READ.getDisplayName());
+        });
+
+        optRemove.setOnAction(e -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Rimuovi Libro");
+            alert.setHeaderText("Vuoi rimuovere '" + book.getTitle() + "' dalla tua libreria?");
+            alert.setContentText("Questa azione rimuoverà permanentemente il libro, incluse le tue valutazioni.");
+
+            ButtonType btnAnnulla = new ButtonType("Annulla", ButtonBar.ButtonData.CANCEL_CLOSE);
+            ButtonType btnOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+            alert.getButtonTypes().setAll(btnAnnulla, btnOk);
+
+            alert.showAndWait().ifPresent(type -> {
+                if (type == btnOk) {
+                    statusBtn.setText("Aggiungi a...");
+                    book.setStatus(null);
+                    onStatusChange.accept("Rimuovi libro"); // La GUI principale si aspetta questa stringa!
+
+                    for (int i = 1; i <= 5; i++) ((Label) ratingBox.getChildren().get(i)).setText("☆");
+                    int[] clickedRating = (int[]) ratingBox.getProperties().get("clickedRating");
+                    if (clickedRating != null) clickedRating[0] = 0;
+                    if (onRate != null) onRate.accept(0);
+                }
+            });
+        });
+
+        statusBtn.getItems().addAll(optWantToRead, optReading, optRead, separator, optRemove);
         return statusBtn;
     }
 
-    private HBox createRatingBox(BookBean book) {
+    private HBox createRatingBox(BookBean book, IntConsumer onRate) {
         HBox ratingBox = new HBox(5);
         ratingBox.setAlignment(Pos.CENTER);
 
@@ -132,16 +151,17 @@ public class BookDetailGUIView extends DashboardGUIView {
         ratingBox.getChildren().add(valutaTesto);
 
         final int[] clickedRating = {book.getRating()};
-        Label[] stars = new Label[5];
+        ratingBox.getProperties().put("clickedRating", clickedRating);
 
+        Label[] stars = new Label[5];
         for (int i = 0; i < 5; i++) {
-            stars[i] = createStar(i, clickedRating, stars, book);
+            stars[i] = createStar(i, clickedRating, stars, onRate);
             ratingBox.getChildren().add(stars[i]);
         }
         return ratingBox;
     }
 
-    private Label createStar(int index, int[] clickedRating, Label[] stars, BookBean book) {
+    private Label createStar(int index, int[] clickedRating, Label[] stars, IntConsumer onRate) {
         int starValue = index + 1;
         Label star = new Label(starValue <= clickedRating[0] ? "★" : "☆");
         star.setStyle("-fx-font-size: 22px; -fx-text-fill: #E6B800; -fx-cursor: hand;");
@@ -152,8 +172,7 @@ public class BookDetailGUIView extends DashboardGUIView {
             clickedRating[0] = starValue;
             updateStars(stars, starValue);
 
-            new it.ispwproject.findyourbook.controller.applicativo.UserLibraryController().rateBook(book, starValue);
-            book.setRating(starValue);
+            onRate.accept(starValue);
         });
         return star;
     }

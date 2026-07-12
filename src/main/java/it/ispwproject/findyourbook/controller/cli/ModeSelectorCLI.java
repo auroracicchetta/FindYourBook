@@ -24,7 +24,6 @@ public class ModeSelectorCLI {
                     return true;
                 }
                 case "3" -> {
-                    // RICORDA: Aggiungi "file" come costante nella tua DAOFactory
                     DAOFactory.setPersistence("file");
                     view.mostraModalitaSelezionata("File (JSON)");
                     return true;

@@ -2,46 +2,58 @@ package it.ispwproject.findyourbook.controller.applicativo;
 
 import it.ispwproject.findyourbook.bean.SessionBean;
 import it.ispwproject.findyourbook.dao.DAOFactory;
+import it.ispwproject.findyourbook.exception.DAOException;
+import it.ispwproject.findyourbook.exception.LoginException;
 import it.ispwproject.findyourbook.model.Credentials;
 import it.ispwproject.findyourbook.model.User;
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
-import it.ispwproject.findyourbook.exception.DAOException;
+import it.ispwproject.findyourbook.util.PasswordUtils; // <-- AGGIUNTO IMPORT
+import it.ispwproject.findyourbook.util.logger.AppLogger;
 
 public class LoginController {
 
     public enum LoginResult {
-        SUCCESSO_LETTORE,
-        SUCCESSO_CASA_EDITRICE
+        SUCCESSO_READER,
+        SUCCESSO_PUBLISHER,
+        SUCCESSO_ADMIN
     }
 
-    public LoginResult login(String username, String password) throws DAOException {
+    public LoginResult login(String username, String password) throws LoginException, DAOException {
 
-        Credentials credentials;
-        User user;
+        String hashedPassword = PasswordUtils.hash(password);
 
+        Credentials credentials = DAOFactory.getLoginDAO().execute(username, hashedPassword);
+
+        User user = null;
         try {
-            // 1. Il LoginDAO controlla se username e password corrispondono
-            credentials = DAOFactory.getLoginDAO().execute(username, password);
-
-            // 2. Lo UserDAO recupera tutti i dati completi dell'utente appena loggato
             user = DAOFactory.getUserDAO().findByUsername(username);
 
-        } catch (Exception e) {
-            // Catturiamo l'eccezione generica dei DAO e la trasformiamo nella nostra DAOException specifica!
-            throw new DAOException("Errore di accesso al database durante il login: " + e.getMessage());
+        } catch (DAOException e) {
+            AppLogger.logError("[LoginController] Errore DAO nel recupero utente: " + e.getMessage());
+            throw new LoginException("Errore nel recupero dei dati utente. Riprova più tardi.");
         }
 
-        // 3. Salviamo l'utente e il bean alleggerito nel SessionManager
+        if (user == null) {
+            throw new LoginException("Utente non trovato nel sistema.");
+        }
+
         SessionManager.getInstance().setLoggedUser(user);
         SessionManager.getInstance().setSessionBean(
                 new SessionBean(user.getUsername(), credentials.getRole())
         );
 
-        // 4. Gestiamo l'instradamento in base al ruolo
+
+        User verificato = SessionManager.getInstance().getLoggedUser();
+        if (verificato == null) {
+            AppLogger.logError("[LoginController] ERRORE CRITICO: Sessione non impostata!");
+            throw new LoginException("Errore interno durante il login. Riprova.");
+        }
+
         return switch (credentials.getRole()) {
-            case LETTORE -> LoginResult.SUCCESSO_LETTORE;
-            case CASA_EDITRICE -> LoginResult.SUCCESSO_CASA_EDITRICE;
-            default -> throw new IllegalStateException("Ruolo non riconosciuto");
+            case READER -> LoginResult.SUCCESSO_READER;
+            case PUBLISHER -> LoginResult.SUCCESSO_PUBLISHER;
+            case ADMIN -> LoginResult.SUCCESSO_ADMIN;
+            default -> throw new IllegalStateException("Ruolo non riconosciuto: " + credentials.getRole());
         };
     }
 }

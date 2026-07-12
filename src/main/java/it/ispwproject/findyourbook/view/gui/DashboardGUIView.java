@@ -11,23 +11,16 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 import it.ispwproject.findyourbook.bean.BookBean;
+import it.ispwproject.findyourbook.enumerator.ReadingStatus;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
 
 public abstract class DashboardGUIView {
 
-    public static final String BG_COLOR = "#EBE2D4";
-    public static final String TEXT_DARK = "#4A3F35";
-    public static final String BTN_GREEN = "#85A38D";
+    public static final String BG_COLOR = "#EFE8D8"; // Beige ufficiale
+    public static final String TEXT_DARK = "#3A352F"; // Marrone scuro ufficiale
+    public static final String BTN_GREEN = "#8AAB8F"; // Verde salvia ufficiale
 
-    protected static final String LBL_DA_LEGGERE = "Da leggere";
-    protected static final String LBL_IN_LETTURA = "In lettura";
-    protected static final String LBL_LETTO = "Letto";
-
-    protected static final String DB_DA_LEGGERE = "DA_LEGGERE";
-    protected static final String DB_IN_LETTURA = "IN_LETTURA";
-    protected static final String DB_LETTO = "LETTO";
-
-    public HBox buildNavbar(Runnable onMyBooksClick, Runnable onLogout, Consumer<String> onSearch) {
+    public HBox buildNavbar(String username, Runnable onMyBooksClick, Runnable onLogout, Consumer<String> onSearch) {
         HBox navbar = new HBox(40);
         navbar.setAlignment(Pos.CENTER_LEFT);
 
@@ -58,36 +51,7 @@ public abstract class DashboardGUIView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // --- AVATAR DINAMICO E MENU EDITORIALE ---
-        String tempUser = "U";
-        try {
-            var user = it.ispwproject.findyourbook.pattern.singleton.SessionManager.getInstance().getLoggedUser();
-            if (user != null) tempUser = user.getUsername();
-        } catch (Exception ignored) {}
-
-        // Creiamo una variabile final per poterla usare dentro la lambda
-        final String username = tempUser;
-        String initial = username.substring(0, 1).toUpperCase();
-
-        MenuButton profileMenu = new MenuButton(initial);
-        // Stile bottone nocciola
-        profileMenu.setStyle("-fx-background-color: #A67B5B; -fx-text-fill: white; -fx-font-family: 'Arial'; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 50; -fx-cursor: hand;");
-        profileMenu.setPrefSize(45, 45);
-
-        MenuItem profileInfo = new MenuItem("I miei dati");
-        MenuItem logoutItem = new MenuItem("Logout");
-
-        // Stile "Editoriale": Sfondo Panna e testo Marrone Scuro
-        String menuStyle = "-fx-background-color: #FDFBF7; -fx-text-fill: " + TEXT_DARK + "; -fx-font-family: 'Georgia'; -fx-font-size: 14px;";
-        profileInfo.setStyle(menuStyle);
-        logoutItem.setStyle(menuStyle);
-
-        profileInfo.setOnAction(e -> {
-            new it.ispwproject.findyourbook.controller.gui.UserProfileGUI().show();
-        });
-
-        logoutItem.setOnAction(e -> onLogout.run());
-        profileMenu.getItems().addAll(profileInfo, logoutItem);
+        Button profileMenu = createAvatar(username, onLogout);
 
         navbar.getChildren().addAll(brand, homeLink, myBooksLink, searchBar, spacer, profileMenu);
         return navbar;
@@ -148,31 +112,32 @@ public abstract class DashboardGUIView {
         Label authorL = new Label("di " + book.getAuthor());
         authorL.setStyle("-fx-font-family: 'Georgia'; -fx-font-size: 13px; -fx-text-fill: #7A7A7A; -fx-font-style: italic;");
 
-        MenuButton readBtn = createReadMenu(currentStatus, onStatusChange, book.getTitle());
         HBox ratingBox = createRatingBox(book.getRating(), onRate);
+        MenuButton readBtn = createReadMenu(currentStatus, onStatusChange, book.getTitle(), ratingBox, onRate);
 
         infoBox.getChildren().addAll(titleL, authorL, readBtn, ratingBox);
         return infoBox;
     }
 
-    private MenuButton createReadMenu(String currentStatus, Consumer<String> onStatusChange, String bookTitle) {
+    private MenuButton createReadMenu(String currentStatus, Consumer<String> onStatusChange, String bookTitle, HBox ratingBox, IntConsumer onRate) {
         String btnText = "Aggiungi a...";
 
-        if (DB_LETTO.equals(currentStatus)) {
-            btnText = LBL_LETTO;
-        } else if (DB_IN_LETTURA.equals(currentStatus)) {
-            btnText = LBL_IN_LETTURA;
-        } else if (DB_DA_LEGGERE.equals(currentStatus)) {
-            btnText = LBL_DA_LEGGERE;
+        if (ReadingStatus.READ.name().equals(currentStatus)) {
+            btnText = ReadingStatus.READ.getDisplayName();
+        } else if (ReadingStatus.READING.name().equals(currentStatus)) {
+            btnText = ReadingStatus.READING.getDisplayName();
+        } else if (ReadingStatus.TO_READ.name().equals(currentStatus)) {
+            btnText = ReadingStatus.TO_READ.getDisplayName();
         }
 
         MenuButton readBtn = new MenuButton(btnText);
         readBtn.setOnMouseClicked(e -> e.consume());
         readBtn.setStyle("-fx-background-color: " + BTN_GREEN + "; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;");
 
-        MenuItem optWantToRead = new MenuItem(LBL_DA_LEGGERE);
-        MenuItem optReading = new MenuItem(LBL_IN_LETTURA);
-        MenuItem optRead = new MenuItem(LBL_LETTO);
+// Usiamo i nomi grafici dell'Enum per le tendine
+        MenuItem optWantToRead = new MenuItem(ReadingStatus.TO_READ.getDisplayName());
+        MenuItem optReading = new MenuItem(ReadingStatus.READING.getDisplayName());
+        MenuItem optRead = new MenuItem(ReadingStatus.READ.getDisplayName());
 
         SeparatorMenuItem separator = new SeparatorMenuItem();
         MenuItem optRemove = new MenuItem("Rimuovi libro");
@@ -180,9 +145,20 @@ public abstract class DashboardGUIView {
 
         readBtn.getItems().addAll(optWantToRead, optReading, optRead, separator, optRemove);
 
-        optWantToRead.setOnAction(e -> { readBtn.setText(LBL_DA_LEGGERE); if(onStatusChange != null) onStatusChange.accept(DB_DA_LEGGERE); });
-        optReading.setOnAction(e -> { readBtn.setText(LBL_IN_LETTURA); if(onStatusChange != null) onStatusChange.accept(DB_IN_LETTURA); });
-        optRead.setOnAction(e -> { readBtn.setText(LBL_LETTO); if(onStatusChange != null) onStatusChange.accept(DB_LETTO); });
+        optWantToRead.setOnAction(e -> {
+            readBtn.setText(ReadingStatus.TO_READ.getDisplayName());
+            if (onStatusChange != null) onStatusChange.accept(ReadingStatus.TO_READ.name());
+        });
+
+        optReading.setOnAction(e -> {
+            readBtn.setText(ReadingStatus.READING.getDisplayName());
+            if (onStatusChange != null) onStatusChange.accept(ReadingStatus.READING.name());
+        });
+
+        optRead.setOnAction(e -> {
+            readBtn.setText(ReadingStatus.READ.getDisplayName());
+            if (onStatusChange != null) onStatusChange.accept(ReadingStatus.READ.name());
+        });
 
         optRemove.setOnAction(e -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -195,12 +171,17 @@ public abstract class DashboardGUIView {
             alert.getButtonTypes().setAll(btnAnnulla, btnOk);
 
             alert.showAndWait().ifPresent(type -> {
-                if (type == btnOk && onStatusChange != null) {
-                    onStatusChange.accept("RIMUOVI");
+                if (type == btnOk) {
+                    if (onStatusChange != null) onStatusChange.accept("RIMUOVI");
+                    readBtn.setText("Aggiungi a...");
+
+                    for (int i = 1; i <= 5; i++) ((Label) ratingBox.getChildren().get(i)).setText("☆");
+                    int[] clickedRating = (int[]) ratingBox.getProperties().get("clickedRating");
+                    if (clickedRating != null) clickedRating[0] = 0;
+                    if (onRate != null) onRate.accept(0);
                 }
             });
         });
-
         return readBtn;
     }
 
@@ -214,8 +195,9 @@ public abstract class DashboardGUIView {
         ratingBox.getChildren().add(valutaText);
 
         final int[] clickedRating = {initialRating};
-        Label[] stars = new Label[5];
+        ratingBox.getProperties().put("clickedRating", clickedRating);
 
+        Label[] stars = new Label[5];
         for (int i = 0; i < 5; i++) {
             stars[i] = createStar(i, clickedRating, stars, onRate);
             ratingBox.getChildren().add(stars[i]);
@@ -284,5 +266,97 @@ public abstract class DashboardGUIView {
 
         tile.getChildren().addAll(icon, lbl);
         return tile;
+    }
+
+    protected MenuButton buildProfileMenu(String username, Runnable onLogout) {
+        String initial = (username != null && !username.isEmpty())
+                ? username.substring(0, 1).toUpperCase()
+                : "U";
+
+        MenuButton profileMenu = new MenuButton(initial);
+
+// STESSO STILE PER TUTTI: nocciola chiaro con testo bianco
+        profileMenu.setStyle(
+                "-fx-background-color: #C1A68D; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-family: 'Georgia'; " +
+                        "-fx-font-size: 18px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-background-radius: 50; " +
+                        "-fx-cursor: hand;"
+        );
+        profileMenu.setPrefSize(45, 45);
+
+// Voci del menu (uguali per tutti)
+        MenuItem profileInfo = new MenuItem("I miei dati");
+        MenuItem logoutItem = new MenuItem("Logout");
+
+        String menuStyle =
+                "-fx-background-color: #FDFBF7; " +
+                        "-fx-text-fill: " + TEXT_DARK + "; " +
+                        "-fx-font-family: 'Georgia'; " +
+                        "-fx-font-size: 14px;";
+        profileInfo.setStyle(menuStyle);
+        logoutItem.setStyle(menuStyle);
+
+        profileInfo.setOnAction(e -> {
+            new it.ispwproject.findyourbook.controller.gui.UserProfileGUI().show();
+        });
+        logoutItem.setOnAction(e -> onLogout.run());
+
+        profileMenu.getItems().addAll(profileInfo, logoutItem);
+        return profileMenu;
+    }
+
+    /**
+     * Metodo STATICO per creare l'avatar - garantito che funzioni sempre!
+     * Usato come fallback se buildProfileMenu non funziona.
+     */
+    public static Button createAvatar(String username, Runnable onLogout) {
+        String initial = (username != null && !username.isEmpty())
+                ? username.substring(0, 1).toUpperCase()
+                : "U";
+
+        Button profileBtn = new Button(initial);
+
+        String AVATAR_BASE = "-fx-background-color: #C1A68D; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 50; -fx-alignment: center; -fx-padding: 0; -fx-cursor: hand;";
+        String AVATAR_HOVER = "-fx-background-color: #9F856D; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 50; -fx-alignment: center; -fx-padding: 0; -fx-cursor: hand;";
+
+        profileBtn.setStyle(AVATAR_BASE);
+
+        profileBtn.setOnMouseEntered(e -> profileBtn.setStyle(AVATAR_HOVER));
+        profileBtn.setOnMouseExited(e -> profileBtn.setStyle(AVATAR_BASE));
+
+        profileBtn.setMinSize(45, 45);
+        profileBtn.setPrefSize(45, 45);
+        profileBtn.setMaxSize(45, 45);
+
+        // Creiamo il menu a tendina separato (ContextMenu)
+        ContextMenu contextMenu = new ContextMenu();
+
+        MenuItem profileInfo = new MenuItem("I miei dati");
+        MenuItem logoutItem = new MenuItem("Logout");
+
+        String menuStyle =
+                "-fx-background-color: #FDFBF7; " +
+                        "-fx-text-fill: " + TEXT_DARK + "; " +
+                        "-fx-font-family: 'Georgia'; " +
+                        "-fx-font-size: 14px;";
+        profileInfo.setStyle(menuStyle);
+        logoutItem.setStyle(menuStyle);
+
+        profileInfo.setOnAction(e -> {
+            new it.ispwproject.findyourbook.controller.gui.UserProfileGUI().show();
+        });
+        logoutItem.setOnAction(e -> onLogout.run());
+
+        contextMenu.getItems().addAll(profileInfo, logoutItem);
+
+        // Quando clicchi il bottone, facciamo apparire il menu esattamente sotto
+        profileBtn.setOnMouseClicked(e -> {
+            contextMenu.show(profileBtn, javafx.geometry.Side.BOTTOM, 0, 5);
+        });
+
+        return profileBtn;
     }
 }

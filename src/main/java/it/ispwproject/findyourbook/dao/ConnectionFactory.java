@@ -9,7 +9,6 @@ import java.util.Properties;
 
 public class ConnectionFactory {
 
-    // Costruttore privato aggiunto per nascondere quello pubblico di default
     private ConnectionFactory() {
         throw new IllegalStateException("Classe di utilità");
     }
@@ -17,7 +16,10 @@ public class ConnectionFactory {
     private static final Properties props = new Properties();
 
     static {
-        try (InputStream input = new FileInputStream("src/main/resources/db.properties")) {
+        try (InputStream input = ConnectionFactory.class.getClassLoader().getResourceAsStream("db.properties")) {
+            if (input == null) {
+                throw new Exception("File db.properties non trovato nel classpath!");
+            }
             props.load(input);
         } catch (Exception e) {
             throw new ExceptionInInitializerError("Errore nel caricamento del file db.properties: " + e.getMessage());
@@ -26,6 +28,7 @@ public class ConnectionFactory {
 
     // Sostituita l'eccezione generica con SQLException
     public static Connection getConnection() throws SQLException {
+
         return DriverManager.getConnection(
                 props.getProperty("CONNECTION_URL"),
                 props.getProperty("LOGIN_USER"),

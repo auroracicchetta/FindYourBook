@@ -1,16 +1,46 @@
 package it.ispwproject.findyourbook.dao.db;
 
-// import it.ispwproject.findyourbook.dao.ConnectionFactory; <-- Lo useremo quando configureremo il DB vero!
+import it.ispwproject.findyourbook.dao.ConnectionFactory;
 import it.ispwproject.findyourbook.dao.LoginDAO;
+import it.ispwproject.findyourbook.enumerator.Role;
 import it.ispwproject.findyourbook.exception.LoginException;
 import it.ispwproject.findyourbook.model.Credentials;
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Types;
 
 public class LoginDAODB implements LoginDAO {
 
     @Override
     public Credentials execute(String username, String plainPassword) throws LoginException {
-        // PER ORA: Lasciamo questo metodo "vuoto" in attesa di creare la ConnectionFactory per MySQL.
-        // Se si attiva la modalità "DATABASE", lancerà questa eccezione temporanea.
-        throw new LoginException("Connessione al database reale non ancora configurata!");
+        String hashedPassword = plainPassword; // Questo è l'hash SHA-256 che arriva dal Controller
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             CallableStatement cs = conn.prepareCall("{call login(?, ?, ?, ?, ?, ?)}")) {
+
+            cs.setString(1, username);
+            cs.setString(2, hashedPassword);
+
+            cs.registerOutParameter(3, Types.INTEGER);
+            cs.registerOutParameter(4, Types.VARCHAR);
+            cs.registerOutParameter(5, Types.VARCHAR);
+            cs.registerOutParameter(6, Types.VARCHAR);
+
+
+            cs.execute();
+
+            String roleStr = cs.getString(6);
+
+            if (roleStr == null || roleStr.equals("NOT_FOUND")) {
+                throw new LoginException("Credenziali non valide. Riprova.");
+            }
+
+            return new Credentials(username, hashedPassword, Role.fromString(roleStr));
+
+        } catch (SQLException e) {
+            throw new LoginException("Errore DB: " + e.getMessage(), e);
+        }
     }
 }

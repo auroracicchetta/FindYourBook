@@ -7,7 +7,8 @@ import it.ispwproject.findyourbook.exception.DAOException;
 import it.ispwproject.findyourbook.exception.RegistrationException;
 import it.ispwproject.findyourbook.view.gui.RegistrationGUIView;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
-import javafx.scene.control.Alert;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class RegistrationGUI {
@@ -18,35 +19,32 @@ public class RegistrationGUI {
     public RegistrationGUI(Stage stage) { this.stage = stage; }
 
     public void show() {
-        // Pass both the back action AND the registration action
-        javafx.scene.Parent root = view.buildRoot(
-                () -> new LoginGUI(stage).show(), // Action for 'Indietro'
-                this::handleRegistration          // Action for 'Completa registrazione'
+        Parent root = view.buildRoot(
+                () -> new LoginGUI(stage).show(), // Azione per 'Indietro'
+                this::handleRegistration          // Azione per 'Completa registrazione'
         );
 
-        javafx.scene.Scene scene = it.ispwproject.findyourbook.controller.gui.GUIUtils.createScene(root);
-
+        Scene scene = GUIUtils.createScene(root);
         stage.setScene(scene);
         stage.show();
     }
 
     private void handleRegistration() {
-        it.ispwproject.findyourbook.bean.RegistrationBean bean = new it.ispwproject.findyourbook.bean.RegistrationBean();
+        RegistrationBean bean = new RegistrationBean();
         bean.setName(view.nameField.getText().trim());
         bean.setSurname(view.surnameField.getText().trim());
         bean.setUsername(view.usernameField.getText().trim());
+        bean.setEmail(view.emailField.getText().trim());
         bean.setPassword(view.passwordField.getText().trim());
         bean.setConfirmPassword(view.confirmPasswordField.getText().trim());
 
-        // Prende la data
-        bean.setDataNascita(view.dataNascita.getValue());
+        bean.setBirthDate(view.dataNascita.getValue());
 
-        bean.setRole(view.casaEditriceRadio.isSelected() ?
-                it.ispwproject.findyourbook.enumerator.Role.CASA_EDITRICE :
-                it.ispwproject.findyourbook.enumerator.Role.LETTORE);
+        // 1. Uso dei ruoli corretti in inglese
+        bean.setRole(view.casaEditriceRadio.isSelected() ? Role.PUBLISHER : Role.READER);
 
         if (view.casaEditriceRadio.isSelected()) {
-            bean.setDescrizione(view.descrizioneField.getText().trim());
+            bean.setDescription(view.descrizioneField.getText().trim());
         }
 
         try {
@@ -54,22 +52,22 @@ public class RegistrationGUI {
             registrationController.register(bean);
             AppLogger.logInfo("--- UTENTE SALVATO NEL DATABASE ---");
 
-            // 1. Mostra il popup di successo
             view.showInformationSuccess(
                     "Registrazione Completata",
                     "Il tuo account è stato creato con successo. Clicca OK per tornare al login."
             );
 
-            // 2. Pulisce i campi del form
             view.clearFields();
-
-            // 3. Ti riporta alla schermata di Login
             new LoginGUI(stage).show();
 
-        } catch (Exception e) {
-            AppLogger.logError("--- ERRORE DURANTE LA REGISTRAZIONE --- " + e.getMessage());
+        } catch (RegistrationException e) {
+            // 2. Errore lato utente (es. email duplicata, password errata, under 14)
+            AppLogger.logWarning("Errore di validazione: " + e.getMessage());
             view.setError(e.getMessage());
+        } catch (DAOException e) {
+            // 3. Errore tecnico del sistema (DB disconnesso)
+            AppLogger.logError("Errore di sistema: " + e.getMessage());
+            view.setError("Errore di sistema durante la registrazione. Riprova più tardi.");
         }
     }
-
 }

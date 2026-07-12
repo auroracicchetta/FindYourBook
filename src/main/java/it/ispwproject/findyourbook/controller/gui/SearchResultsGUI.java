@@ -2,39 +2,81 @@ package it.ispwproject.findyourbook.controller.gui;
 
 import it.ispwproject.findyourbook.bean.BookBean;
 import it.ispwproject.findyourbook.controller.applicativo.BookController;
+import it.ispwproject.findyourbook.controller.applicativo.UserLibraryController;
+import it.ispwproject.findyourbook.enumerator.ReadingStatus;import it.ispwproject.findyourbook.enumerator.ReadingStatus;
 import it.ispwproject.findyourbook.view.gui.SearchResultsGUIView;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
 import java.util.List;
 
 public class SearchResultsGUI {
     private final Stage stage;
+    private final String username;
+    private final Runnable onLogout;
     private final List<BookBean> results;
     private final String lastQuery;
     private final SearchResultsGUIView view;
+    private final BookController bookController;
+    private final UserLibraryController userLibraryController;
 
-    public SearchResultsGUI(Stage stage, List<BookBean> results, String lastQuery) {
+    public SearchResultsGUI(Stage stage, String username, Runnable onLogout, List<BookBean> results, String lastQuery) {
         this.stage = stage;
+        this.username = username;
+        this.onLogout = onLogout;
         this.results = results;
         this.lastQuery = lastQuery;
         this.view = new SearchResultsGUIView();
+        this.bookController = new BookController();
+        this.userLibraryController = new UserLibraryController();
     }
 
+
     public void show() {
+
+        String username = it.ispwproject.findyourbook.pattern.singleton.SessionManager.getInstance().getLoggedUser().getUsername();
+
         Parent root = view.buildRoot(
+                username,
                 this.results,
                 this.lastQuery,
-                () -> new ReaderDashboardGUI(stage).show(),
+                () -> new ReaderDashboardGUI(stage, username, onLogout).show(),
                 this::handleSearch,
-                MainGUI::showLogin,
-                () -> new UserLibraryGUI(stage).show(),
+                onLogout,
+                () -> new UserLibraryGUI(stage, username, onLogout).show(),
+                book -> new BookDetailGUI(stage, username, onLogout, book, book.getStatus(),
+                        () -> new SearchResultsGUI(stage, username, onLogout, this.results, this.lastQuery).show()
+                ).show(),
 
-                book -> new it.ispwproject.findyourbook.controller.gui.BookDetailGUI(stage, book, book.getStatus(),
-                        () -> new SearchResultsGUI(stage, this.results, this.lastQuery).show()
-                ).show()
+                (book, newStatus) -> {
+                    try {
+                        UserLibraryController libController = new UserLibraryController();
+                        if (newStatus == null) {
+                            libController.removeBookFromLibrary(book);
+                            book.setStatus(null);
+                        } else {
+                            // newStatus è già un ReadingStatus, lo passiamo direttamente senza valueOf!
+                            libController.saveBookToLibrary(book, newStatus);
+                            book.setStatus(newStatus);
+                        }
+                        AppLogger.logInfo("✅ Stato griglia aggiornato per: " + book.getTitle());
+                    } catch (Exception e) {
+                        AppLogger.logError("Errore salvataggio stato da griglia: " + e.getMessage());
+                    }
+                },
+
+                (book, rating) -> {
+                    try {
+                        userLibraryController.rateBook(book, rating);
+                        book.setRating(rating); // <-- AGGIORNAMENTO ISTANTANEO DEL VOTO
+                        AppLogger.logInfo("⭐ Voto griglia aggiornato per: " + book.getTitle());
+                    } catch (Exception e) {
+                        AppLogger.logError("Errore valutazione da griglia: " + e.getMessage());
+                    }
+                }
         );
 
         Scene scene = GUIUtils.createScene(root);
@@ -44,17 +86,14 @@ public class SearchResultsGUI {
 
     private void handleSearch(String query) {
         if (query == null || query.trim().isEmpty()) return;
-        new Thread(() -> {
-            try {
-                // Anche qui, usiamo il BookController per avere la sincronizzazione
-                BookController controller = new BookController();
-                List<BookBean> risultati = controller.searchBooks(query);
 
-                Platform.runLater(() -> new SearchResultsGUI(stage, risultati, query).show());
-            } catch (Exception e) {
-                // Risolto il code smell usando il logger al posto di System.err
-                Platform.runLater(() -> AppLogger.logError("Errore ricerca: " + e.getMessage()));
-            }
-        }).start();
+        try {
+            List<BookBean> risultati = bookController.searchBooks(query);
+            new UserLibraryController().syncBooksWithDatabase(risultati);
+
+            new SearchResultsGUI(stage, username, onLogout, risultati, query).show();
+        } catch (Exception e) {
+            AppLogger.logError("Errore ricerca: " + e.getMessage());
+        }
     }
 }

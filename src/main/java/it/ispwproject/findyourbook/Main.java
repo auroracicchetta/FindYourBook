@@ -1,5 +1,6 @@
 package it.ispwproject.findyourbook;
 
+import it.ispwproject.findyourbook.controller.cli.MainCLI;
 import it.ispwproject.findyourbook.controller.cli.ModeSelectorCLI;
 import it.ispwproject.findyourbook.controller.gui.MainGUI;
 import it.ispwproject.findyourbook.dao.ConnectionFactory;
@@ -39,12 +40,10 @@ public class Main {
             }
         }
 
-        // 3. Avvio
         if (scelta.equals("2")) {
-            MainGUI.launch(args); // Lancia JavaFX
+            MainGUI.launch(args);
         } else {
-            // Lancia la Macchina a Stati per il Terminale
-            new CLIStateMachineImpl().start();
+            MainCLI.start();
         }
     }
 }

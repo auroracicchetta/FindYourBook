@@ -18,7 +18,6 @@ public class LoginCLI extends AbstractCLIState {
         String username = credentials[0];
         String password = credentials[1];
 
-        // Usiamo il metodo universale che hai appena aggiunto in AbstractCLIState
         if (isBackChoice(username)) {
             goBack(context);
             return;
@@ -31,18 +30,15 @@ public class LoginCLI extends AbstractCLIState {
         }
 
         try {
-            // 1. Chiamiamo il controller applicativo e salviamo il risultato
             LoginController.LoginResult result = loginController.login(username, password);
 
-            // 2. Recuperiamo il nome per il messaggio di benvenuto
             String name = SessionManager.getInstance().getLoggedUser().getUsername();
             view.showSuccess(name);
 
-            // 3. Gestione della transizione in base al ruolo
             switch (result) {
-                case SUCCESSO_LETTORE ->
+                case SUCCESSO_READER ->
                         goNext(context, new ReaderDashboardCLI());
-                case SUCCESSO_CASA_EDITRICE ->
+                case SUCCESSO_PUBLISHER ->
                         goNext(context, new PublisherDashboardCLI());
             }
 

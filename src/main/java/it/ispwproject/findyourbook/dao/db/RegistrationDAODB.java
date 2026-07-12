@@ -11,13 +11,12 @@ import java.sql.*;
 
 public class RegistrationDAODB implements RegistrationDAO {
 
-    // ⚠️ ATTENZIONE: Assicurati che nel tuo database MySQL la tabella si chiami "utenti".
-    // Se si chiama "user" o "users", cambialo in queste due stringhe!
     private static final String CHECK_USERNAME =
             "SELECT COUNT(*) FROM utenti WHERE username = ?";
 
+    // AGGIUNTA COLONNA email E UN '?' IN PIU' NEI VALUES
     private static final String INSERT_USER =
-            "INSERT INTO utenti (nome, cognome, username, password, ruolo, data_nascita, descrizione) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO utenti (nome, cognome, username, password, email, ruolo, data_nascita, descrizione) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     @Override
     public boolean usernameExists(String username) throws DAOException {
@@ -48,16 +47,17 @@ public class RegistrationDAODB implements RegistrationDAO {
             ps.setString(3, user.getUsername());
             ps.setString(4, user.getPassword());
 
-            // Risolto il code smell applicando il pattern matching di Java 16+
-            if (user instanceof Publisher pub) {
-                ps.setString(5, "CASA_EDITRICE");
-                ps.setDate(6, java.sql.Date.valueOf(pub.getDataNascita()));
-                ps.setString(7, pub.getDescrizione());
+            // AGGIUNTO IL PASSAGGIO DELL'EMAIL COME QUINTO PARAMETRO
+            ps.setString(5, user.getEmail());
 
+            if (user instanceof Publisher pub) {
+                ps.setString(6, "PUBLISHER");
+                ps.setNull(7, Types.DATE);
+                ps.setString(8, pub.getDescription());
             } else if (user instanceof Reader reader) {
-                ps.setString(5, "LETTORE");
-                ps.setDate(6, java.sql.Date.valueOf(reader.getDataNascita()));
-                ps.setNull(7, Types.VARCHAR);
+                ps.setString(6, "READER");
+                ps.setDate(7, java.sql.Date.valueOf(reader.getBirthDate()));
+                ps.setNull(8, Types.VARCHAR);
             }
 
             ps.executeUpdate();

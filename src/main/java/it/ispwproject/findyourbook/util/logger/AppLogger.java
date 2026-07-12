@@ -7,7 +7,6 @@ import java.util.logging.SimpleFormatter;
 
 public class AppLogger {
 
-    // Ho cambiato il nome del logger per il tuo progetto
     private static final Logger LOGGER = Logger.getLogger("FindYourBookLogger");
 
     static {
@@ -18,7 +17,6 @@ public class AppLogger {
         LOGGER.setLevel(Level.ALL);
     }
 
-    // Costruttore privato (Piace a SonarCloud!)
     private AppLogger() {}
 
     public static Logger getLogger() {

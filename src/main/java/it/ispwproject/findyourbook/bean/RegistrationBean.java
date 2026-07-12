@@ -8,18 +8,15 @@ public class RegistrationBean {
     private String name;
     private String surname;
     private String username;
-    private String email; // <--- AGGIUNTO
-    private LocalDate dataNascita;
+    private String email;
+    private LocalDate birthDate; // Tradotto
     private String password;
     private String confirmPassword;
     private Role role;
-    private String descrizione;
+    private String description; // Tradotto
 
-    public RegistrationBean() {
-        //Costruttore vuoto di default
-    }
+    public RegistrationBean() {}
 
-    // Metodi Get e Set
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
@@ -29,8 +26,8 @@ public class RegistrationBean {
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 
-    public String getEmail() { return email; } // <--- AGGIUNTO
-    public void setEmail(String email) { this.email = email; } // <--- AGGIUNTO
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
@@ -41,9 +38,9 @@ public class RegistrationBean {
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
 
-    public String getDescrizione() { return descrizione; }
-    public void setDescrizione(String descrizione) { this.descrizione = descrizione; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public LocalDate getDataNascita() { return dataNascita; }
-    public void setDataNascita(LocalDate dataNascita) { this.dataNascita = dataNascita; }
+    public LocalDate getBirthDate() { return birthDate; }
+    public void setBirthDate(LocalDate birthDate) { this.birthDate = birthDate; }
 }

@@ -10,6 +10,8 @@ import it.ispwproject.findyourbook.exception.RegistrationException;
 import it.ispwproject.findyourbook.model.Publisher;
 import it.ispwproject.findyourbook.model.Reader;
 import it.ispwproject.findyourbook.model.User;
+import it.ispwproject.findyourbook.pattern.observer.RegistrationObserver;
+import it.ispwproject.findyourbook.service.NotificationService;
 import it.ispwproject.findyourbook.util.PasswordUtils;
 import java.time.LocalDate;
 import java.time.Period;
@@ -24,7 +26,6 @@ public class RegistrationController {
     }
 
     public void register(RegistrationBean bean) throws DAOException, RegistrationException {
-
         validateBean(bean);
 
         if (registrationDAO.usernameExists(bean.getUsername())) {
@@ -39,16 +40,29 @@ public class RegistrationController {
         }
 
         User user;
-        if (bean.getRole() == Role.CASA_EDITRICE) {
-            // Aggiunto bean.getDataNascita() prima della descrizione
-            user = new Publisher(0, bean.getName(), bean.getSurname(), bean.getUsername(), hashedPassword, bean.getDataNascita(), bean.getDescrizione());
+        LocalDate regDate = LocalDate.now();
+
+        String email = bean.getEmail();
+
+        if (bean.getRole() == Role.PUBLISHER) {
+            user = new Publisher(0, bean.getName(), bean.getSurname(), bean.getUsername(),
+                    email, hashedPassword, regDate, bean.getDescription());
         } else {
-            // Aggiunto bean.getDataNascita() alla fine
-            user = new Reader(0, bean.getName(), bean.getSurname(), bean.getUsername(), hashedPassword, bean.getDataNascita());
+            user = new Reader(0, bean.getName(), bean.getSurname(), bean.getUsername(),
+                    email, hashedPassword, regDate, bean.getBirthDate());
         }
 
         registrationDAO.save(user);
-    }
+
+        RegistrationObserver observer = new RegistrationObserver(
+                email,
+                bean.getName(),
+                bean.getRole().name()
+        );
+        user.attach(observer);
+        user.completeRegistration();
+        user.detach(observer);
+        }
 
     private void validateBean(RegistrationBean bean) throws RegistrationException {
         if (bean == null) throw new RegistrationException("Dati di registrazione non validi.");
@@ -56,54 +70,47 @@ public class RegistrationController {
         validateRequiredField(bean.getName(), "Il nome è obbligatorio.");
         validateRequiredField(bean.getSurname(), "Il cognome è obbligatorio.");
         validateRequiredField(bean.getUsername(), "L'username è obbligatorio.");
+        validateRequiredField(bean.getEmail(), "L'email è obbligatoria.");
+
+        if (!it.ispwproject.findyourbook.util.ValidationUtils.isValidEmail(bean.getEmail())) {
+            throw new RegistrationException("Il formato dell'indirizzo email non è valido.");
+        }
+
         validatePassword(bean);
         validateRole(bean);
 
-        if (bean.getRole() == Role.LETTORE) {
-            validateAge(bean.getDataNascita());
+        if (bean.getRole() == Role.READER) {
+            validateAge(bean.getBirthDate());
         }
 
-        if (bean.getRole() == Role.CASA_EDITRICE) {
-            validateRequiredField(bean.getDescrizione(), "La descrizione aziendale è obbligatoria per le Case Editrici.");
+        if (bean.getRole() == Role.PUBLISHER) {
+            validateRequiredField(bean.getDescription(), "La descrizione aziendale è obbligatoria per le Case Editrici.");
         }
     }
 
     private void validateRequiredField(String value, String message) throws RegistrationException {
-        if (value == null || value.isBlank()) {
-            throw new RegistrationException(message);
-        }
+        if (value == null || value.isBlank()) throw new RegistrationException(message);
     }
 
     private void validatePassword(RegistrationBean bean) throws RegistrationException {
-        if (bean.getPassword() == null || bean.getPassword().length() < 8) {
+        if (bean.getPassword() == null || bean.getPassword().length() < 8)
             throw new RegistrationException("La password deve essere di almeno 8 caratteri.");
-        }
-        if (bean.getPassword().chars().noneMatch(Character::isUpperCase)) {
+        if (bean.getPassword().chars().noneMatch(Character::isUpperCase))
             throw new RegistrationException("La password deve contenere almeno una lettera maiuscola.");
-        }
-        if (bean.getPassword().chars().noneMatch(Character::isDigit)) {
+        if (bean.getPassword().chars().noneMatch(Character::isDigit))
             throw new RegistrationException("La password deve contenere almeno un numero.");
-        }
-        if (!bean.getPassword().equals(bean.getConfirmPassword())) {
+        if (!bean.getPassword().equals(bean.getConfirmPassword()))
             throw new RegistrationException("Le password non coincidono.");
-        }
     }
 
     private void validateRole(RegistrationBean bean) throws RegistrationException {
-        if (bean.getRole() == null) {
-            throw new RegistrationException("Seleziona un ruolo.");
-        }
+        if (bean.getRole() == null) throw new RegistrationException("Seleziona un ruolo.");
     }
 
     private void validateAge(LocalDate birthDate) throws RegistrationException {
-        if (birthDate == null) {
-            throw new RegistrationException("La data di nascita è obbligatoria.");
-        }
-
-        // Calcola l'età rispetto alla data di oggi
+        if (birthDate == null) throw new RegistrationException("La data di nascita è obbligatoria.");
         if (Period.between(birthDate, LocalDate.now(ZoneId.systemDefault())).getYears() < 14) {
             throw new RegistrationException("Devi avere almeno 14 anni per registrarti.");
         }
     }
-
 }

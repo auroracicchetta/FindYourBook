@@ -4,7 +4,7 @@ import it.ispwproject.findyourbook.bean.RegistrationBean;
 import it.ispwproject.findyourbook.controller.applicativo.RegistrationController;
 import it.ispwproject.findyourbook.pattern.state.AbstractCLIState;
 import it.ispwproject.findyourbook.pattern.state.CLIStateMachine;
-import it.ispwproject.findyourbook.view.cli.RegistrationView;
+import it.ispwproject.findyourbook.view.cli.RegistrationCLIView;
 import it.ispwproject.findyourbook.enumerator.Role;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -13,13 +13,12 @@ import it.ispwproject.findyourbook.util.logger.AppLogger;
 public class RegistrationCLI extends AbstractCLIState {
 
     private final RegistrationController registrationController = new RegistrationController();
-    private final RegistrationView view = new RegistrationView();
+    private final RegistrationCLIView view = new RegistrationCLIView();
 
     @Override
     public void entry(CLIStateMachine context) {
         view.showHeader();
-        // Aggiungi un piccolo suggerimento nella view o nel log se preferisci
-        AppLogger.logInfo("(Digita '0' in qualsiasi campo per annullare e tornare indietro)");
+        view.showMessaggio("(Digita '0' in qualsiasi campo per annullare e tornare indietro)");
     }
 
     @Override
@@ -28,47 +27,43 @@ public class RegistrationCLI extends AbstractCLIState {
             RegistrationBean bean = new RegistrationBean();
 
             String nome = view.askField("Nome");
-            if (isBackChoice(nome)) { goBack(context); return; }
+            if (isBackChoice(nome)) { goNext(context, new LoginCLI()); return; }
             bean.setName(nome);
 
             String cognome = view.askField("Cognome");
-            if (isBackChoice(cognome)) { goBack(context); return; }
+            if (isBackChoice(cognome)) { goNext(context, new LoginCLI()); return; }
             bean.setSurname(cognome);
 
             String username = view.askField("Username");
-            if (isBackChoice(username)) { goBack(context); return; }
+            if (isBackChoice(username)) { goNext(context, new LoginCLI()); return; }
             bean.setUsername(username);
 
             String email = view.askField("Email");
-            if (isBackChoice(email)) { goBack(context); return; }
+            if (isBackChoice(email)) { goNext(context, new LoginCLI()); return; }
             bean.setEmail(email);
 
             String password = view.askPasswordField("Password");
-            if (isBackChoice(password)) { goBack(context); return; }
+            if (isBackChoice(password)) { goNext(context, new LoginCLI()); return; }
             bean.setPassword(password);
 
             String confirm = view.askPasswordField("Conferma password");
-            if (isBackChoice(confirm)) { goBack(context); return; }
+            if (isBackChoice(confirm)) { goNext(context, new LoginCLI()); return; }
             bean.setConfirmPassword(confirm);
 
-            // 1. Chiedi prima il ruolo!
             Role role = view.askRole();
             bean.setRole(role);
 
-            // 2. Ora chiedi i dati in base al ruolo
-            if (role == Role.LETTORE) {
+            if (role == Role.READER) {
                 String dataString = view.askField("Data di nascita (formato: AAAA-MM-GG)");
-                if (isBackChoice(dataString)) { goBack(context); return; }
+                if (isBackChoice(dataString)) { goNext(context, new LoginCLI()); return; }
 
-                // Richiamo il nuovo metodo estratto per evitare il try annidato
                 if (!impostaDataDiNascita(bean, dataString, context)) {
                     return;
                 }
             } else {
-                // Sei una Casa Editrice, chiedi la descrizione
                 String desc = view.askField("Descrizione attività");
-                if (isBackChoice(desc)) { goBack(context); return; }
-                bean.setDescrizione(desc);
+                if (isBackChoice(desc)) { goNext(context, new LoginCLI()); return; }
+                bean.setDescription(desc);
             }
 
             registrationController.register(bean);
@@ -82,10 +77,9 @@ public class RegistrationCLI extends AbstractCLIState {
         }
     }
 
-    // --- METODO ESTRATTO (Per fare felice SonarCloud ed evitare le matrioske) ---
     private boolean impostaDataDiNascita(RegistrationBean bean, String dataString, CLIStateMachine context) {
         try {
-            bean.setDataNascita(LocalDate.parse(dataString));
+            bean.setBirthDate(LocalDate.parse(dataString));
             return true;
         } catch (DateTimeParseException e) {
             view.showError("Formato data non valido.");

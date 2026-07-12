@@ -1,15 +1,15 @@
 package it.ispwproject.findyourbook.enumerator;
 
 public enum Role {
-    LETTORE,
-    CASA_EDITRICE,
-    AMMINISTRATORE;
+    READER,
+    PUBLISHER,
+    ADMIN;
 
     public static Role fromString(String role) {
         return switch (role.toUpperCase()) {
-            case "LETTORE" -> LETTORE;
-            case "CASA_EDITRICE" -> CASA_EDITRICE;
-            case "AMMINISTRATORE" -> AMMINISTRATORE;
+            case "READER" -> READER;
+            case "PUBLISHER" -> PUBLISHER;
+            case "ADMIN" -> ADMIN;
             default -> throw new IllegalArgumentException(
                     "Ruolo non valido: " + role);
         };
