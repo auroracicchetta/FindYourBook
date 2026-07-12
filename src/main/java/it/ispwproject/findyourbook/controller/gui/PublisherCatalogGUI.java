@@ -65,7 +65,6 @@ public class PublisherCatalogGUI {
                     book.getTitle(),
                     book.getAuthor(),
                     book.getImageUrl(),
-                    book.getCopieVendute(),
                     () -> openEditPopup(book)
             );
         }

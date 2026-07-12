@@ -4,7 +4,7 @@ public class LoginView {
 
     public String[] askCredentials() {
         CLIRenderer.intestazione("FindYourBook – Accedi");
-        System.out.println(" (o digita '0' per tornare al menu iniziale)");
+        CLIRenderer.voceMenuZero(" (o digita '0' per tornare al menu iniziale)");
         CLIRenderer.vuota();
         String username = CLIRenderer.chiediCampo("Username");
         if (username.equals("0")) return new String[]{"0", "0"};

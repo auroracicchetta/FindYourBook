@@ -14,13 +14,14 @@ public class PublisherCatalogGUIView extends DashboardGUIView {
     private static final String CARD_BG = "#FFFFFF";
     private static final String TEXT_DARK = "#3A352F";
     private static final String ACCENT_GREEN = "#8AAB8F";
+    private static final String FX_BACKGROUND_COLOR = "-fx-background-color: ";
 
     public final FlowPane catalogGrid = new FlowPane();
 
     public BorderPane buildRoot(String companyName, Runnable onBack, Runnable onLogout,
                                 java.util.function.Consumer<String> onSearchAction) {
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: " + BG_COLOR + ";");
+        root.setStyle(FX_BACKGROUND_COLOR + BG_COLOR + ";");
         root.getStyleClass().add("fyb-background");
 
         try {
@@ -76,15 +77,15 @@ public class PublisherCatalogGUIView extends DashboardGUIView {
         return root;
     }
 
-    public void addCatalogCard(String title, String author, String imageUrl, int copieVendute, Runnable onClick) {
+    public void addCatalogCard(String title, String author, String imageUrl, Runnable onClick) {
         VBox card = new VBox(15);
-        card.setStyle("-fx-background-color: " + CARD_BG + "; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5); -fx-cursor: hand; -fx-padding: 20;");
+        card.setStyle(FX_BACKGROUND_COLOR + CARD_BG + "; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5); -fx-cursor: hand; -fx-padding: 20;");
         card.setPrefSize(200, 320); // Dimensioni fisse per evitare griglie disordinate
         card.setAlignment(Pos.TOP_CENTER);
 
         // Effetto Hover (si solleva e aumenta l'ombra)
-        card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: " + CARD_BG + "; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 8); -fx-cursor: hand; -fx-padding: 20;"));
-        card.setOnMouseExited(e -> card.setStyle("-fx-background-color: " + CARD_BG + "; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5); -fx-cursor: hand; -fx-padding: 20;"));
+        card.setOnMouseEntered(e -> card.setStyle(FX_BACKGROUND_COLOR + CARD_BG + "; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 8); -fx-cursor: hand; -fx-padding: 20;"));
+        card.setOnMouseExited(e -> card.setStyle(FX_BACKGROUND_COLOR + CARD_BG + "; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5); -fx-cursor: hand; -fx-padding: 20;"));
         card.setOnMouseClicked(e -> onClick.run());
 
         // Gestione dell'Immagine
@@ -101,7 +102,6 @@ public class PublisherCatalogGUIView extends DashboardGUIView {
                 AppLogger.logError("Immagine non caricata: " + imageUrl);
             }
         } else {
-            // Segnaposto se non c'è il link
             coverView.setStyle("-fx-background-color: #D3C5B1;");
         }
 
