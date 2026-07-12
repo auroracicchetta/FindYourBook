@@ -1,5 +1,5 @@
 FindYourBook
-Developed for the Software Engineering and Web Design course, University of Rome Tor Vergata.<img width="1440" height="900" alt="Screenshot 2026-07-12 alle 19 44 33" src="https://github.com/user-attachments/assets/b7b89012-0c96-48f1-bf00-c312ea862965" />
+Developed for the Software Engineering and Web Design course, University of Rome Tor Vergata.
 
 
 ## Description
