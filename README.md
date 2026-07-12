@@ -54,20 +54,25 @@ LOGIN_USER=root
 LOGIN_PASS=
 SENDGRID_API_KEY=TUA_API_KEY
 SENDGRID_FROM_EMAIL=findyourbook.support@gmail.com
+```
 
-** ⚠️ The db.properties file includes database credentials and a placeholder for the SendGrid API key. Email notifications in action can be seen in the project demo video.
+⚠️ The db.properties file includes database credentials and a placeholder for the SendGrid API key. Email notifications in action can be seen in the project demo video.
 
-** Demo credentials
-** Role	        Username	              Password
-** Reader	       mario	                qualsiasi
-** Publisher	   mondadori              	qualsiasi
+## Demo credentials
 
-** Database credentials (modalità MySQL)
-** Role	        Username	                Password
-** Reader	       mario	                Password123!
-** Publisher	    mondadori              	Password123!
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| Reader | `mario` | qualsiasi |
+| Publisher | `mondadori` | qualsiasi |
 
-**Other test accounts available, see BrainBank_db.sql for the full list.
+## Database credentials (modalità MySQL)
+
+| Role | Username | Password |
+| :--- | :--- | :--- |
+| Reader | `mario` | Password123! |
+| Publisher | `mondadori` | Password123! |
+
+Other test accounts available, see findyourbook_db.sql for the full list.
 
 ## Author
 Cicchetta Aurora
