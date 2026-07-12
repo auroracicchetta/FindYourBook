@@ -20,7 +20,7 @@ public class PublishBookCLIView {
     }
 
     private void showGlobalMessage(String message) {
-        showGlobalMessage(message);
+        System.out.println(message);
     }
 
     private void showGlobalPrompt(String prompt) {

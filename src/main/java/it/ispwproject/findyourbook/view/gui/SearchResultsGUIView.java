@@ -86,6 +86,8 @@ public class SearchResultsGUIView extends DashboardGUIView {
                 try {
                     statusEnum = ReadingStatus.valueOf(newStatusStr);
                 } catch (IllegalArgumentException ignored) {
+                    // Valore non valido gestito silenziosamente come fallback
+
 
                 }
             }

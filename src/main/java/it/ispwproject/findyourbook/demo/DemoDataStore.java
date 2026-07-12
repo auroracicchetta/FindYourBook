@@ -19,6 +19,7 @@ public class DemoDataStore {
     private int nextUserId = 10;
     private int nextBookId = 1;
     private static final String DEMO_EMAIL = "auroracicchetta@students.uniroma2.eu";
+    private static final java.util.Random RANDOM = new java.util.Random();
 
     private DemoDataStore() {
         initData();
@@ -228,7 +229,7 @@ public class DemoDataStore {
         b.setImageUrl(imageUrl);
         b.setPublisherUsername(publisherUsername);
 
-        b.setCopieVendute(new java.util.Random().nextInt(1000));
+        b.setCopieVendute(RANDOM.nextInt(1000));
         return b;
     }
 
