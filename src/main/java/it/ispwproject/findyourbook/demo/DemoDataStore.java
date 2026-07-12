@@ -3,6 +3,7 @@ package it.ispwproject.findyourbook.demo;
 import it.ispwproject.findyourbook.model.*;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ public class DemoDataStore {
 
     private int nextUserId = 10;
     private int nextBookId = 1;
+    private static final String DEMO_EMAIL = "auroracicchetta@students.uniroma2.eu";
 
     private DemoDataStore() {
         initData();
@@ -44,13 +46,13 @@ public class DemoDataStore {
 
     private void initData() {
         // 1. CARICHIAMO I LETTORI
-        users.add(new Reader(1, "Mario", "Rossi", "mario", "aurora.cicchetta@students.uniroma2.eu", null, LocalDate.now(), LocalDate.of(1995, 5, 20)));
+        users.add(new Reader(1, "Mario", "Rossi", "mario", "DEMO_EMAIL", null, LocalDate.now(java.time.ZoneId.systemDefault()), LocalDate.of(1995, Month.MAY, 20)));
 
         // 2. CARICHIAMO LE CASE EDITRICI
-        users.add(new Publisher(2, "Mondadori", "Editore", "mondadori", "aurora.cicchetta@students.uniroma2.eu", null, LocalDate.now(), "La più grande casa editrice italiana."));
-        users.add(new Publisher(3, "Feltrinelli", "Editore", "feltrinelli", "aurora.cicchetta@students.uniroma2.eu", null, LocalDate.now(), "Fondata nel 1954, specializzata in narrativa."));
-        users.add(new Publisher(4, "Newton", "Compton", "newton", "aurora.cicchetta@students.uniroma2.eu", null, LocalDate.now(), "Classici a prezzi popolari e gialli."));
-        users.add(new Publisher(5, "Einaudi", "Editore", "einaudi", "aurora.cicchetta@students.uniroma2.eu", null, LocalDate.now(), "Punto di riferimento per la cultura e i classici."));
+        users.add(new Publisher(2, "Mondadori", "Editore", "mondadori", "DEMO_EMAIL", null, LocalDate.now(java.time.ZoneId.systemDefault()), "La più grande casa editrice italiana."));
+        users.add(new Publisher(3, "Feltrinelli", "Editore", "feltrinelli", "DEMO_EMAIL", null, LocalDate.now(java.time.ZoneId.systemDefault()), "Fondata nel 1954, specializzata in narrativa."));
+        users.add(new Publisher(4, "Newton", "Compton", "newton", "DEMO_EMAIL", null, LocalDate.now(java.time.ZoneId.systemDefault()), "Classici a prezzi popolari e gialli."));
+        users.add(new Publisher(5, "Einaudi", "Editore", "einaudi", "DEMO_EMAIL", null, LocalDate.now(java.time.ZoneId.systemDefault()), "Punto di riferimento per la cultura e i classici."));
 
         // ==========================================
         // 3. CATALOGO DEMO
@@ -177,7 +179,7 @@ public class DemoDataStore {
 
         if (libroVecchio != null) {
             libroVecchio.setStatus(it.ispwproject.findyourbook.enumerator.ReadingStatus.READING);
-            libroVecchio.setReadingStartDate(LocalDate.now().minusDays(35));
+            libroVecchio.setReadingStartDate(LocalDate.now(java.time.ZoneId.systemDefault()).minusDays(35));
 
             List<Book> marioLibrary = new ArrayList<>();
             marioLibrary.add(libroVecchio);
