@@ -33,24 +33,7 @@ public class UserDAODB implements UserDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) throw new DAOException("Utente non trovato: " + username);
-
-                int id = rs.getInt("id");
-                String name = rs.getString("nome");
-                String surname = rs.getString("cognome");
-                String user = rs.getString("username");
-                String pass = rs.getString("password");
-                String email = rs.getString("email");
-                Role role = Role.fromString(rs.getString("ruolo"));
-
-                java.sql.Date sqlRegDate = rs.getDate("data_registrazione");
-                LocalDate regDate = (sqlRegDate != null) ? sqlRegDate.toLocalDate() : LocalDate.now(java.time.ZoneId.systemDefault());
-
-                java.sql.Date sqlBirthDate = rs.getDate("data_nascita");
-                LocalDate birthDate = (sqlBirthDate != null) ? sqlBirthDate.toLocalDate() : null;
-
-                String description = rs.getString("descrizione");
-
-                return buildUser(id, name, surname, user, email, pass, regDate, birthDate, role, description);
+                return extractUser(rs);
             }
         } catch (SQLException e) {
             throw new DAOException("Errore caricamento utente: " + e.getMessage(), e);
@@ -65,23 +48,7 @@ public class UserDAODB implements UserDAO {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("nome");
-                String surname = rs.getString("cognome");
-                String user = rs.getString("username");
-                String pass = rs.getString("password");
-                String email = rs.getString("email");
-                Role role = Role.fromString(rs.getString("ruolo"));
-
-                java.sql.Date sqlRegDate = rs.getDate("data_registrazione");
-                LocalDate regDate = (sqlRegDate != null) ? sqlRegDate.toLocalDate() : LocalDate.now(java.time.ZoneId.systemDefault());
-
-                java.sql.Date sqlBirthDate = rs.getDate("data_nascita");
-                LocalDate birthDate = (sqlBirthDate != null) ? sqlBirthDate.toLocalDate() : null;
-
-                String description = rs.getString("descrizione");
-
-                result.add(buildUser(id, name, surname, user, email, pass, regDate, birthDate, role, description));
+                result.add(extractUser(rs));
             }
         } catch (SQLException e) {
             throw new DAOException("Errore caricamento utenti: " + e.getMessage(), e);
@@ -89,12 +56,38 @@ public class UserDAODB implements UserDAO {
         return result;
     }
 
-    private User buildUser(int id, String name, String surname, String username, String email,
-                           String password, LocalDate regDate, LocalDate birthDate, Role role, String description) {
-        return switch (role) {
-            case READER -> new Reader(id, name, surname, username, email, password, regDate, birthDate);
-            case PUBLISHER -> new Publisher(id, name, surname, username, email, password, regDate, description);
-            default -> throw new IllegalStateException("Ruolo non riconosciuto: " + role);
+    private User extractUser(ResultSet rs) throws SQLException {
+        int id = rs.getInt("id");
+        String name = rs.getString("nome");
+        String surname = rs.getString("cognome");
+        String user = rs.getString("username");
+        String pass = rs.getString("password");
+        String email = rs.getString("email");
+        Role role = Role.fromString(rs.getString("ruolo"));
+
+        java.sql.Date sqlRegDate = rs.getDate("data_registrazione");
+        LocalDate regDate = (sqlRegDate != null) ? sqlRegDate.toLocalDate() : LocalDate.now(java.time.ZoneId.systemDefault());
+
+        java.sql.Date sqlBirthDate = rs.getDate("data_nascita");
+        LocalDate birthDate = (sqlBirthDate != null) ? sqlBirthDate.toLocalDate() : null;
+
+        String description = rs.getString("descrizione");
+
+        UserData data = new UserData(id, name, surname, user, email, pass, regDate, birthDate, role, description);
+        return buildUser(data);
+    }
+
+    private record UserData(int id, String name, String surname, String username, String email,
+                            String password, LocalDate regDate, LocalDate birthDate, Role role, String description) {
+    }
+
+    private User buildUser(UserData data) {
+        return switch (data.role()) {
+            case READER ->
+                    new Reader(data.id(), data.name(), data.surname(), data.username(), data.email(), data.password(), data.regDate(), data.birthDate());
+            case PUBLISHER ->
+                    new Publisher(data.id(), data.name(), data.surname(), data.username(), data.email(), data.password(), data.regDate(), data.description());
+            default -> throw new IllegalStateException("Ruolo non riconosciuto: " + data.role());
         };
     }
 
