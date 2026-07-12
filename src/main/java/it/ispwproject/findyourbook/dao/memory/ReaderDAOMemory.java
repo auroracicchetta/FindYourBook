@@ -10,7 +10,6 @@ import it.ispwproject.findyourbook.model.Reader;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ReaderDAOMemory implements ReaderDAO {
     private final DemoDataStore store = DemoDataStore.getInstance();

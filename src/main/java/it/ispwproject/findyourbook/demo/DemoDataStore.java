@@ -1,6 +1,5 @@
 package it.ispwproject.findyourbook.demo;
 
-import it.ispwproject.findyourbook.exception.DAOException;
 import it.ispwproject.findyourbook.model.*;
 
 import java.time.LocalDate;
@@ -14,7 +13,6 @@ public class DemoDataStore {
 
     private final List<User> users = new ArrayList<>();
     private final List<Book> books = new ArrayList<>();
-    // Mappa per i preferiti: Username -> Lista di Libri
     private final Map<String, List<Book>> favorites = new HashMap<>();
 
     private int nextUserId = 10;
@@ -220,15 +218,15 @@ public class DemoDataStore {
      */
     private Book createDemoBook(String title, String author, String genre, String description, String imageUrl, String publisherUsername) {
         Book b = new Book();
-        b.setId(nextBookId++); // Assegna un ID incrementale finto
+        b.setId(nextBookId++);
         b.setTitle(title);
         b.setAuthor(author);
         b.setGenre(genre);
         b.setDescription(description);
         b.setImageUrl(imageUrl);
-        b.setPublisherUsername(publisherUsername); // Il collegamento magico con l'editore!
+        b.setPublisherUsername(publisherUsername);
 
-        b.setCopieVendute( (int)(Math.random() * 1000) );
+        b.setCopieVendute(new java.util.Random().nextInt(1000));
         return b;
     }
 
