@@ -6,8 +6,8 @@ public class PublishBookCLIView {
     private final Scanner scanner = new Scanner(System.in);
 
     public void showHeader() {
-        showGlobalMessage("\n=== PUBBLICA UN NUOVO LIBRO ===");
-        showGlobalMessage("(Digita '0' in qualsiasi momento per annullare e tornare indietro)");
+        CLIRenderer.messaggio("\n=== PUBBLICA UN NUOVO LIBRO ===");
+        CLIRenderer.messaggio("(Digita '0' in qualsiasi momento per annullare e tornare indietro)");
     }
 
     public String askField(String prompt) {
@@ -16,14 +16,10 @@ public class PublishBookCLIView {
     }
 
     public void showMessage(String msg) {
-        showGlobalMessage("-> " + msg);
-    }
-
-    private void showGlobalMessage(String message) {
-        System.out.println(message);
+        CLIRenderer.messaggio("-> " + msg);
     }
 
     private void showGlobalPrompt(String prompt) {
-        showGlobalMessage(prompt);
+        CLIRenderer.messaggio(prompt);
     }
 }
