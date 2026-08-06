@@ -1,6 +1,7 @@
 package it.ispwproject.findyourbook.controller.applicativo;
 
 import it.ispwproject.findyourbook.bean.BookBean;
+import it.ispwproject.findyourbook.bean.ReaderBean;
 import it.ispwproject.findyourbook.dao.DAOFactory;
 import it.ispwproject.findyourbook.dao.ReaderDAO;
 import it.ispwproject.findyourbook.enumerator.ReadingStatus;
@@ -12,12 +13,15 @@ import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
 import it.ispwproject.findyourbook.exception.DAOException;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
 
+import java.util.concurrent.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserLibraryController {
 
     private final ReaderDAO readerDAO;
-    private boolean reminderAlreadySent = false;
+    private static final ExecutorService NOTIFICATION_EXECUTOR = Executors.newCachedThreadPool();
 
     public UserLibraryController() {
         this.readerDAO = DAOFactory.getReaderDAO();
@@ -40,20 +44,45 @@ public class UserLibraryController {
 
         if (status == ReadingStatus.READ) {
 
-            BookCompletedObserver observer = new BookCompletedObserver(
-                    reader.getEmail(),
-                    reader.getUsername(),
-                    book.getTitle()
-            );
-            book.attach(observer);
-            book.markAsRead();
-            book.detach(observer);
+            // Invio asincrono, stesso pattern di checkInactiveReading(): la mail
+            // "obiettivo di lettura raggiunto" non deve bloccare il thread della GUI.
+            BookCompletedObserver observer = new BookCompletedObserver(reader, book);
+            NOTIFICATION_EXECUTOR.submit(() -> {
+                book.attach(observer);
+                book.markAsRead();
+                book.detach(observer);
+            });
         }
     }
 
     public void removeBookFromLibrary(BookBean bookBean) throws DAOException {
         Reader reader = (Reader) SessionManager.getInstance().getLoggedUser();
         readerDAO.removeFavoriteBook(reader.getUsername(), bookBean.getTitle());
+    }
+
+    // Punto unico di parsing/dispatch: sostituisce la logica duplicata
+    // che prima stava in UserLibraryGUI e BookDetailGUI.
+    public void updateReadingStatus(BookBean bookBean, String rawStatus) throws DAOException {
+        if (rawStatus == null || rawStatus.equals("Rimuovi libro") || rawStatus.equals("RIMUOVI")) {
+            removeBookFromLibrary(bookBean);
+            bookBean.setStatus(null);
+            return;
+        }
+
+        ReadingStatus targetStatus = parseReadingStatus(rawStatus);
+        if (targetStatus == null) return; // stringa non riconosciuta, nessuna azione
+
+        saveBookToLibrary(bookBean, targetStatus);
+        bookBean.setStatus(targetStatus);
+    }
+
+    private ReadingStatus parseReadingStatus(String rawStatus) {
+        for (ReadingStatus status : ReadingStatus.values()) {
+            if (rawStatus.equals(status.name()) || rawStatus.equals(status.getDisplayName())) {
+                return status;
+            }
+        }
+        return null;
     }
 
     public void rateBook(BookBean bookBean, int rating) throws DAOException {
@@ -67,7 +96,7 @@ public class UserLibraryController {
         Reader reader = (Reader) SessionManager.getInstance().getLoggedUser();
         if (reader == null) return;
 
-        List<Book> savedBooks = readerDAO.getBooksByStatus(reader.getUsername(), ReadingStatus.READ.name());
+        List<Book> savedBooks = new ArrayList<>(readerDAO.getBooksByStatus(reader.getUsername(), ReadingStatus.READ.name()));
         savedBooks.addAll(readerDAO.getBooksByStatus(reader.getUsername(), ReadingStatus.TO_READ.name()));
         savedBooks.addAll(readerDAO.getBooksByStatus(reader.getUsername(), ReadingStatus.READING.name()));
 
@@ -95,7 +124,10 @@ public class UserLibraryController {
     }
 
     public void checkInactiveReading() {
-        if (reminderAlreadySent) return;
+        // Flag a livello di SESSIONE (non d'istanza): cosi' resta valido anche
+        // quando il Reader naviga via e ricostruisce UserLibraryController entrando
+        // di nuovo nella libreria personale nella stessa sessione di login.
+        if (SessionManager.getInstance().isInactivityReminderSent()) return;
 
         Reader reader = (Reader) SessionManager.getInstance().getLoggedUser();
         if (reader == null) return;
@@ -107,16 +139,15 @@ public class UserLibraryController {
             for (Book book : readingBooks) {
                 if (book.getReadingStartDate() != null && book.getReadingStartDate().isBefore(thirtyDaysAgo)) {
 
-                    ReadingReminderObserver observer = new ReadingReminderObserver(
-                            reader.getEmail(),
-                            reader.getName(),
-                            book.getTitle()
-                    );
-                    book.attach(observer);
-                    book.triggerReminder();
-                    book.detach(observer);
+                    ReadingReminderObserver observer = new ReadingReminderObserver(reader, book);
 
-                    reminderAlreadySent = true;
+                    NOTIFICATION_EXECUTOR.submit(() -> {
+                        book.attach(observer);
+                        book.triggerReminder();
+                        book.detach(observer);
+                    });
+
+                    SessionManager.getInstance().setInactivityReminderSent(true);
                     break;
                 }
             }

@@ -10,13 +10,13 @@ public class PublisherStatsCLIView {
 
     public void showStats(PublisherStatsBean stats) {
         CLIRenderer.campo("Libri a Catalogo", String.valueOf(stats.getTotalBooksPublished()));
-        CLIRenderer.campo("Totale Libri Letti", String.valueOf(stats.getTotalCopiesSold()));
+        CLIRenderer.campo("Totale Libri Letti", String.valueOf(stats.getTotalBooksRead()));
 
         CLIRenderer.sezione("I Libri più Letti dagli Utenti");
-        if (stats.getTopSellingBooks().isEmpty()) {
+        if (stats.getTopReadBooks().isEmpty()) {
             CLIRenderer.messaggio("Nessun dato disponibile.");
         } else {
-            stats.getTopSellingBooks().forEach((titolo, letture) ->
+            stats.getTopReadBooks().forEach((titolo, letture) ->
                     CLIRenderer.messaggio(CLIRenderer.BULLET + " " + titolo + ": " + letture + " letture"));
         }
     }

@@ -11,8 +11,8 @@ import java.util.List;
 
 public class BookDAODB implements BookDAO {
 
-    private static final String SELECT_BY_GENRE = "SELECT id, title, author, genre, image_url, description, publisher_username, copie_vendute FROM published_books WHERE genre = ?";
-    private static final String SEARCH_QUERY = "SELECT id, title, author, genre, image_url, description, publisher_username, copie_vendute FROM published_books WHERE title LIKE ? OR author LIKE ?";
+    private static final String SELECT_BY_GENRE = "SELECT id, title, author, genre, image_url, description, publisher_username, copie_lette FROM published_books WHERE genre = ?";
+    private static final String SEARCH_QUERY = "SELECT id, title, author, genre, image_url, description, publisher_username, copie_lette FROM published_books WHERE title LIKE ? OR author LIKE ?";
 
     @Override
     public List<Book> findByGenre(String genre) throws DAOException {
@@ -66,7 +66,7 @@ public class BookDAODB implements BookDAO {
         book.setImageUrl(rs.getString("image_url"));
         book.setDescription(rs.getString("description"));
         book.setPublisherUsername(rs.getString("publisher_username"));
-        book.setCopieVendute(rs.getInt("copie_vendute"));
+        book.setCopieLette(rs.getInt("copie_lette"));
 
         return book;
     }

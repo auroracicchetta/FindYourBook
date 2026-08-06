@@ -15,7 +15,7 @@ public class Book extends Observable {
     private int rating;
     private ReadingStatus status;
     private String publisherUsername;
-    private int copieVendute;
+    private int copieLette;
     private LocalDate readingStartDate;
 
     public Book() {}
@@ -66,8 +66,8 @@ public class Book extends Observable {
         return publisherUsername;
     }
 
-    public int getCopieVendute() { return copieVendute; }
-    public void setCopieVendute(int copieVendute) { this.copieVendute = copieVendute; }
+    public int getCopieLette() { return copieLette; }
+    public void setCopieLette(int copieLette) { this.copieLette = copieLette; }
 
     public LocalDate getReadingStartDate() { return readingStartDate; }
     public void setReadingStartDate(LocalDate readingStartDate) { this.readingStartDate = readingStartDate; }

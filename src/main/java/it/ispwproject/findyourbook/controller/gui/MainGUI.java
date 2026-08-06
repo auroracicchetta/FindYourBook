@@ -1,10 +1,13 @@
 package it.ispwproject.findyourbook.controller.gui;
 
+import it.ispwproject.findyourbook.dao.ConnectionFactory;
 import it.ispwproject.findyourbook.model.User;
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
 import javafx.application.Application;
 import javafx.stage.Stage;
+
+import java.sql.SQLException;
 
 public class MainGUI extends Application {
 
@@ -42,6 +45,12 @@ public class MainGUI extends Application {
             return;
         }
 
+        if (!SessionManager.getInstance().isReader()) {
+            AppLogger.logError(" ERRORE: accesso alla dashboard Lettore negato, ruolo non valido. Reindirizzo al login.");
+            showLogin();
+            return;
+        }
+
         String displayName = loggedUser.getUsername();
 
         if (displayName == null || displayName.isEmpty()) {
@@ -53,6 +62,11 @@ public class MainGUI extends Application {
 
         Runnable onLogout = () -> {
             SessionManager.getInstance().clearSession();
+            try {
+                ConnectionFactory.clearRole();
+            } catch (SQLException e) {
+                AppLogger.logError("Errore durante il reset delle credenziali DB al logout: " + e.getMessage());
+            }
             showLogin();
         };
 
@@ -68,10 +82,16 @@ public class MainGUI extends Application {
             return;
         }
 
+        if (!SessionManager.getInstance().isPublisher()) {
+            AppLogger.logError("ERRORE: accesso alla dashboard Casa Editrice negato, ruolo non valido. Reindirizzo al login.");
+            showLogin();
+            return;
+        }
+
         String displayName = loggedUser.getUsername();
 
         if (displayName == null || displayName.isEmpty()) {
-            displayName = loggedUser.getName();  // Fallback
+            displayName = loggedUser.getName();
         }
         if (displayName == null || displayName.isEmpty()) {
             displayName = "Casa Editrice";
@@ -79,6 +99,11 @@ public class MainGUI extends Application {
 
         Runnable onLogout = () -> {
             SessionManager.getInstance().clearSession();
+            try {
+                ConnectionFactory.clearRole();
+            } catch (SQLException e) {
+                AppLogger.logError("Errore durante il reset delle credenziali DB al logout: " + e.getMessage());
+            }
             showLogin();
         };
 

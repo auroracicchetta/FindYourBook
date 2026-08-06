@@ -14,8 +14,11 @@ public class RegistrationDAODB implements RegistrationDAO {
     private static final String CHECK_USERNAME =
             "SELECT COUNT(*) FROM utenti WHERE username = ?";
 
+    private static final String CHECK_EMAIL =
+            "SELECT COUNT(*) FROM utenti WHERE email = ?";
+
     private static final String INSERT_USER =
-            "INSERT INTO utenti (nome, cognome, username, password, email, ruolo, data_nascita, descrizione) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO utenti (nome, cognome, username, password, email, ruolo, data_nascita, descrizione, data_registrazione) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     @Override
     public boolean usernameExists(String username) throws DAOException {
@@ -31,6 +34,25 @@ public class RegistrationDAODB implements RegistrationDAO {
             }
         } catch (Exception e) {
             throw new DAOException("Errore verifica username: " + e.getMessage());
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean emailExists(String email) throws DAOException {
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement ps = conn.prepareStatement(CHECK_EMAIL)) {
+
+            ps.setString(1, email);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            throw new DAOException("Errore verifica email: " + e.getMessage());
         }
 
         return false;
@@ -57,6 +79,8 @@ public class RegistrationDAODB implements RegistrationDAO {
                 ps.setDate(7, java.sql.Date.valueOf(reader.getBirthDate()));
                 ps.setNull(8, Types.VARCHAR);
             }
+
+            ps.setDate(9, java.sql.Date.valueOf(user.getRegistrationDate()));
 
             ps.executeUpdate();
 

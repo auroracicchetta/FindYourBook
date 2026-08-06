@@ -10,6 +10,7 @@ import it.ispwproject.findyourbook.pattern.state.CLIStateMachine;
 import it.ispwproject.findyourbook.view.cli.UserLibraryCLIView;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class UserLibraryCLI extends AbstractCLIState {
 
@@ -20,8 +21,28 @@ public class UserLibraryCLI extends AbstractCLIState {
     @Override
     public void entry(CLIStateMachine context) {
         String username = SessionManager.getInstance().getLoggedUser().getUsername();
-        userLibraryController.checkInactiveReading();
-        view.showHeader(username);
+
+        // Stesso fork+join genuino della GUI (UserLibraryGUI.show()): "Retrieve total
+        // read count" e "Check inactive reading" leggono dati indipendenti, vengono
+        // eseguiti in parallelo (fork) e si attende il completamento di ENTRAMBI (join)
+        // prima di mostrare l'header. Cosi' anche la realizzazione CLI del caso d'uso
+        // esegue davvero il passo previsto dall'Activity Diagram, non solo la GUI.
+        CompletableFuture<Integer> readCountFuture = CompletableFuture.supplyAsync(() -> {
+            try {
+                return bookController.getFavoriteBooks(username, ReadingStatus.READ).size();
+            } catch (Exception e) {
+                return 0;
+            }
+        });
+
+        CompletableFuture<Void> inactiveReadingFuture = CompletableFuture.runAsync(
+                userLibraryController::checkInactiveReading
+        );
+
+        CompletableFuture.allOf(readCountFuture, inactiveReadingFuture).join();
+        int readCount = readCountFuture.join();
+
+        view.showHeader(username, readCount);
     }
 
     @Override
@@ -29,7 +50,7 @@ public class UserLibraryCLI extends AbstractCLIState {
         ReadingStatus selectedStatus = view.askStatusFilter();
 
         if (selectedStatus == null) {
-            goNext(context, new ReaderDashboardCLI());
+            goBack(context);
             return;
         }
 
@@ -57,11 +78,11 @@ public class UserLibraryCLI extends AbstractCLIState {
                 }
             }
 
-            goNext(context, this);
+            repeat(context);
 
         } catch (Exception e) {
             view.showMessage("Errore nel recupero della libreria: " + e.getMessage());
-            goNext(context, this);
+            repeat(context);
         }
     }
 
@@ -78,6 +99,7 @@ public class UserLibraryCLI extends AbstractCLIState {
                     if (rating >= 1 && rating <= 5) {
                         try {
                             userLibraryController.rateBook(book, rating);
+                            book.setRating(rating);
                             view.showMessage("Voto inserito con successo!");
                         } catch (Exception e) {
                             view.showMessage("Errore: " + e.getMessage());

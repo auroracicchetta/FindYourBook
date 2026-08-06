@@ -28,6 +28,31 @@ public abstract class AbstractCLIState {
         context.goBack();
     }
 
+    /**
+     * Ripete lo stato corrente (es. scelta non valida, nuovo tentativo)
+     * SENZA alterare lo storico di navigazione. A differenza di
+     * goNext(context, this), che tramite transition() spingerebbe una copia
+     * dello stato corrente sullo stateHistory ad ogni ripetizione, repeat()
+     * richiama solo action() sullo stato già attivo. Questo evita che lo
+     * stack di goBack() si "gonfi" di duplicati e che il tasto 0 richieda
+     * un numero di pressioni crescente per tornare davvero indietro.
+     */
+    public void repeat(CLIStateMachine context) {
+        context.goNext();
+    }
+
+    /**
+     * Passa a un nuovo stato SENZA lasciare quello corrente nello storico di
+     * navigazione. Da usare quando la transizione rappresenta il completamento
+     * di un flusso (es. registrazione riuscita -> Login, login riuscito ->
+     * Dashboard), non una schermata da cui l'utente deve poter tornare con
+     * goBack(). A differenza di goNext(), lo stato di partenza NON deve più
+     * essere raggiungibile premendo 0 più avanti.
+     */
+    public void redirect(CLIStateMachine context, AbstractCLIState nextState) {
+        context.redirect(nextState);
+    }
+
     public boolean isBackChoice(String input) {
         return input.equals("0");
     }

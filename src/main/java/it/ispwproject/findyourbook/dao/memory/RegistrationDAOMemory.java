@@ -15,6 +15,12 @@ public class RegistrationDAOMemory implements RegistrationDAO {
     }
 
     @Override
+    public boolean emailExists(String email) throws DAOException {
+        return store.getUsers().stream()
+                .anyMatch(u -> u.getEmail().equalsIgnoreCase(email));
+    }
+
+    @Override
     public void save(User user) throws DAOException {
         user.setId(store.nextUserId());
         store.getUsers().add(user);

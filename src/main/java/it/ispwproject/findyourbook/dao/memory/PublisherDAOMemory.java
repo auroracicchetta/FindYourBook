@@ -35,7 +35,7 @@ public class PublisherDAOMemory implements PublisherDAO {
         b.setDescription(book.getDescription());
         b.setImageUrl(book.getImageUrl());
         b.setPublisherUsername(publisherUsername);
-        b.setCopieVendute(0);
+        b.setCopieLette(0);
 
         DemoDataStore.getInstance().getBooks().add(b);
     }
@@ -72,14 +72,14 @@ public class PublisherDAOMemory implements PublisherDAO {
                 .toList();
 
         int totalBooks = publisherBooks.size();
-        int totalSales = publisherBooks.stream().mapToInt(Book::getCopieVendute).sum();
+        int totalBooksRead = publisherBooks.stream().mapToInt(Book::getCopieLette).sum();
 
-        Map<String, Integer> topSelling = publisherBooks.stream()
-                .sorted(Comparator.comparingInt(Book::getCopieVendute).reversed())
+        Map<String, Integer> topRead = publisherBooks.stream()
+                .sorted(Comparator.comparingInt(Book::getCopieLette).reversed())
                 .limit(4)
                 .collect(Collectors.toMap(
                         Book::getTitle,
-                        Book::getCopieVendute,
+                        Book::getCopieLette,
                         (oldValue, newValue) -> oldValue,
                         LinkedHashMap::new // Mantiene l'ordinamento inserito!
                 ));
@@ -87,9 +87,9 @@ public class PublisherDAOMemory implements PublisherDAO {
         Map<String, Integer> byGenre = publisherBooks.stream()
                 .collect(Collectors.groupingBy(
                         Book::getGenre,
-                        Collectors.summingInt(Book::getCopieVendute)
+                        Collectors.summingInt(Book::getCopieLette)
                 ));
 
-        return new PublisherStats(totalBooks, totalSales, topSelling, byGenre);
+        return new PublisherStats(totalBooks, totalBooksRead, topRead, byGenre);
     }
 }

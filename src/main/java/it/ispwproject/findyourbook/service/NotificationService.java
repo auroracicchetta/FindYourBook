@@ -9,6 +9,10 @@ import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
 import it.ispwproject.findyourbook.exception.NotificationException;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
+import it.ispwproject.findyourbook.bean.BookBean;
+import it.ispwproject.findyourbook.bean.PublisherBean;
+import it.ispwproject.findyourbook.bean.ReaderBean;
+import it.ispwproject.findyourbook.bean.RegistrationBean;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -43,7 +47,8 @@ public class NotificationService {
     private NotificationService() {}
 
     // 1. Email di Conferma Registrazione
-    public static void sendRegistrationConfirmation(String toEmail, String name, String role) throws NotificationException {
+    public static void sendRegistrationConfirmation(RegistrationBean bean) throws NotificationException {
+        String toEmail = bean.getEmail();
         if (API_KEY == null || API_KEY.isBlank()) {
             AppLogger.logInfo("[DEMO EMAIL] Registrazione confermata inviata a: " + toEmail);
             return;
@@ -51,25 +56,26 @@ public class NotificationService {
         try {
             Personalization p = new Personalization();
             p.addTo(new Email(toEmail));
-            p.addDynamicTemplateData(KEY_USER_NAME, name);
-            p.addDynamicTemplateData(KEY_ROLE, role);
+            p.addDynamicTemplateData(KEY_USER_NAME, bean.getName());
+            p.addDynamicTemplateData(KEY_ROLE, bean.getRole().name());
             sendTemplateEmail(TEMPLATE_REGISTRATION, p);
         } catch (Exception e) {
-            throw new NotificationException("Errore invio mail pubblicazione libro: " + e.getMessage(), e);
+            throw new NotificationException("Errore invio mail registrazione: " + e.getMessage(), e);
         }
     }
 
     // 2. Email Pubblicazione Nuovo Libro (Casa Editrice)
-    public static void sendBookPublishedNotification(String toEmail, String publisherName, String bookTitle) throws NotificationException {
+    public static void sendBookPublishedNotification(PublisherBean publisherBean, BookBean bookBean) throws NotificationException {
+        String toEmail = publisherBean.getEmail();
         if (API_KEY == null || API_KEY.isBlank()) {
-            AppLogger.logInfo("[DEMO EMAIL] Libro '" + bookTitle + "' pubblicato con successo, notifica inviata a: " + toEmail);
+            AppLogger.logInfo("[DEMO EMAIL] Libro '" + bookBean.getTitle() + "' pubblicato con successo, notifica inviata a: " + toEmail);
             return;
         }
         try {
             Personalization p = new Personalization();
             p.addTo(new Email(toEmail));
-            p.addDynamicTemplateData(KEY_USER_NAME, publisherName);
-            p.addDynamicTemplateData(KEY_BOOK_TITLE, bookTitle);
+            p.addDynamicTemplateData(KEY_USER_NAME, publisherBean.getName());
+            p.addDynamicTemplateData(KEY_BOOK_TITLE, bookBean.getTitle());
             sendTemplateEmail(TEMPLATE_NEW_BOOK, p);
         } catch (Exception e) {
             throw new NotificationException("Errore invio mail pubblicazione libro: " + e.getMessage(), e);
@@ -77,23 +83,25 @@ public class NotificationService {
     }
 
     // 3. Email Obiettivo Lettura Raggiunto (Lettore)
-    public static void sendReadingGoalReachedNotification(String toEmail, String readerName, String bookTitle) throws NotificationException {
+    public static void sendReadingGoalReachedNotification(ReaderBean readerBean, BookBean bookBean) throws NotificationException {
+        String toEmail = readerBean.getEmail();
         if (API_KEY == null || API_KEY.isBlank()) {
-            AppLogger.logInfo("[DEMO EMAIL] Congratulazioni per il completamento di '" + bookTitle + "' inviata a: " + toEmail);
+            AppLogger.logInfo("[DEMO EMAIL] Congratulazioni per il completamento di '" + bookBean.getTitle() + "' inviata a: " + toEmail);
             return;
         }
         try {
             Personalization p = new Personalization();
             p.addTo(new Email(toEmail));
-            p.addDynamicTemplateData(KEY_USER_NAME, readerName);
-            p.addDynamicTemplateData(KEY_BOOK_TITLE, bookTitle);
+            p.addDynamicTemplateData(KEY_USER_NAME, readerBean.getUsername());
+            p.addDynamicTemplateData(KEY_BOOK_TITLE, bookBean.getTitle());
             sendTemplateEmail(TEMPLATE_GOAL_REACHED, p);
         } catch (Exception e) {
-            throw new NotificationException("Errore invio mail pubblicazione libro: " + e.getMessage(), e);
+            throw new NotificationException("Errore invio mail obiettivo raggiunto: " + e.getMessage(), e);
         }
     }
 
-    public static void sendReadingReminder(String toEmail, String readerName, String bookTitle) throws NotificationException {
+    public static void sendReadingReminder(ReaderBean readerBean, BookBean bookBean) throws NotificationException {
+        String toEmail = readerBean.getEmail();
         if (API_KEY == null || API_KEY.isBlank()) {
             AppLogger.logInfo("[DEMO EMAIL] Promemoria 'Stai ancora leggendo?' inviato a: " + toEmail);
             return;
@@ -101,11 +109,11 @@ public class NotificationService {
         try {
             Personalization p = new Personalization();
             p.addTo(new Email(toEmail));
-            p.addDynamicTemplateData(KEY_USER_NAME, readerName);
-            p.addDynamicTemplateData(KEY_BOOK_TITLE, bookTitle);
+            p.addDynamicTemplateData(KEY_USER_NAME, readerBean.getName());
+            p.addDynamicTemplateData(KEY_BOOK_TITLE, bookBean.getTitle());
             sendTemplateEmail(TEMPLATE_READING_REMINDER, p);
         } catch (Exception e) {
-            throw new NotificationException("Errore invio mail pubblicazione libro: " + e.getMessage(), e);
+            throw new NotificationException("Errore invio mail promemoria: " + e.getMessage(), e);
         }
     }
 

@@ -22,7 +22,7 @@ public class InitialCLI extends AbstractCLIState {
             case "0" -> context.setState(null);
             default  -> {
                 view.showError("Scelta non valida.");
-                goNext(context, this);
+                repeat(context);
             }
         }
     }

@@ -34,13 +34,13 @@ public class PublisherCatalogCLI extends AbstractCLIState {
             int choice = view.askBookChoice(catalog.size());
 
             if (choice == 0) {
-                goNext(context, new PublisherDashboardCLI());
+                goBack(context);
             } else if (choice > 0) {
                 BookBean selectedBook = catalog.get(choice - 1);
                 manageBook(selectedBook, context);
             } else {
                 view.showMessage("Scelta non valida.");
-                goNext(context, this);
+                repeat(context);
             }
 
         } catch (Exception e) {
@@ -84,6 +84,6 @@ public class PublisherCatalogCLI extends AbstractCLIState {
             }
         }
 
-        goNext(context, this);
+        repeat(context);
     }
 }

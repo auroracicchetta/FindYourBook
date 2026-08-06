@@ -20,17 +20,26 @@ public class BookDetailGUI {
     private final BookBean book;
     private final ReadingStatus currentStatus;
     private final Runnable onBackAction;
+    private final String originLabel;
     private final BookDetailGUIView view;
     private final BookController bookController;
     private final UserLibraryController userLibraryController;
 
     public BookDetailGUI(Stage stage, String username, Runnable onLogout, BookBean book, ReadingStatus currentStatus, Runnable onBack) {
+        this(stage, username, onLogout, book, currentStatus, onBack, null);
+    }
+
+    // originLabel: nome della schermata di provenienza (es. "I miei libri",
+    // "Risultati ricerca"), mostrato nel bottone Indietro cosi' l'utente capisce
+    // sempre il contesto anche se il dettaglio libro non e' ne' Home ne' I miei libri.
+    public BookDetailGUI(Stage stage, String username, Runnable onLogout, BookBean book, ReadingStatus currentStatus, Runnable onBack, String originLabel) {
         this.stage = stage;
         this.username = username;
         this.onLogout = onLogout;
         this.book = book;
         this.currentStatus = currentStatus;
         this.onBackAction = onBack;
+        this.originLabel = originLabel;
         this.view = new BookDetailGUIView();
         this.bookController = new BookController();
         this.userLibraryController = new UserLibraryController();
@@ -44,7 +53,7 @@ public class BookDetailGUI {
                 this::handleStatusChange,
                 rating -> {
                     try {
-                        new UserLibraryController().rateBook(this.book, rating);
+                        userLibraryController.rateBook(this.book, rating);
                         this.book.setRating(rating);
                     } catch (Exception e) {
                         AppLogger.logError("Errore salvataggio valutazione: " + e.getMessage());
@@ -54,7 +63,8 @@ public class BookDetailGUI {
                 () -> new ReaderDashboardGUI(stage, this.username, this.onLogout).show(),
                 () -> new UserLibraryGUI(stage, this.username, this.onLogout).show(),
                 this.onLogout,
-                this::handleSearch
+                this::handleSearch,
+                this.originLabel
         );
 
         Scene scene = GUIUtils.createScene(root);
@@ -64,24 +74,7 @@ public class BookDetailGUI {
 
     private void handleStatusChange(String selectedOption) {
         try {
-            if (selectedOption == null || selectedOption.equals("Rimuovi libro") || selectedOption.equals("RIMUOVI")) {
-                userLibraryController.removeBookFromLibrary(this.book);
-                this.book.setStatus(null);
-            } else {
-                ReadingStatus newStatus = null;
-                if (selectedOption.equals(ReadingStatus.TO_READ.name()) || selectedOption.equals(ReadingStatus.TO_READ.getDisplayName())) {
-                    newStatus = ReadingStatus.TO_READ;
-                } else if (selectedOption.equals(ReadingStatus.READING.name()) || selectedOption.equals(ReadingStatus.READING.getDisplayName())) {
-                    newStatus = ReadingStatus.READING;
-                } else if (selectedOption.equals(ReadingStatus.READ.name()) || selectedOption.equals(ReadingStatus.READ.getDisplayName())) {
-                    newStatus = ReadingStatus.READ;
-                } else {
-                    newStatus = ReadingStatus.valueOf(selectedOption);
-                }
-
-                userLibraryController.saveBookToLibrary(this.book, newStatus);
-                this.book.setStatus(newStatus);
-            }
+            userLibraryController.updateReadingStatus(this.book, selectedOption);
         } catch (Exception e) {
             AppLogger.logError("Errore aggiornamento libreria: " + e.getMessage());
         }

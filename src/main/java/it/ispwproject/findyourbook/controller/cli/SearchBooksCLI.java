@@ -37,7 +37,7 @@ public class SearchBooksCLI extends AbstractCLIState {
 
             if (results.isEmpty()) {
                 view.showMessage("Nessun libro trovato per '" + query + "'.");
-                goNext(context, this);
+                repeat(context);
                 return;
             }
 
@@ -47,13 +47,13 @@ public class SearchBooksCLI extends AbstractCLIState {
             int choice = view.askBookChoice(results.size());
 
             if (choice == 0) {
-                goNext(context, this);
+                repeat(context);
                 return;
             }
 
             if (choice < 1 || choice > results.size()) {
                 view.showMessage("Scelta non valida.");
-                goNext(context, this);
+                repeat(context);
                 return;
             }
 
@@ -63,7 +63,7 @@ public class SearchBooksCLI extends AbstractCLIState {
 
         } catch (Exception e) {
             view.showMessage("Errore durante la ricerca: " + e.getMessage());
-            goNext(context, this);
+            repeat(context);
         }
     }
 
@@ -93,23 +93,17 @@ public class SearchBooksCLI extends AbstractCLIState {
             }
         }
 
-        goNext(context, this);
+        repeat(context);
     }
 
     private void handleBookAction(BookBean book) {
         String statusStr = view.askStatus();
         if (statusStr != null) {
             try {
-                if (statusStr.equals("RIMUOVI")) {
-                    userLibraryController.removeBookFromLibrary(book);
-                    view.showMessage("Libro rimosso dalla tua libreria.");
-                    book.setStatus(null);
-                } else {
-                    ReadingStatus newStatus = ReadingStatus.valueOf(statusStr);
-                    userLibraryController.saveBookToLibrary(book, newStatus);
-                    view.showMessage("Stato aggiornato con successo a: " + newStatus);
-                    book.setStatus(newStatus);
-                }
+                ReadingStatus newStatus = ReadingStatus.valueOf(statusStr);
+                userLibraryController.saveBookToLibrary(book, newStatus);
+                view.showMessage("Stato aggiornato con successo a: " + newStatus);
+                book.setStatus(newStatus);
             } catch (Exception e) {
                 view.showMessage("Errore nell'aggiornamento: " + e.getMessage());
             }

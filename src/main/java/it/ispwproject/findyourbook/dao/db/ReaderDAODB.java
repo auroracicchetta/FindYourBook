@@ -54,39 +54,58 @@ public class ReaderDAODB implements ReaderDAO {
     @Override
     public void addFavoriteBook(String username, Book book, String readingStatus) throws DAOException {
 
+        String selectCurrent = "SELECT stato_lettura FROM preferiti WHERE username = ? AND titolo = ?";
         String query = "INSERT INTO preferiti (username, titolo, autore, immagine_url, stato_lettura, descrizione, data_inizio_lettura) VALUES (?, ?, ?, ?, ?, ?, ?) " +
                 "ON DUPLICATE KEY UPDATE stato_lettura = ?, descrizione = ?, data_inizio_lettura = ?";
 
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = ConnectionFactory.getConnection()) {
 
-            stmt.setString(1, username);
-            stmt.setString(2, book.getTitle());
-            stmt.setString(3, book.getAuthor());
-            stmt.setString(4, book.getImageUrl());
-            stmt.setString(5, readingStatus);
-
-            String desc = book.getDescription() != null ? book.getDescription() : "Trama non disponibile.";
-            stmt.setString(6, desc);
-
-            java.sql.Date sqlDate = null;
-            if ("READING".equalsIgnoreCase(readingStatus) || "IN LETTURA".equalsIgnoreCase(readingStatus)) {
-                sqlDate = java.sql.Date.valueOf(LocalDate.now(java.time.ZoneId.systemDefault()));
-            }
-            stmt.setDate(7, sqlDate);
-
-            stmt.setString(8, readingStatus);
-            stmt.setString(9, desc);
-            stmt.setDate(10, sqlDate);
-
-            stmt.executeUpdate();
-
-            if (ReadingStatus.READ.name().equalsIgnoreCase(readingStatus) || "LETTO".equalsIgnoreCase(readingStatus)) {
-                String updateSales = "UPDATE published_books SET copie_vendute = copie_vendute + 1 WHERE title = ?";
-                try (PreparedStatement updateStmt = conn.prepareStatement(updateSales)) {
-                    updateStmt.setString(1, book.getTitle());
-                    updateStmt.executeUpdate();
+            // Stato precedente PRIMA di sovrascrivere la riga: serve per capire se il
+            // contatore copie_lette va incrementato, decrementato o lasciato invariato.
+            String previousStatus = null;
+            try (PreparedStatement selectStmt = conn.prepareStatement(selectCurrent)) {
+                selectStmt.setString(1, username);
+                selectStmt.setString(2, book.getTitle());
+                try (ResultSet rs = selectStmt.executeQuery()) {
+                    if (rs.next()) {
+                        previousStatus = rs.getString("stato_lettura");
+                    }
                 }
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, username);
+                stmt.setString(2, book.getTitle());
+                stmt.setString(3, book.getAuthor());
+                stmt.setString(4, book.getImageUrl());
+                stmt.setString(5, readingStatus);
+
+                String desc = book.getDescription() != null ? book.getDescription() : "Trama non disponibile.";
+                stmt.setString(6, desc);
+
+                java.sql.Date sqlDate = null;
+                if ("READING".equalsIgnoreCase(readingStatus) || "IN LETTURA".equalsIgnoreCase(readingStatus)) {
+                    sqlDate = java.sql.Date.valueOf(LocalDate.now(java.time.ZoneId.systemDefault()));
+                }
+                stmt.setDate(7, sqlDate);
+
+                stmt.setString(8, readingStatus);
+                stmt.setString(9, desc);
+                stmt.setDate(10, sqlDate);
+
+                stmt.executeUpdate();
+            }
+
+            boolean wasRead = ReadingStatus.READ.name().equalsIgnoreCase(previousStatus);
+            boolean isRead = ReadingStatus.READ.name().equalsIgnoreCase(readingStatus) || "LETTO".equalsIgnoreCase(readingStatus);
+
+            // copie_lette rappresenta quanti lettori hanno ORA il libro segnato come
+            // Letto: si tocca solo quando lo stato READ cambia davvero (entra o esce),
+            // mai su un semplice "riconferma" dello stesso stato.
+            if (isRead && !wasRead) {
+                adjustCopieLette(conn, book.getTitle(), true);
+            } else if (!isRead && wasRead) {
+                adjustCopieLette(conn, book.getTitle(), false);
             }
 
         } catch (SQLException e) {
@@ -94,14 +113,48 @@ public class ReaderDAODB implements ReaderDAO {
         }
     }
 
+    private void adjustCopieLette(Connection conn, String title, boolean increment) throws SQLException {
+        String updateLetture = increment
+                ? "UPDATE published_books SET copie_lette = copie_lette + 1 WHERE title = ?"
+                : "UPDATE published_books SET copie_lette = GREATEST(copie_lette - 1, 0) WHERE title = ?";
+        try (PreparedStatement updateStmt = conn.prepareStatement(updateLetture)) {
+            updateStmt.setString(1, title);
+            updateStmt.executeUpdate();
+        }
+    }
+
     @Override
     public void removeFavoriteBook(String username, String bookTitle) throws DAOException {
+        String selectCurrent = "SELECT stato_lettura FROM preferiti WHERE username = ? AND titolo = ?";
         String query = "DELETE FROM preferiti WHERE username = ? AND titolo = ?";
-        try (Connection conn = ConnectionFactory.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, username);
-            stmt.setString(2, bookTitle);
-            stmt.executeUpdate();
+
+        try (Connection conn = ConnectionFactory.getConnection()) {
+
+            // Se il libro rimosso era segnato come Letto, il contatore va
+            // decrementato: altrimenti resterebbe gonfiato anche se il lettore
+            // toglie del tutto il libro dalla libreria (bug distinto da quello
+            // sulla semplice modifica di stato, gia' corretto sopra).
+            String previousStatus = null;
+            try (PreparedStatement selectStmt = conn.prepareStatement(selectCurrent)) {
+                selectStmt.setString(1, username);
+                selectStmt.setString(2, bookTitle);
+                try (ResultSet rs = selectStmt.executeQuery()) {
+                    if (rs.next()) {
+                        previousStatus = rs.getString("stato_lettura");
+                    }
+                }
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, username);
+                stmt.setString(2, bookTitle);
+                stmt.executeUpdate();
+            }
+
+            if (ReadingStatus.READ.name().equalsIgnoreCase(previousStatus)) {
+                adjustCopieLette(conn, bookTitle, false);
+            }
+
         } catch (SQLException e) { throw new DAOException(e.getMessage()); }
     }
 

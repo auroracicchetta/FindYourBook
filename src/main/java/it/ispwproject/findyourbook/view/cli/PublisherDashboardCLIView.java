@@ -8,7 +8,7 @@ public class PublisherDashboardCLIView {
 
         CLIRenderer.voceMenu(1, "Gestione Catalogo");
         CLIRenderer.voceMenu(2, "Pubblica un nuovo libro");
-        CLIRenderer.voceMenu(3, "Statistiche di vendita");
+        CLIRenderer.voceMenu(3, "Statistiche di lettura");
         CLIRenderer.voceMenu(4, "Il mio Profilo (Modifica Email)");
 
         CLIRenderer.voceMenuZero("Logout");

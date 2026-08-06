@@ -25,7 +25,7 @@ public class LoginCLI extends AbstractCLIState {
 
         if (username.isEmpty() || password.isEmpty()) {
             view.showInputError();
-            goNext(context, this);
+            repeat(context);
             return;
         }
 
@@ -36,14 +36,14 @@ public class LoginCLI extends AbstractCLIState {
             view.showSuccess(name);
 
             if (result == LoginController.LoginResult.SUCCESSO_READER) {
-                goNext(context, new ReaderDashboardCLI());
+                redirect(context, new ReaderDashboardCLI());
             } else if (result == LoginController.LoginResult.SUCCESSO_PUBLISHER) {
-                goNext(context, new PublisherDashboardCLI());
+                redirect(context, new PublisherDashboardCLI());
             }
 
         } catch (Exception e) {
             view.showError("Errore durante il login: " + e.getMessage());
-            goNext(context, this);
+            repeat(context);
         }
     }
 }

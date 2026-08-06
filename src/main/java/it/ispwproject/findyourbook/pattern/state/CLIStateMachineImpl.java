@@ -49,6 +49,20 @@ public class CLIStateMachineImpl implements CLIStateMachine {
     }
 
     @Override
+    public void redirect(AbstractCLIState nextState) {
+        // Come transition(), ma SENZA spingere lo stato corrente sullo
+        // stateHistory: da usare quando si completa un flusso (registrazione
+        // riuscita -> Login, login riuscito -> Dashboard) e la schermata
+        // appena conclusa non deve restare raggiungibile con goBack().
+        if (currentState != null) {
+            currentState.exit(this);
+        }
+        currentState = nextState;
+        currentState.entry(this);
+        goNext();
+    }
+
+    @Override
     public AbstractCLIState getState() {
         return currentState;
     }

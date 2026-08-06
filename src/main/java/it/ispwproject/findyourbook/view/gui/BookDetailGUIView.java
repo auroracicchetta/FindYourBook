@@ -20,7 +20,8 @@ public class BookDetailGUIView extends DashboardGUIView {
     public VBox buildRoot(String username, BookBean book, ReadingStatus currentStatus,
                           Consumer<String> onStatusChange, IntConsumer onRate,
                           Runnable onBack, Runnable onHomeClick,
-                          Runnable onMyBooksClick, Runnable onLogout, Consumer<String> onSearch) {
+                          Runnable onMyBooksClick, Runnable onLogout, Consumer<String> onSearch,
+                          String originLabel) {
         VBox root = new VBox(20);
         root.setPadding(new Insets(20, 50, 20, 50));
         root.setStyle("-fx-background-color: " + BG_COLOR + ";");
@@ -33,8 +34,10 @@ public class BookDetailGUIView extends DashboardGUIView {
         homeLabel.setStyle("-fx-cursor: hand;");
         homeLabel.setOnMouseClicked(e -> onHomeClick.run());
 
-        // 2. Bottone Indietro
-        Button backBtn = createBackButton(onBack);
+        // 2. Bottone Indietro: mostra esplicitamente da dove si e' arrivati
+        // (es. "I miei libri" o "Risultati ricerca"), cosi' l'utente capisce
+        // sempre il contesto della schermata anche se non e' ne' Home ne' I miei libri.
+        Button backBtn = createBackButton(onBack, originLabel);
 
         // 3. Contenitore Principale
         HBox mainContent = new HBox(40);
@@ -51,15 +54,19 @@ public class BookDetailGUIView extends DashboardGUIView {
         return root;
     }
 
-    private Button createBackButton(Runnable onBack) {
-        Button backBtn = new Button("< Indietro");
+    // originLabel arriva gia' completo di preposizione corretta (es. "a I miei
+    // libri", "alla sezione Romance", "alla ricerca generale"), cosi' la stessa
+    // frase funziona in italiano per contesti di origine diversi.
+    private Button createBackButton(Runnable onBack, String originLabel) {
+        String label = (originLabel == null || originLabel.isBlank()) ? "Indietro" : "Torna " + originLabel;
+        Button backBtn = new Button("< " + label);
         backBtn.getStyleClass().add("back-link-button");
         backBtn.setOnAction(e -> onBack.run());
         return backBtn;
     }
 
     private VBox createLeftColumn(BookBean book, ReadingStatus currentStatus, Consumer<String> onStatusChange, IntConsumer onRate) {
-       VBox leftColumn = new VBox(15);
+        VBox leftColumn = new VBox(15);
         leftColumn.setAlignment(Pos.TOP_CENTER);
         leftColumn.setPrefWidth(200);
 
@@ -72,7 +79,7 @@ public class BookDetailGUIView extends DashboardGUIView {
         }
 
         HBox ratingBox = createRatingBox(book, onRate);
-        MenuButton statusBtn = createStatusButton(book, currentStatus, onStatusChange, ratingBox, onRate);
+        MenuButton statusBtn = createStatusButton(currentStatus, onStatusChange);
 
         VBox actionBox = new VBox(20, statusBtn, ratingBox);
         actionBox.setAlignment(Pos.CENTER);
@@ -83,22 +90,24 @@ public class BookDetailGUIView extends DashboardGUIView {
     }
 
 
-    private MenuButton createStatusButton(BookBean book, ReadingStatus currentStatus, Consumer<String> onStatusChange, HBox ratingBox, IntConsumer onRate) {
+    // "Rimuovi libro" non compare qui: la rimozione, essendo un'azione distruttiva
+    // protetta dal timer di annullamento, resta disponibile solo nella Libreria personale.
+    private MenuButton createStatusButton(ReadingStatus currentStatus, Consumer<String> onStatusChange) {
         String statusText = "Aggiungi a...";
         if (currentStatus == ReadingStatus.TO_READ) statusText = ReadingStatus.TO_READ.getDisplayName();
         else if (currentStatus == ReadingStatus.READING) statusText = ReadingStatus.READING.getDisplayName();
         else if (currentStatus == ReadingStatus.READ) statusText = ReadingStatus.READ.getDisplayName();
 
         MenuButton statusBtn = new MenuButton(statusText);
-        statusBtn.setStyle("-fx-background-color: #85A38D; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand; -fx-padding: 5 15;");
+        final String statusBtnBaseStyle = "-fx-background-color: #85A38D; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand; -fx-padding: 5 15;";
+        final String statusBtnHoverStyle = "-fx-background-color: #9DB9A5; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand; -fx-padding: 5 15;";
+        statusBtn.setStyle(statusBtnBaseStyle);
+        statusBtn.setOnMouseEntered(e -> statusBtn.setStyle(statusBtnHoverStyle));
+        statusBtn.setOnMouseExited(e -> statusBtn.setStyle(statusBtnBaseStyle));
 
         MenuItem optWantToRead = new MenuItem(ReadingStatus.TO_READ.getDisplayName());
         MenuItem optReading = new MenuItem(ReadingStatus.READING.getDisplayName());
         MenuItem optRead = new MenuItem(ReadingStatus.READ.getDisplayName());
-
-        SeparatorMenuItem separator = new SeparatorMenuItem();
-        MenuItem optRemove = new MenuItem("Rimuovi libro");
-        optRemove.setStyle("-fx-text-fill: #C0392B;");
 
         optWantToRead.setOnAction(e -> {
             statusBtn.setText(ReadingStatus.TO_READ.getDisplayName());
@@ -115,36 +124,8 @@ public class BookDetailGUIView extends DashboardGUIView {
             onStatusChange.accept(ReadingStatus.READ.getDisplayName());
         });
 
-        setupRemoveAction(statusBtn, book, onStatusChange, ratingBox, onRate, optRemove);
-
-        statusBtn.getItems().addAll(optWantToRead, optReading, optRead, separator, optRemove);
+        statusBtn.getItems().addAll(optWantToRead, optReading, optRead);
         return statusBtn;
-    }
-
-    private void setupRemoveAction(MenuButton statusBtn, BookBean book, Consumer<String> onStatusChange, HBox ratingBox, IntConsumer onRate, MenuItem optRemove) {
-        optRemove.setOnAction(e -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Rimuovi Libro");
-            alert.setHeaderText("Vuoi rimuovere '" + book.getTitle() + "' dalla tua libreria?");
-            alert.setContentText("Questa azione rimuoverà permanentemente il libro, incluse le tue valutazioni.");
-
-            ButtonType btnAnnulla = new ButtonType("Annulla", ButtonBar.ButtonData.CANCEL_CLOSE);
-            ButtonType btnOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-            alert.getButtonTypes().setAll(btnAnnulla, btnOk);
-
-            alert.showAndWait().ifPresent(type -> {
-                if (type == btnOk) {
-                    statusBtn.setText("Aggiungi a...");
-                    book.setStatus(null);
-                    onStatusChange.accept("Rimuovi libro");
-
-                    for (int i = 1; i <= 5; i++) ((Label) ratingBox.getChildren().get(i)).setText("☆");
-                    int[] clickedRating = (int[]) ratingBox.getProperties().get("clickedRating");
-                    if (clickedRating != null) clickedRating[0] = 0;
-                    if (onRate != null) onRate.accept(0);
-                }
-            });
-        });
     }
 
     private HBox createRatingBox(BookBean book, IntConsumer onRate) {

@@ -6,8 +6,9 @@ import java.util.List;
 
 public class UserLibraryCLIView {
 
-    public void showHeader(String username) {
+    public void showHeader(String username, int readBooksCount) {
         CLIRenderer.intestazione("LIBRERIA DI " + username.toUpperCase());
+        CLIRenderer.campo("Libri letti", String.valueOf(readBooksCount));
     }
 
     public ReadingStatus askStatusFilter() {

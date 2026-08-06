@@ -3,19 +3,26 @@ package it.ispwproject.findyourbook.controller.gui;
 import it.ispwproject.findyourbook.bean.BookBean;
 import it.ispwproject.findyourbook.controller.applicativo.BookController;
 import it.ispwproject.findyourbook.controller.applicativo.UserLibraryController;
+import it.ispwproject.findyourbook.dao.ConnectionFactory;
 import it.ispwproject.findyourbook.enumerator.ReadingStatus;
-import it.ispwproject.findyourbook.model.User;
-import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
-import it.ispwproject.findyourbook.service.NotificationService;
 import it.ispwproject.findyourbook.view.gui.UserLibraryGUIView;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public class UserLibraryGUI {
 
@@ -37,14 +44,25 @@ public class UserLibraryGUI {
     }
 
     public void show() {
-        int readCount = 0;
-        try {
-            readCount = bookController.getFavoriteBooks(this.username, ReadingStatus.READ).size();
-        } catch (Exception e) {
-            AppLogger.logWarning("Impossibile recuperare il conteggio dei libri letti.");
-        }
+        CompletableFuture<Integer> readCountFuture = CompletableFuture.supplyAsync(() -> {
+            synchronized (ConnectionFactory.class) {
+                try {
+                    return bookController.getFavoriteBooks(this.username, ReadingStatus.READ).size();
+                } catch (Exception e) {
+                    AppLogger.logWarning("Impossibile recuperare il conteggio dei libri letti.");
+                    return 0;
+                }
+            }
+        });
 
-        userLibraryController.checkInactiveReading();
+        CompletableFuture<Void> inactiveReadingFuture = CompletableFuture.runAsync(() -> {
+            synchronized (ConnectionFactory.class) {
+                userLibraryController.checkInactiveReading();
+            }
+        });
+
+        CompletableFuture.allOf(readCountFuture, inactiveReadingFuture).join();
+        int readCount = readCountFuture.join();
 
         Parent root = view.buildRoot(
                 this.username,
@@ -59,11 +77,15 @@ public class UserLibraryGUI {
         stage.setScene(scene);
         stage.show();
 
-        loadBooksByStatus(currentFilter);
+        if (currentFilter != null) {
+            loadBooksByStatus(currentFilter);
+        } else {
+            view.setActiveButton(null);
+            view.showChooseSectionPrompt();
+        }
     }
 
-    // Nuovo metodo statico per risolvere il Code Smell sull'assegnazione statica
-    private static void updateCurrentFilter(ReadingStatus status) {
+    private void updateCurrentFilter(ReadingStatus status) {
         currentFilter = status;
     }
 
@@ -86,13 +108,16 @@ public class UserLibraryGUI {
                             try {
                                 userLibraryController.rateBook(book, rating);
                                 book.setRating(rating);
+                                this.show();
                             } catch (Exception e) {
                                 AppLogger.logError("Errore nel salvataggio del voto.");
                             }
                         },
                         () -> new BookDetailGUI(stage, this.username, onLogout, book, status,
-                                () -> new UserLibraryGUI(stage, this.username, onLogout).show()
-                        ).show()
+                                () -> new UserLibraryGUI(stage, this.username, onLogout).show(),
+                                "a I miei libri"
+                        ).show(),
+                        false // niente Alert bloccante: qui la rimozione usa il banner "Annulla" col timer
                 );
                 bookCards.add(card);
             }
@@ -107,15 +132,17 @@ public class UserLibraryGUI {
     private void changeBookStatus(BookBean book, String newStatus) {
         AppLogger.logInfo("Richiesto spostamento del libro '" + book.getTitle() + "' in " + newStatus);
 
-        try {
-            if ("Rimuovi libro".equals(newStatus) || "RIMUOVI".equals(newStatus)) {
-                userLibraryController.removeBookFromLibrary(book);
-                book.setStatus(null);
-                AppLogger.logInfo("Libro rimosso definitivamente dal Database.");
-            } else {
-                updateToNewStatus(book, newStatus);
-            }
+        boolean isRemoval = "Rimuovi libro".equals(newStatus) || "RIMUOVI".equals(newStatus);
+        if (isRemoval) {
+            confirmRemovalWithCountdown(book);
+            return;
+        }
 
+        try {
+            // L'invio della mail "libro completato" e' gia' gestito dentro
+            // updateReadingStatus -> saveBookToLibrary tramite il BookCompletedObserver:
+            // non va duplicato qui con una seconda chiamata diretta a NotificationService.
+            userLibraryController.updateReadingStatus(book, newStatus);
             this.show();
 
         } catch (Exception e) {
@@ -123,35 +150,59 @@ public class UserLibraryGUI {
         }
     }
 
-    // Rimosso "throws Exception" dalla firma, gestito internamente
-    private void updateToNewStatus(BookBean book, String newStatus) {
-        try {
-            User loggedUser = SessionManager.getInstance().getLoggedUser();
-            ReadingStatus targetStatus = null;
+    // Timer vero (stesso pattern del Timeline usato nel checkout, ora con la
+    // stessa polarita' delle colleghe): il countdown corre in parallelo
+    // all'attesa di un click su "Rimuovi ora" o "Annulla". Se il tempo scade
+    // senza un click esplicito su "Rimuovi ora", la richiesta viene annullata
+    // di default (deny-by-default) - stesso comportamento del pagamento di
+    // NightFlow (mostraSimulazioneGateway) e della prenotazione di BrainBank
+    // (showCountdownDialog): solo una conferma esplicita porta a termine l'azione.
+    private void confirmRemovalWithCountdown(BookBean book) {
+        Alert alert = new Alert(Alert.AlertType.NONE);
+        alert.setTitle("Rimuovi Libro");
+        alert.setHeaderText("Rimozione di '" + book.getTitle() + "'");
 
-            if (newStatus.equals(ReadingStatus.TO_READ.getDisplayName()) || newStatus.equals(ReadingStatus.TO_READ.name())) {
-                targetStatus = ReadingStatus.TO_READ;
-            } else if (newStatus.equals(ReadingStatus.READING.getDisplayName()) || newStatus.equals(ReadingStatus.READING.name())) {
-                targetStatus = ReadingStatus.READING;
-            } else if (newStatus.equals(ReadingStatus.READ.getDisplayName()) || newStatus.equals(ReadingStatus.READ.name())) {
-                targetStatus = ReadingStatus.READ;
+        ButtonType btnRimuoviOra = new ButtonType("Rimuovi ora", ButtonBar.ButtonData.OK_DONE);
+        ButtonType btnAnnulla = new ButtonType("Annulla", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(btnRimuoviOra, btnAnnulla);
+
+        Button removeButtonNode = (Button) alert.getDialogPane().lookupButton(btnRimuoviOra);
+        removeButtonNode.setStyle("-fx-background-color: #c0392b; -fx-text-fill: white; -fx-font-weight: bold;");
+
+        final int[] secondsLeft = {5};
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(Timeline.INDEFINITE);
+
+        Runnable updateCountdown = () -> alert.setContentText(
+                "Hai " + secondsLeft[0] + " secondi per confermare.\n" +
+                        "Premi \"Rimuovi ora\" per confermare la rimozione, altrimenti la richiesta verra' annullata automaticamente."
+        );
+        updateCountdown.run();
+
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), e -> {
+            secondsLeft[0]--;
+            updateCountdown.run();
+            if (secondsLeft[0] <= 0) {
+                timeline.stop();
+                alert.close();
             }
+        });
+        timeline.getKeyFrames().add(keyFrame);
+        timeline.play();
 
-            if (targetStatus != null) {
-                userLibraryController.saveBookToLibrary(book, targetStatus);
-                book.setStatus(targetStatus);
-                AppLogger.logInfo("Stato aggiornato a: " + targetStatus.name());
+        Optional<ButtonType> result = alert.showAndWait();
+        timeline.stop();
 
-                if (targetStatus == ReadingStatus.READ) {
-                    NotificationService.sendReadingGoalReachedNotification(
-                            loggedUser.getEmail(),
-                            loggedUser.getName(),
-                            book.getTitle()
-                    );
-                }
+        if (result.isPresent() && result.get() == btnRimuoviOra) {
+            try {
+                userLibraryController.removeBookFromLibrary(book);
+                AppLogger.logInfo("Libro '" + book.getTitle() + "' rimosso su conferma esplicita dell'utente.");
+                this.show();
+            } catch (Exception e) {
+                AppLogger.logError("Errore durante la rimozione: " + e.getMessage());
             }
-        } catch (Exception e) {
-            AppLogger.logError("Errore durante l'aggiornamento dello stato: " + e.getMessage());
+        } else {
+            AppLogger.logInfo("Rimozione di '" + book.getTitle() + "' non confermata (annullata o tempo scaduto): il libro resta nella libreria.");
         }
     }
 

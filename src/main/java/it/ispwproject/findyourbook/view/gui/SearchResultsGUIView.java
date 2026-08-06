@@ -50,6 +50,8 @@ public class SearchResultsGUIView extends DashboardGUIView {
         grid.setPrefColumns(2);
 
         for (BookBean book : books) {
+            // showRemoveOption = false: dai risultati di ricerca si può solo valutare
+            // e categorizzare il libro; "Rimuovi" resta riservato alla Libreria personale.
             VBox card = super.buildBookCard(
                     null,
                     book,
@@ -59,7 +61,9 @@ public class SearchResultsGUIView extends DashboardGUIView {
                         onRate.accept(book, rating);
                         book.setRating(rating);
                     },
-                    () -> onBookClick.accept(book)
+                    () -> onBookClick.accept(book),
+                    true,
+                    false
             );
             grid.getChildren().add(card);
         }
@@ -86,7 +90,6 @@ public class SearchResultsGUIView extends DashboardGUIView {
                 try {
                     statusEnum = ReadingStatus.valueOf(newStatusStr);
                 } catch (IllegalArgumentException ignored) {
-                    // Valore non valido gestito silenziosamente come fallback
 
 
                 }

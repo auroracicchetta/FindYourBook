@@ -24,19 +24,17 @@ public class PublisherController {
 
         User loggedUser = SessionManager.getInstance().getLoggedUser();
         String publisherUsername = loggedUser.getUsername();
-        String publisherEmail = loggedUser.getEmail();
-        String publisherName = loggedUser.getName();
 
         publisherDAO.publishBook(bookBean, publisherUsername);
 
-        BookPublishedObserver observer = new BookPublishedObserver(
-                publisherEmail,
-                publisherName,
-                bookBean.getTitle()
-        );
-
         Book book = new Book();
         book.setTitle(bookBean.getTitle());
+        book.setAuthor(bookBean.getAuthor());
+        book.setGenre(bookBean.getGenre());
+        book.setImageUrl(bookBean.getImageUrl());
+        book.setDescription(bookBean.getDescription());
+
+        BookPublishedObserver observer = new BookPublishedObserver(loggedUser, book);
 
         book.attach(observer);
         book.markAsPublished();
@@ -57,7 +55,7 @@ public class PublisherController {
             bean.setGenre(b.getGenre());
             bean.setDescription(b.getDescription());
             bean.setImageUrl(b.getImageUrl());
-            bean.setCopieVendute(b.getCopieVendute());
+            bean.setCopieLette(b.getCopieLette());
             beans.add(bean);
         }
 

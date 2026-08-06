@@ -49,7 +49,7 @@ public class ReaderDashboardGUI {
             new UserLibraryController().syncBooksWithDatabase(risultati);
 
             AppLogger.logInfo("Generi caricati! Trovati " + risultati.size() + " libri.");
-            new SearchResultsGUI(stage, username, onLogout, risultati, genre).show();
+            new SearchResultsGUI(stage, username, onLogout, risultati, genre, true).show();
 
         } catch (Exception e) {
             AppLogger.logError("Errore nel recupero genere: " + e.getMessage());

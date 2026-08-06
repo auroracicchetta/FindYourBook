@@ -2,8 +2,11 @@ package it.ispwproject.findyourbook.view.gui;
 
 import it.ispwproject.findyourbook.bean.PublisherStatsBean;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
+import javafx.application.Platform;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
@@ -14,8 +17,10 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.util.Map;
@@ -30,7 +35,13 @@ public class PublisherStatsGUIView extends DashboardGUIView {
     public final BarChart<String, Number> barChart;
 
     private final Label totalBooksLbl = new Label("0");
-    private final Label totalSalesLbl = new Label("0");
+    private final Label totalReadLbl = new Label("0");
+
+    // Pannello trasparente sovrapposto al grafico solo per le etichette dei
+    // valori: non dipende dalla struttura interna del BarChart (che e'
+    // privata/di libreria e puo' variare), le posizioniamo convertendo le
+    // coordinate della barra in coordinate di questo pannello.
+    private final Pane labelOverlay = new Pane();
 
     public PublisherStatsGUIView() {
         CategoryAxis xAxis = new CategoryAxis();
@@ -91,11 +102,16 @@ public class PublisherStatsGUIView extends DashboardGUIView {
         // ─── STATISTICHE ───
         HBox summaryBox = new HBox(30,
                 createStatCard("Libri a Catalogo", totalBooksLbl),
-                createStatCard("Totale Libri Letti", totalSalesLbl)
+                createStatCard("Totale Libri Letti", totalReadLbl)
         );
         summaryBox.setAlignment(Pos.CENTER);
 
-        VBox centerBox = new VBox(30, summaryBox, barChart);
+        labelOverlay.setMouseTransparent(true);
+        labelOverlay.prefWidthProperty().bind(barChart.widthProperty());
+        labelOverlay.prefHeightProperty().bind(barChart.heightProperty());
+        StackPane chartStack = new StackPane(barChart, labelOverlay);
+
+        VBox centerBox = new VBox(30, summaryBox, chartStack);
         centerBox.setPadding(new Insets(10, 0, 0, 0));
         root.setCenter(centerBox);
 
@@ -119,10 +135,12 @@ public class PublisherStatsGUIView extends DashboardGUIView {
 
     public void updateView(PublisherStatsBean statsBean) {
         totalBooksLbl.setText(String.valueOf(statsBean.getTotalBooksPublished()));
-        totalSalesLbl.setText(String.valueOf(statsBean.getTotalCopiesSold()));
+        totalReadLbl.setText(String.valueOf(statsBean.getTotalBooksRead()));
+
+        labelOverlay.getChildren().clear();
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        for (Map.Entry<String, Integer> entry : statsBean.getTopSellingBooks().entrySet()) {
+        for (Map.Entry<String, Integer> entry : statsBean.getTopReadBooks().entrySet()) {
             series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
         }
 
@@ -131,6 +149,36 @@ public class PublisherStatsGUIView extends DashboardGUIView {
 
         for (XYChart.Data<String, Number> data : series.getData()) {
             data.getNode().setStyle("-fx-bar-fill: " + ACCENT_GREEN + ";");
+            addValueLabel(data);
         }
+    }
+
+    // Mostra il numero esatto di letture sopra ogni barra. Non ci affidiamo
+    // alla struttura interna del BarChart (di libreria, privata, rischiosa da
+    // assumere) per attaccarci un figlio: l'etichetta vive invece in
+    // labelOverlay, un pannello trasparente sovrapposto al grafico, e la
+    // posizioniamo convertendo i bound della barra (locali al suo nodo) prima
+    // in coordinate di Scene e poi in coordinate di labelOverlay. Funziona a
+    // prescindere da quando/come JavaFX crea e posiziona il nodo della barra.
+    private void addValueLabel(XYChart.Data<String, Number> data) {
+        Label valueLbl = new Label(String.valueOf(data.getYValue()));
+        valueLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: " + TEXT_DARK + ";");
+        labelOverlay.getChildren().add(valueLbl);
+
+        Node barNode = data.getNode();
+
+        Runnable reposition = () -> {
+            if (barNode.getScene() == null) return;
+            Bounds boundsInScene = barNode.localToScene(barNode.getBoundsInLocal());
+            Bounds boundsInOverlay = labelOverlay.sceneToLocal(boundsInScene);
+            valueLbl.setLayoutX(boundsInOverlay.getMinX() + boundsInOverlay.getWidth() / 2 - 14);
+            valueLbl.setLayoutY(boundsInOverlay.getMinY() - 16);
+        };
+
+        barNode.boundsInLocalProperty().addListener((obs, oldB, newB) -> reposition.run());
+        barNode.layoutXProperty().addListener((obs, oldX, newX) -> reposition.run());
+        barNode.layoutYProperty().addListener((obs, oldY, newY) -> reposition.run());
+
+        Platform.runLater(reposition);
     }
 }

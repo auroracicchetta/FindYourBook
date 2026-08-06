@@ -1,3 +1,7 @@
+-- ══════════════════════════════
+--  FINDYOURBOOK DATABASE
+-- ══════════════════════════════
+
 -- 1. Pulizia e Creazione Database
 DROP DATABASE IF EXISTS findyourbookdb;
 CREATE DATABASE findyourbookdb;
@@ -26,7 +30,7 @@ CREATE TABLE published_books (
     description TEXT,
     image_url VARCHAR(500),
     publisher_username VARCHAR(255) NOT NULL,
-    copie_vendute INT DEFAULT 0,
+    copie_lette INT DEFAULT 0,
     publish_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -40,12 +44,12 @@ CREATE TABLE preferiti (
     descrizione TEXT,
     valutazione INT DEFAULT 0,
     data_aggiunta TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_inizio_lettura DATE DEFAULT NULL, 
+    data_inizio_lettura DATE DEFAULT NULL,
     PRIMARY KEY (username, titolo),
     FOREIGN KEY (username) REFERENCES utenti(username) ON DELETE CASCADE
 );
 
--- 5. Stored Procedure per il Login 
+-- 5. Stored Procedure per il Login
 DELIMITER $$
 DROP PROCEDURE IF EXISTS login$$
 CREATE PROCEDURE login(
@@ -59,9 +63,9 @@ CREATE PROCEDURE login(
 BEGIN
     SELECT id, nome, cognome, ruolo
     INTO p_id, p_name, p_surname, p_role
-    FROM utenti 
-    WHERE username = p_username 
-      AND password = p_password; 
+    FROM utenti
+    WHERE username = p_username
+      AND password = p_password;
 
     IF p_role IS NULL THEN
         SET p_role = 'NOT_FOUND';
@@ -70,10 +74,45 @@ END$$
 DELIMITER ;
 
 -- ==========================================
+-- UTENTI MYSQL A PERMESSI LIMITATI (usati da ConnectionFactory.changeRole
+-- dopo il login, uno per ruolo READER/PUBLISHER). Non toccano ne' cancellano
+-- nessuna tabella o dato: creano solo due nuovi utenti MySQL con permessi
+-- scoped alle operazioni che READER e PUBLISHER fanno davvero nel codice.
+--
+-- PRIMA di eseguire questo script: sostituisci CAMBIAMI_reader e
+-- CAMBIAMI_publisher qui sotto con due password vere a tua scelta, poi
+-- riportale identiche in db.properties (READER_PASS/PUBLISHER_PASS).
+-- ==========================================
+
+-- Reader: puo' toccare solo la propria libreria (preferiti), la lettura del
+-- catalogo e l'incremento di copie_lette quando segna un libro come letto,
+-- piu' l'email del proprio profilo. Non legge le password di nessuno.
+
+DROP USER IF EXISTS 'fyb_reader'@'localhost';
+CREATE USER 'fyb_reader'@'localhost' IDENTIFIED BY 'reader123';
+GRANT SELECT, INSERT, UPDATE, DELETE ON findyourbookdb.preferiti TO 'fyb_reader'@'localhost';
+GRANT SELECT ON findyourbookdb.published_books TO 'fyb_reader'@'localhost';
+GRANT UPDATE (copie_lette) ON findyourbookdb.published_books TO 'fyb_reader'@'localhost';
+GRANT SELECT (id, nome, cognome, username, email, ruolo, data_registrazione, data_nascita, descrizione)
+      ON findyourbookdb.utenti TO 'fyb_reader'@'localhost';
+GRANT UPDATE (email) ON findyourbookdb.utenti TO 'fyb_reader'@'localhost';
+
+-- Publisher: puo' gestire solo il proprio catalogo (published_books) e
+-- l'email del proprio profilo. Nessun accesso a preferiti ne' alle password.
+DROP USER IF EXISTS 'fyb_publisher'@'localhost';
+CREATE USER 'fyb_publisher'@'localhost' IDENTIFIED BY 'publisher123';
+GRANT SELECT, INSERT, UPDATE, DELETE ON findyourbookdb.published_books TO 'fyb_publisher'@'localhost';
+GRANT SELECT (id, nome, cognome, username, email, ruolo, data_registrazione, data_nascita, descrizione)
+      ON findyourbookdb.utenti TO 'fyb_publisher'@'localhost';
+GRANT UPDATE (email) ON findyourbookdb.utenti TO 'fyb_publisher'@'localhost';
+
+FLUSH PRIVILEGES;
+
+-- ==========================================
 -- POPOLAMENTO UTENTI
 -- ==========================================
 
-INSERT INTO utenti (nome, cognome, username, password, email, ruolo, data_registrazione, descrizione) VALUES 
+INSERT INTO utenti (nome, cognome, username, password, email, ruolo, data_registrazione, descrizione) VALUES
 -- Case Editrici (Password: Password123!)
 ('Aurora', 'Cicchetta', 'mondadori', 'a109e36947ad56de1dca1cc49f0ef8ac9ad9a7b1aa0df41fb3c4cb73c1ff01ea', 'aurora.cicchetta@students.uniroma2.eu', 'PUBLISHER', '2026-07-06', 'La più grande casa editrice italiana.'),
 ('Marco', 'Rossi', 'feltrinelli', 'a109e36947ad56de1dca1cc49f0ef8ac9ad9a7b1aa0df41fb3c4cb73c1ff01ea', 'aurora.cicchetta@students.uniroma2.eu', 'PUBLISHER', '2026-07-06', 'Fondata nel 1954, specializzata in narrativa.'),
@@ -86,7 +125,7 @@ INSERT INTO utenti (nome, cognome, username, password, email, ruolo, data_regist
 -- POPOLAMENTO CATALOGO (Copia esatta dal DemoDataStore)
 -- ==========================================
 
-INSERT INTO published_books (title, author, genre, description, image_url, publisher_username, copie_vendute) VALUES 
+INSERT INTO published_books (title, author, genre, description, image_url, publisher_username, copie_lette) VALUES
 -- CLASSICI
 ('I promessi sposi', 'Alessandro Manzoni', 'classici', 'La monumentale e immortale storia di Renzo e Lucia, due giovani promessi sposi la cui serena felicità viene brutalmente ostacolata dal perfido e prepotente signorotto locale Don Rodrigo. Ambientato nella Lombardia oppressa dalla dominazione spagnola del Seicento, il romanzo si sviluppa attraverso un intricato e drammatico percorso fatto di fughe, separazioni forzate, la paura della calata dei Lanzichenecchi e la spaventosa tragedia della peste manzoniana, fino alla miracolosa e commovente redenzione e ricongiungimento finale.', 'https://m.media-amazon.com/images/I/61hsfUlwvzL._SL1500_.jpg', 'mondadori', 21500),
 ('La Divina Commedia', 'Dante Alighieri', 'classici', 'Il viaggio allegorico, visionario e spirituale del Sommo Poeta Dante Alighieri attraverso i tre regni dell''oltretomba cristiano: l''Inferno, dove assiste alle pene eterne dei dannati e dei grandi personaggi storici; il Purgatorio, luogo di purificazione e speranza; e infine il Paradiso, regno della luce e della beatitudine divina. Guidato prima dal saggio poeta latino Virgilio e poi dall''amata Beatrice, Dante compie un percorso di redenzione universale che ha plasmato per sempre la lingua e la cultura italiana.', 'https://m.media-amazon.com/images/I/81FZZ6hw5ML._SL1414_.jpg', 'einaudi', 19800),
@@ -197,81 +236,81 @@ INSERT INTO published_books (title, author, genre, description, image_url, publi
 ('Sorvegliare e punire. Nascita della prigione', 'Michel Foucault', 'filosofici', 'Un''indagine storica e filosofica sulla nascita del sistema carcerario moderno, che ricostruisce il passaggio dai supplizi pubblici dell''antico regime alla disciplina invisibile e capillare delle istituzioni moderne. Foucault mostra come il potere non agisca più solo attraverso la repressione violenta, ma attraverso la sorveglianza costante e la normalizzazione dei corpi, in un''analisi che ha rivoluzionato il modo di pensare le istituzioni.', 'https://m.media-amazon.com/images/I/71KEv1I4uYL._SL1184_.jpg', 'einaudi', 17200),
 ('La struttura delle rivoluzioni scientifiche', 'Thomas S. Kuhn', 'filosofici', 'Il saggio che ha introdotto nel dibattito filosofico ed epistemologico il concetto di ''paradigma'', sostenendo che la scienza non progredisce in modo lineare e cumulativo ma attraverso rivoluzioni concettuali che rovesciano le teorie precedenti. Un''opera che ha cambiato profondamente il modo di intendere la storia della scienza, influenzando filosofia, sociologia e teoria della conoscenza ben oltre i confini della disciplina scientifica.', 'https://m.media-amazon.com/images/I/61Do-eDmaxL._SL1410_.jpg', 'einaudi', 19100);
 
-INSERT INTO preferiti (username, titolo, autore, immagine_url, stato_lettura, descrizione, valutazione, data_inizio_lettura) 
+INSERT INTO preferiti (username, titolo, autore, immagine_url, stato_lettura, descrizione, valutazione, data_inizio_lettura)
 VALUES (
-    'mario', 
-    'Il Signore degli Anelli', 
-    'J.R.R. Tolkien', 
-    'https://m.media-amazon.com/images/I/6190PaQZkrL._SL1500_.jpg', 
-    'READING', 
-    'L''epico e insuperabile viaggio della Compagnia dell''Anello, formata da uomini, un elfo, un nano, hobbit e lo stregone Gandalf, determinati a percorrere la Terra di Mezzo fino alle terre oscure di Mordor per distruggere l''Unico Anello nel fuoco del Monte Fato e sconfiggere per sempre il potere dell''Oscuro Signore Sauron, in un racconto fondativo della letteratura fantastica moderna.', 
-    0, 
+    'mario',
+    'Il Signore degli Anelli',
+    'J.R.R. Tolkien',
+    'https://m.media-amazon.com/images/I/6190PaQZkrL._SL1500_.jpg',
+    'READING',
+    'L''epico e insuperabile viaggio della Compagnia dell''Anello, formata da uomini, un elfo, un nano, hobbit e lo stregone Gandalf, determinati a percorrere la Terra di Mezzo fino alle terre oscure di Mordor per distruggere l''Unico Anello nel fuoco del Monte Fato e sconfiggere per sempre il potere dell''Oscuro Signore Sauron, in un racconto fondativo della letteratura fantastica moderna.',
+    0,
     '2026-05-01' -- Data vecchia di oltre 30 giorni!
 )
-ON DUPLICATE KEY UPDATE 
-    stato_lettura = 'READING', 
+ON DUPLICATE KEY UPDATE
+    stato_lettura = 'READING',
     data_inizio_lettura = '2026-05-01';
-    
+
 -- 1. LIBRO DA LEGGERE
-INSERT INTO preferiti (username, titolo, autore, immagine_url, stato_lettura, descrizione, valutazione, data_inizio_lettura) 
+INSERT INTO preferiti (username, titolo, autore, immagine_url, stato_lettura, descrizione, valutazione, data_inizio_lettura)
 VALUES (
-    'mario', 
-    'Dieci piccoli indiani', 
-    'Agatha Christie', 
-    'https://m.media-amazon.com/images/I/711jiyCoP+L._SL1500_.jpg', 
-    'TO_READ', 
-    'Dieci persone apparentemente senza alcun legame comune tra loro vengono misteriosamente invitate su una isolata e cupa roccia al largo della costa del Devon da un anfitrione che si fa chiamare signor U.N. Owen. Una volta giunti nella magnifica villa, un grammofono accusa ciascuno di loro di aver commesso in passato un omicidio rimasto impunito. Isolati dal maltempo e senza via di fuga, gli ospiti iniziano a essere eliminati uno alla volta, seguendo spietatamente i versi di una vecchia e macabra filastrocca infantile incisa in ogni camera, mentre il panico e il sospetto reciproco distruggono ogni briciolo di lucidità.', 
-    0, 
+    'mario',
+    'Dieci piccoli indiani',
+    'Agatha Christie',
+    'https://m.media-amazon.com/images/I/711jiyCoP+L._SL1500_.jpg',
+    'TO_READ',
+    'Dieci persone apparentemente senza alcun legame comune tra loro vengono misteriosamente invitate su una isolata e cupa roccia al largo della costa del Devon da un anfitrione che si fa chiamare signor U.N. Owen. Una volta giunti nella magnifica villa, un grammofono accusa ciascuno di loro di aver commesso in passato un omicidio rimasto impunito. Isolati dal maltempo e senza via di fuga, gli ospiti iniziano a essere eliminati uno alla volta, seguendo spietatamente i versi di una vecchia e macabra filastrocca infantile incisa in ogni camera, mentre il panico e il sospetto reciproco distruggono ogni briciolo di lucidità.',
+    0,
     NULL
 )
-ON DUPLICATE KEY UPDATE 
-    stato_lettura = 'TO_READ', 
+ON DUPLICATE KEY UPDATE
+    stato_lettura = 'TO_READ',
     data_inizio_lettura = NULL;
 
 -- 2. LIBRO LETTO (Orgoglio e pregiudizio)
-INSERT INTO preferiti (username, titolo, autore, immagine_url, stato_lettura, descrizione, valutazione, data_inizio_lettura) 
+INSERT INTO preferiti (username, titolo, autore, immagine_url, stato_lettura, descrizione, valutazione, data_inizio_lettura)
 VALUES (
-    'mario', 
-    'Orgoglio e pregiudizio', 
-    'Jane Austen', 
-    'https://m.media-amazon.com/images/I/71AET+iM0oL._SL1500_.jpg', 
-    'READ', 
-    'Nell''Inghilterra rurale dell''Ottocento, la brillante e ostinata Elizabeth Bennet si scontra costantemente con il ricco, altero e riservato signor Darcy. Tra eleganti balli di campagna, pettegolezzi di provincia e le rigide convenzioni sociali dell''epoca, i due dovranno superare il proprio orgoglio e i reciproci malintesi. Solo spogliandosi dei loro pregiudizi riusciranno a riconoscere la profonda affinità intellettuale e la passione autentica che li lega inesorabilmente.', 
-    0, 
+    'mario',
+    'Orgoglio e pregiudizio',
+    'Jane Austen',
+    'https://m.media-amazon.com/images/I/71AET+iM0oL._SL1500_.jpg',
+    'READ',
+    'Nell''Inghilterra rurale dell''Ottocento, la brillante e ostinata Elizabeth Bennet si scontra costantemente con il ricco, altero e riservato signor Darcy. Tra eleganti balli di campagna, pettegolezzi di provincia e le rigide convenzioni sociali dell''epoca, i due dovranno superare il proprio orgoglio e i reciproci malintesi. Solo spogliandosi dei loro pregiudizi riusciranno a riconoscere la profonda affinità intellettuale e la passione autentica che li lega inesorabilmente.',
+    0,
     NULL
 )
-ON DUPLICATE KEY UPDATE 
-    stato_lettura = 'READ', 
+ON DUPLICATE KEY UPDATE
+    stato_lettura = 'READ',
     data_inizio_lettura = NULL;
 
 -- 3. LIBRO LETTO (Moby Dick)
-INSERT INTO preferiti (username, titolo, autore, immagine_url, stato_lettura, descrizione, valutazione, data_inizio_lettura) 
+INSERT INTO preferiti (username, titolo, autore, immagine_url, stato_lettura, descrizione, valutazione, data_inizio_lettura)
 VALUES (
-    'mario', 
-    'Moby Dick', 
-    'Herman Melville', 
-    'https://m.media-amazon.com/images/I/713kOZfCINL._SL1500_.jpg', 
-    'READ', 
-    'A bordo della baleniera Pequod salpata da Nantucket, il giovane marinaio Ishmael fa i conti con la follia titanica e l''ossessione monomaniacale del comandante, il capitano Ahab. Privato di una gamba da una gigantesca balena bianca, la famigerata Moby Dick, Ahab vive unicamente per la vendetta, trasformando la caccia commerciale in una simbolica e distruttiva crociata contro l''impenetrabile mistero del male e della natura, che coinvolgerà l''intero equipaggio in un epilogo memorabile.', 
-    0, 
+    'mario',
+    'Moby Dick',
+    'Herman Melville',
+    'https://m.media-amazon.com/images/I/713kOZfCINL._SL1500_.jpg',
+    'READ',
+    'A bordo della baleniera Pequod salpata da Nantucket, il giovane marinaio Ishmael fa i conti con la follia titanica e l''ossessione monomaniacale del comandante, il capitano Ahab. Privato di una gamba da una gigantesca balena bianca, la famigerata Moby Dick, Ahab vive unicamente per la vendetta, trasformando la caccia commerciale in una simbolica e distruttiva crociata contro l''impenetrabile mistero del male e della natura, che coinvolgerà l''intero equipaggio in un epilogo memorabile.',
+    0,
     NULL
 )
-ON DUPLICATE KEY UPDATE 
-    stato_lettura = 'READ', 
+ON DUPLICATE KEY UPDATE
+    stato_lettura = 'READ',
     data_inizio_lettura = NULL;
 
 -- 4. LIBRO LETTO (Le cronache di Narnia)
-INSERT INTO preferiti (username, titolo, autore, immagine_url, stato_lettura, descrizione, valutazione, data_inizio_lettura) 
+INSERT INTO preferiti (username, titolo, autore, immagine_url, stato_lettura, descrizione, valutazione, data_inizio_lettura)
 VALUES (
-    'mario', 
-    'Le cronache di Narnia', 
-    'C.S. Lewis', 
-    'https://m.media-amazon.com/images/I/71+eLNG0bXL._SL1500_.jpg', 
-    'READ', 
-    'Quattro fratelli – Peter, Susan, Edmund e Lucy – scoprono che un vecchio armadio è in realtà un portale magico. Oltre le ante di legno si nasconde Narnia, un mondo incantato popolato da animali parlanti e congelato in un inverno senza fine dalla malvagia Strega Bianca. Guidati dal maestoso leone Aslan, i ragazzi dovranno affrontare epiche battaglie, creature mitologiche e tradimenti per spezzare l''oscura maledizione e riportare la primavera nel regno.', 
-    0, 
+    'mario',
+    'Le cronache di Narnia',
+    'C.S. Lewis',
+    'https://m.media-amazon.com/images/I/71+eLNG0bXL._SL1500_.jpg',
+    'READ',
+    'Quattro fratelli – Peter, Susan, Edmund e Lucy – scoprono che un vecchio armadio è in realtà un portale magico. Oltre le ante di legno si nasconde Narnia, un mondo incantato popolato da animali parlanti e congelato in un inverno senza fine dalla malvagia Strega Bianca. Guidati dal maestoso leone Aslan, i ragazzi dovranno affrontare epiche battaglie, creature mitologiche e tradimenti per spezzare l''oscura maledizione e riportare la primavera nel regno.',
+    0,
     NULL
 )
-ON DUPLICATE KEY UPDATE 
-    stato_lettura = 'READ', 
+ON DUPLICATE KEY UPDATE
+    stato_lettura = 'READ',
     data_inizio_lettura = NULL;

@@ -18,19 +18,22 @@ public class BookDAOFile implements BookDAO {
 
     private static final String FILE_PATH = "books.json";
     private final Gson gson;
-    private final List<Book> cache;
 
     public BookDAOFile() {
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
                 .setPrettyPrinting()
                 .create();
-        this.cache = loadFromFile();
+        // Nessuna cache caricata una volta sola nel costruttore: ogni metodo
+        // ricarica fresco da books.json (stesso motivo di ReaderDAOFile) cosi'
+        // un controller che tiene questa istanza a lungo (es. BookController in
+        // una schermata GUI) vede sempre lo stato più recente su disco.
     }
 
     @Override
     public List<Book> findByGenre(String genre) throws DAOException {
         if (genre == null) return new ArrayList<>();
+        List<Book> cache = loadFromFile();
         return cache.stream()
                 .filter(b -> b.getGenre() != null && b.getGenre().equalsIgnoreCase(genre))
                 .toList();
@@ -40,6 +43,7 @@ public class BookDAOFile implements BookDAO {
     public List<Book> searchByQuery(String query) throws DAOException {
         if (query == null || query.trim().isEmpty()) return new ArrayList<>();
         String lowerQuery = query.toLowerCase().trim();
+        List<Book> cache = loadFromFile();
 
         return cache.stream()
                 .filter(b -> (b.getTitle() != null && b.getTitle().toLowerCase().contains(lowerQuery)) ||
@@ -49,11 +53,12 @@ public class BookDAOFile implements BookDAO {
 
     @Override
     public void save(Book book) throws DAOException {
+        List<Book> cache = loadFromFile();
         if (book.getId() == 0) {
             book.setId(cache.size() + 1);
         }
         cache.add(book);
-        saveToFile();
+        saveToFile(cache);
     }
 
     private List<Book> loadFromFile() {
@@ -68,7 +73,7 @@ public class BookDAOFile implements BookDAO {
         }
     }
 
-    private void saveToFile() {
+    private void saveToFile(List<Book> cache) {
         try (Writer writer = new FileWriter(FILE_PATH)) {
             gson.toJson(cache, writer);
         } catch (IOException e) {

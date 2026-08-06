@@ -5,6 +5,7 @@ public interface CLIStateMachine {
     void goNext();
     void goBack();
     void transition(AbstractCLIState nextState);
+    void redirect(AbstractCLIState nextState);
     AbstractCLIState getState();
     void setState(AbstractCLIState state);
 }

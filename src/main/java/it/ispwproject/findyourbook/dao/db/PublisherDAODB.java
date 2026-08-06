@@ -71,7 +71,7 @@ public class PublisherDAODB implements PublisherDAO {
 
             int rowsAffected = stmt.executeUpdate();
 
-            if (rowsAffected > 0) {
+            if (rowsAffected == 0) {
                 throw new DAOException("Nessuna riga inserita nel database durante la pubblicazione.");
             }
 
@@ -164,13 +164,13 @@ public class PublisherDAODB implements PublisherDAO {
     @Override
     public PublisherStats getPublisherStatistics(String publisherUsername) throws DAOException {
         int totalBooks = 0;
-        int totalSales = 0;
-        java.util.Map<String, Integer> topSelling = new java.util.LinkedHashMap<>();
+        int totalBooksRead = 0;
+        java.util.Map<String, Integer> topRead = new java.util.LinkedHashMap<>();
         java.util.Map<String, Integer> byGenre = new java.util.LinkedHashMap<>();
 
-        String queryTotals = "SELECT COUNT(id) AS total_books, COALESCE(SUM(copie_vendute), 0) AS total_sales FROM published_books WHERE publisher_username = ?";
-        String queryTop = "SELECT title, copie_vendute FROM published_books WHERE publisher_username = ? ORDER BY copie_vendute DESC LIMIT 4";
-        String queryGenre = "SELECT genre, COALESCE(SUM(copie_vendute), 0) AS genre_sales FROM published_books WHERE publisher_username = ? GROUP BY genre";
+        String queryTotals = "SELECT COUNT(id) AS total_books, COALESCE(SUM(copie_lette), 0) AS total_letture FROM published_books WHERE publisher_username = ?";
+        String queryTop = "SELECT title, copie_lette FROM published_books WHERE publisher_username = ? ORDER BY copie_lette DESC LIMIT 4";
+        String queryGenre = "SELECT genre, COALESCE(SUM(copie_lette), 0) AS genre_letture FROM published_books WHERE publisher_username = ? GROUP BY genre";
 
         try (Connection conn = ConnectionFactory.getConnection()) {
 
@@ -179,7 +179,7 @@ public class PublisherDAODB implements PublisherDAO {
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         totalBooks = rs.getInt("total_books");
-                        totalSales = rs.getInt("total_sales");
+                        totalBooksRead = rs.getInt("total_letture");
                     }
                 }
             }
@@ -188,7 +188,7 @@ public class PublisherDAODB implements PublisherDAO {
                 ps.setString(1, publisherUsername);
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        topSelling.put(rs.getString("title"), rs.getInt("copie_vendute"));
+                        topRead.put(rs.getString("title"), rs.getInt("copie_lette"));
                     }
                 }
             }
@@ -197,7 +197,7 @@ public class PublisherDAODB implements PublisherDAO {
                 ps.setString(1, publisherUsername);
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        byGenre.put(rs.getString("genre"), rs.getInt("genre_sales"));
+                        byGenre.put(rs.getString("genre"), rs.getInt("genre_letture"));
                     }
                 }
             }
@@ -206,7 +206,7 @@ public class PublisherDAODB implements PublisherDAO {
             throw new DAOException("Errore nel recupero statistiche dal DB: " + e.getMessage());
         }
 
-        return new PublisherStats(totalBooks, totalSales, topSelling, byGenre);
+        return new PublisherStats(totalBooks, totalBooksRead, topRead, byGenre);
     }
 
 }

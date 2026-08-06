@@ -58,10 +58,33 @@ public abstract class DashboardGUIView {
     }
 
     public VBox buildBookCard(String sectionTitle, BookBean book, String currentStatus, Consumer<String> onStatusChange, IntConsumer onRate, Runnable onClick) {
+        return buildBookCard(sectionTitle, book, currentStatus, onStatusChange, onRate, onClick, true, true);
+    }
+
+    // confirmBeforeRemove = false: niente Alert bloccante, "Rimuovi libro" chiama
+    // subito onStatusChange (usato dalla schermata con popup+timer di annullamento).
+    public VBox buildBookCard(String sectionTitle, BookBean book, String currentStatus, Consumer<String> onStatusChange, IntConsumer onRate, Runnable onClick, boolean confirmBeforeRemove) {
+        return buildBookCard(sectionTitle, book, currentStatus, onStatusChange, onRate, onClick, confirmBeforeRemove, true);
+    }
+
+    public VBox buildBookCard(String sectionTitle, BookBean book, String currentStatus, Consumer<String> onStatusChange, IntConsumer onRate, Runnable onClick, boolean confirmBeforeRemove, boolean showRemoveOption) {
         VBox card = new VBox(10);
         card.setStyle("-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);");
         card.setPrefWidth(320);
         card.setMaxWidth(320);
+
+        // Icona dedicata di rimozione (pallino rosso con X), separata dal menu di
+        // stato: compare solo dove showRemoveOption e' true, cioe' solo nelle card
+        // della Libreria personale (unico chiamante che lo passa a true).
+        if (showRemoveOption) {
+            HBox topBar = new HBox();
+            topBar.setAlignment(Pos.CENTER_RIGHT);
+            Region spacer = new Region();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+            Label removeIcon = createRemoveIcon(onStatusChange);
+            topBar.getChildren().addAll(spacer, removeIcon);
+            card.getChildren().add(topBar);
+        }
 
         if (sectionTitle != null && !sectionTitle.trim().isEmpty()) {
             Label header = new Label(sectionTitle);
@@ -83,6 +106,27 @@ public abstract class DashboardGUIView {
         card.getChildren().add(content);
 
         return card;
+    }
+
+    private static final String REMOVE_ICON_BASE_STYLE = "-fx-background-color: #C0392B; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 100; -fx-cursor: hand;";
+    private static final String REMOVE_ICON_HOVER_STYLE = "-fx-background-color: #D9695D; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-background-radius: 100; -fx-cursor: hand;";
+
+    private Label createRemoveIcon(Consumer<String> onStatusChange) {
+        Label removeIcon = new Label("✕");
+        removeIcon.setMinSize(22, 22);
+        removeIcon.setMaxSize(22, 22);
+        removeIcon.setAlignment(Pos.CENTER);
+        removeIcon.setStyle(REMOVE_ICON_BASE_STYLE);
+        removeIcon.setOnMouseEntered(e -> removeIcon.setStyle(REMOVE_ICON_HOVER_STYLE));
+        removeIcon.setOnMouseExited(e -> removeIcon.setStyle(REMOVE_ICON_BASE_STYLE));
+
+        removeIcon.setOnMouseClicked(e -> {
+            e.consume();
+            AppLogger.logInfo("Rimozione richiesta tramite icona dedicata sulla card.");
+            if (onStatusChange != null) onStatusChange.accept("RIMUOVI");
+        });
+
+        return removeIcon;
     }
 
     private ImageView createCoverView(String imageUrl) {
@@ -113,7 +157,7 @@ public abstract class DashboardGUIView {
         authorL.setStyle("-fx-font-family: 'Georgia'; -fx-font-size: 13px; -fx-text-fill: #7A7A7A; -fx-font-style: italic;");
 
         HBox ratingBox = createRatingBox(book.getRating(), onRate);
-        MenuButton readBtn = createReadMenu(currentStatus, onStatusChange, book.getTitle(), ratingBox, onRate);
+        MenuButton readBtn = createReadMenu(currentStatus, onStatusChange);
 
         infoBox.getChildren().addAll(titleL, authorL, readBtn, ratingBox);
         return infoBox;
@@ -130,28 +174,27 @@ public abstract class DashboardGUIView {
         return "Aggiungi a...";
     }
 
-    private MenuButton createReadMenu(String currentStatus, Consumer<String> onStatusChange, String bookTitle, HBox ratingBox, IntConsumer onRate) {
+
+    private static final String READ_BTN_BASE_STYLE = "-fx-background-color: " + BTN_GREEN + "; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;";
+    private static final String READ_BTN_HOVER_STYLE = "-fx-background-color: #A3C2A8; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;";
+
+   private MenuButton createReadMenu(String currentStatus, Consumer<String> onStatusChange) {
         MenuButton readBtn = new MenuButton(resolveStatusText(currentStatus));
         readBtn.setOnMouseClicked(e -> e.consume());
-        readBtn.setStyle("-fx-background-color: " + BTN_GREEN + "; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;");
-
+        readBtn.setStyle(READ_BTN_BASE_STYLE);
+        readBtn.setOnMouseEntered(e -> readBtn.setStyle(READ_BTN_HOVER_STYLE));
+        readBtn.setOnMouseExited(e -> readBtn.setStyle(READ_BTN_BASE_STYLE));
         MenuItem optWantToRead = new MenuItem(ReadingStatus.TO_READ.getDisplayName());
         MenuItem optReading = new MenuItem(ReadingStatus.READING.getDisplayName());
         MenuItem optRead = new MenuItem(ReadingStatus.READ.getDisplayName());
 
-        SeparatorMenuItem separator = new SeparatorMenuItem();
-        MenuItem optRemove = new MenuItem("Rimuovi libro");
-        optRemove.setStyle("-fx-text-fill: #C0392B;");
-
-        readBtn.getItems().addAll(optWantToRead, optReading, optRead, separator, optRemove);
-
-        setupMenuActions(readBtn, optWantToRead, optReading, optRead, optRemove, onStatusChange, bookTitle, ratingBox, onRate);
+        readBtn.getItems().addAll(optWantToRead, optReading, optRead);
+        setupStatusActions(readBtn, optWantToRead, optReading, optRead, onStatusChange);
 
         return readBtn;
     }
 
-    private void setupMenuActions(MenuButton readBtn, MenuItem optWantToRead, MenuItem optReading, MenuItem optRead, MenuItem optRemove,
-                                  Consumer<String> onStatusChange, String bookTitle, HBox ratingBox, IntConsumer onRate) {
+    private void setupStatusActions(MenuButton readBtn, MenuItem optWantToRead, MenuItem optReading, MenuItem optRead, Consumer<String> onStatusChange) {
         optWantToRead.setOnAction(e -> {
             readBtn.setText(ReadingStatus.TO_READ.getDisplayName());
             if (onStatusChange != null) onStatusChange.accept(ReadingStatus.TO_READ.name());
@@ -166,32 +209,8 @@ public abstract class DashboardGUIView {
             readBtn.setText(ReadingStatus.READ.getDisplayName());
             if (onStatusChange != null) onStatusChange.accept(ReadingStatus.READ.name());
         });
-
-        optRemove.setOnAction(e -> handleRemoveAction(readBtn, onStatusChange, bookTitle, ratingBox, onRate));
     }
 
-    private void handleRemoveAction(MenuButton readBtn, Consumer<String> onStatusChange, String bookTitle, HBox ratingBox, IntConsumer onRate) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Rimuovi Libro");
-        alert.setHeaderText("Vuoi rimuovere '" + bookTitle + "' dalla tua libreria?");
-        alert.setContentText("Questa azione rimuoverà permanentemente il libro, incluse le tue valutazioni.");
-
-        ButtonType btnAnnulla = new ButtonType("Annulla", ButtonBar.ButtonData.CANCEL_CLOSE);
-        ButtonType btnOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        alert.getButtonTypes().setAll(btnAnnulla, btnOk);
-
-        alert.showAndWait().ifPresent(type -> {
-            if (type == btnOk) {
-                if (onStatusChange != null) onStatusChange.accept("RIMUOVI");
-                readBtn.setText("Aggiungi a...");
-
-                for (int i = 1; i <= 5; i++) ((Label) ratingBox.getChildren().get(i)).setText("☆");
-                int[] clickedRating = (int[]) ratingBox.getProperties().get("clickedRating");
-                if (clickedRating != null) clickedRating[0] = 0;
-                if (onRate != null) onRate.accept(0);
-            }
-        });
-    }
 
     private HBox createRatingBox(int initialRating, IntConsumer onRate) {
         HBox ratingBox = new HBox(2);

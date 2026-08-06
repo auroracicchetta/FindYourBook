@@ -12,7 +12,7 @@ public class BookBean {
     private int rating;
     private String description;
     private ReadingStatus status;
-    private int copieVendute;
+    private int copieLette;
     private LocalDate readingStartDate;
 
     public BookBean() {}
@@ -50,8 +50,8 @@ public class BookBean {
     public ReadingStatus getStatus() { return status; }
     public void setStatus(ReadingStatus status) { this.status = status; }
 
-    public int getCopieVendute() {return copieVendute;}
-    public void setCopieVendute(int copieVendute) {this.copieVendute = copieVendute;}
+    public int getCopieLette() {return copieLette;}
+    public void setCopieLette(int copieLette) {this.copieLette = copieLette;}
 
     public LocalDate getReadingStartDate() { return readingStartDate; }
     public void setReadingStartDate(LocalDate readingStartDate) { this.readingStartDate = readingStartDate; }

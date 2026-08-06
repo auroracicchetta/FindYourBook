@@ -16,9 +16,9 @@ public class PublisherStatsController {
 
         return new PublisherStatsBean(
                 model.getTotalBooksPublished(),
-                model.getTotalCopiesSold(),
-                model.getTopSellingBooks(),
-                model.getSalesByGenre()
+                model.getTotalBooksRead(),
+                model.getTopReadBooks(),
+                model.getReadsByGenre()
         );
     }
 }

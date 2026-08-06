@@ -7,7 +7,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/61hsfUlwvzL._SL1500_.jpg",
     "description": "La monumentale e immortale storia di Renzo e Lucia, due giovani promessi sposi la cui serena felicità viene brutalmente ostacolata dal perfido e prepotente signorotto locale Don Rodrigo. Ambientato nella Lombardia oppressa dalla dominazione spagnola del Seicento, il romanzo si sviluppa attraverso un intricato e drammatico percorso fatto di fughe, separazioni forzate, la paura della calata dei Lanzichenecchi e la spaventosa tragedia della peste manzoniana, fino alla miracolosa e commovente redenzione e ricongiungimento finale.",
     "rating": 0,
-    "copieVendute": 21500
+    "copieVendute": 21500,
+    "observers": []
   },
   {
     "id": 2,
@@ -17,7 +18,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/81FZZ6hw5ML._SL1414_.jpg",
     "description": "Il viaggio allegorico, visionario e spirituale del Sommo Poeta Dante Alighieri attraverso i tre regni dell\u0027oltretomba cristiano: l\u0027Inferno, dove assiste alle pene eterne dei dannati e dei grandi personaggi storici; il Purgatorio, luogo di purificazione e speranza; e infine il Paradiso, regno della luce e della beatitudine divina. Guidato prima dal saggio poeta latino Virgilio e poi dall\u0027amata Beatrice, Dante compie un percorso di redenzione universale che ha plasmato per sempre la lingua e la cultura italiana.",
     "rating": 0,
-    "copieVendute": 19800
+    "copieVendute": 19800,
+    "observers": []
   },
   {
     "id": 3,
@@ -27,7 +29,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/61n4TPRyZIL._SL1500_.jpg",
     "description": "Nel soffocante e plumbeo clima di una San Pietroburgo opprimente, il giovane e indigente ex studente Rodion Raskolnikov cova una teoria delirante secondo cui gli uomini straordinari hanno il diritto morale di superare ogni legge per un fine superiore. Spinto dalla miseria e da questa folle idea, compie un efferato duplice omicidio. Da quel momento, tuttavia, non subentra il trionfo, ma un implacabile e devastante crollo psicologico, un duello intellettuale e morale con l\u0027astuto giudice Porfirij e la sofferta via di redenzione attraverso l\u0027amore di Sonja.",
     "rating": 0,
-    "copieVendute": 14500
+    "copieVendute": 14500,
+    "observers": []
   },
   {
     "id": 4,
@@ -37,7 +40,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/61bRbB4Rk3L._SL1500_.jpg",
     "description": "L\u0027affascinante e corrotto viaggio nell\u0027estetismo e nel peccato di Dorian Gray, un giovane di straordinaria bellezza che, suggestionato dalle teorie ciniche e edoniste di Lord Henry Wotton, esprime un desiderio fatale: che sia il ritratto dipinto da Basil Hallward a invecchiare e a portare i segni del tempo e della depravazione, mentre il suo corpo rimane giovane e incontaminato. Mentre Dorian si abbandona a una vita di segreti abomini e crudeltà, la tela in soffitta si trasforma in un mostruoso e deforme specchio della sua anima.",
     "rating": 0,
-    "copieVendute": 89500
+    "copieVendute": 89500,
+    "observers": []
   },
   {
     "id": 5,
@@ -47,7 +51,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/6190PaQZkrL._SL1500_.jpg",
     "description": "L\u0027epico e insuperabile viaggio della Compagnia dell\u0027Anello, formata da uomini, un elfo, un nano, hobbit e lo stregone Gandalf, determinati a percorrere la Terra di Mezzo fino alle terre oscure di Mordor per distruggere l\u0027Unico Anello nel fuoco del Monte Fato e sconfiggere per sempre il potere dell\u0027Oscuro Signore Sauron, in un racconto fondativo della letteratura fantastica moderna.",
     "rating": 0,
-    "copieVendute": 18500
+    "copieVendute": 18500,
+    "observers": []
   },
   {
     "id": 6,
@@ -57,7 +62,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/71+eLNG0bXL._SL1500_.jpg",
     "description": "Quattro fratelli – Peter, Susan, Edmund e Lucy – scoprono che un vecchio armadio è in realtà un portale magico. Oltre le ante di legno si nasconde Narnia, un mondo incantato popolato da animali parlanti e congelato in un inverno senza fine dalla malvagia Strega Bianca. Guidati dal maestoso leone Aslan, i ragazzi dovranno affrontare epiche battaglie, creature mitologiche e tradimenti per spezzare l\u0027oscura maledizione e riportare la primavera nel regno.",
     "rating": 0,
-    "copieVendute": 22300
+    "copieVendute": 22300,
+    "observers": []
   },
   {
     "id": 7,
@@ -67,7 +73,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/71I7798hdLL._SL1500_.jpg",
     "description": "Gli intrighi spietati, le lotte di potere, i duelli e i tradimenti sanguinosi tra le nobili casate del continente di Westeros, dai ghiacci del Nord al caldo sud, tutti in lizza per il controllo del famigerato Trono di Spade. Mentre le famiglie si dilaniano a vicenda con alleanze fragili e vendette implacabili, alle frontiere estreme del regno, oltre la grande Barriera di ghiaccio, si risvegliano minacce antiche e dimenticate.",
     "rating": 0,
-    "copieVendute": 23900
+    "copieVendute": 23900,
+    "observers": []
   },
   {
     "id": 8,
@@ -77,7 +84,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/71AET+iM0oL._SL1500_.jpg",
     "description": "Nell\u0027Inghilterra rurale dell\u0027Ottocento, la brillante e ostinata Elizabeth Bennet si scontra costantemente con il ricco, altero e riservato signor Darcy. Tra eleganti balli di campagna, pettegolezzi di provincia e le rigide convenzioni sociali dell\u0027epoca, i due dovranno superare il proprio orgoglio e i reciproci malintesi. Solo spogliandosi dei loro pregiudizi riusciranno a riconoscere la profonda affinità intellettuale e la passione autentica che li lega inesorabilmente.",
     "rating": 0,
-    "copieVendute": 15600
+    "copieVendute": 15600,
+    "observers": []
   },
   {
     "id": 9,
@@ -87,7 +95,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/61qfetCDhHL._SL1500_.jpg",
     "description": "Nelle selvagge e desolate brughiere dello Yorkshire, si consuma la passione distruttiva, assoluta e crudele tra lo scontroso trovatello Heathcliff e la ribelle Catherine Earnshaw. Il loro legame, tanto profondo da sfidare le convenzioni borghesi, la morale, il tempo e persino la morte, si trasformerà in una maledizione implacabile. Un sentimento divorante che finirà per travolgere non solo le loro esistenze, ma anche quelle delle generazioni future in un vortice di vendetta e follia.",
     "rating": 0,
-    "copieVendute": 26100
+    "copieVendute": 26100,
+    "observers": []
   },
   {
     "id": 10,
@@ -97,7 +106,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/71Oy6VUOCNL._SL1500_.jpg",
     "description": "Rimasta orfana e cresciuta in un ambiente freddo e ostile, la giovane e volitiva Jane Eyre trova lavoro come istitutrice nell\u0027isolata e gotica tenuta di Thornfield Hall. Qui incontra l\u0027enigmatico e tormentato padrone di casa, il signor Rochester, verso il quale inizia a nutrire un amore profondo, paritario e totalmente ricambiato. Ma proprio a un passo dalla felicità, un oscuro e terribile segreto nascosto nel passato dell\u0027uomo la costringerà a mettere alla prova tutta la sua indipendenza e forza morale.",
     "rating": 0,
-    "copieVendute": 18400
+    "copieVendute": 18400,
+    "observers": []
   },
   {
     "id": 11,
@@ -107,7 +117,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/711jiyCoP+L._SL1500_.jpg",
     "description": "Dieci persone apparentemente senza alcun legame comune tra loro vengono misteriosamente invitate su una isolata e cupa roccia al largo della costa del Devon da un anfitrione che si fa chiamare signor U.N. Owen. Una volta giunti nella magnifica villa, un grammofono accusa ciascuno di loro di aver commesso in passato un omicidio rimasto impunito. Isolati dal maltempo e senza via di fuga, gli ospiti iniziano a essere eliminati uno alla volta, seguendo spietatamente i versi di una vecchia e macabra filastrocca infantile incisa in ogni camera, mentre il panico e il sospetto reciproco distruggono ogni briciolo di lucidità.",
     "rating": 0,
-    "copieVendute": 12500
+    "copieVendute": 12500,
+    "observers": []
   },
   {
     "id": 12,
@@ -117,7 +128,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/71-gfpil2WL._SL1500_.jpg",
     "description": "Durante un lussuoso e affollato viaggio sull\u0027Orient Express, il leggendario treno viene improvvisamente bloccato da una fitta e impenetrabile nevicata nel bel mezzo dei Balcani. Nel cuore della notte, un odioso e spregiudicato uomo d\u0027affari americano viene brutalmente assassinato nel suo scompartimento con ben dodici coltellate. Poiché il treno è bloccato e non ci sono vie d\u0027accesso esterne, l\u0027assassino si nasconde inevitabilmente tra i passeggeri dell\u0027vagone. Spetta al celebre e meticoloso investigatore belga Hercule Poirot, aiutato dalla sua ineguagliabile materia grigia, esaminare indizi contrastanti, false identità e alibi apparentemente di ferro per svelare una verità sbalorditiva e profondamente tragica.",
     "rating": 0,
-    "copieVendute": 19800
+    "copieVendute": 19800,
+    "observers": []
   },
   {
     "id": 13,
@@ -127,7 +139,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/51Av9TA3aNL._SY445_SX342_QL70_ML2_.jpg",
     "description": "Il leggendario e acuto detective Sherlock Holmes e il suo fido compagno dottor Watson vengono ingaggiati per risolvere un mistero antico e spettrale che minaccia la nobile e aristocratica famiglia dei Baskerville. Nelle desolate, nebrosose e infide lande del Dartmoor si aggirerebbe una creatura mostruosa e diabolica, un mastino spettrale dagli occhi di fuoco deciso a vendicare un\u0027antica maledizione di famiglia. Tra torbiere infide, ululati agghiaccianti nella notte e una fitta rete di inganni umani, Holmes dovrà separare la superstizione popolare dalla fredda e calcolata realtà criminale per catturare il vero colpevole appostato nell\u0027ombra.",
     "rating": 0,
-    "copieVendute": 26700
+    "copieVendute": 26700,
+    "observers": []
   },
   {
     "id": 14,
@@ -137,7 +150,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/716zPhFO8cL._SL1500_.jpg",
     "description": "Sull\u0027isola inespugnabile di Mompracem vive Sandokan, la Tigre della Malesia, principe spodestato dagli inglesi che gli hanno sterminato la famiglia. Circondato dai suoi fedeli tigrotti e affiancato dall\u0027inseparabile Yanez, si getta in una vita fatta di arrembaggi e battaglie, finché una ferita lo porta sulle coste di Labuan, dove incontra la bellissima Marianna. Da quel momento sarà disposto a rischiare tutto pur di farla sua regina.",
     "rating": 0,
-    "copieVendute": 18500
+    "copieVendute": 18500,
+    "observers": []
   },
   {
     "id": 15,
@@ -147,7 +161,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/71+yJKKElRL._SL1359_.jpg",
     "description": "Walter Andretti è un giornalista precipitato dallo sport alla cronaca nera, l\u0027ultimo posto dove avrebbe voluto lavorare. Quando il suo capo gli affida la copertura di due omicidi apparentemente slegati, Andretti si ritrova suo malgrado a indagare, inciampando in goffaggini e passi falsi. Ma dietro quelle morti si cela un legame inquietante, una stessa mano che nessuno aveva saputo vedere, e che lo costringerà a mettere in gioco più di quanto avrebbe voluto.",
     "rating": 0,
-    "copieVendute": 15900
+    "copieVendute": 15900,
+    "observers": []
   },
   {
     "id": 16,
@@ -157,7 +172,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/71KoPPOlv2L._SL1328_.jpg",
     "description": "Scuro e spietato, il Corsaro Nero solca i Mari dei Caraibi in cerca di vendetta contro il duca fiammingo che ha tradito e ucciso i suoi fratelli. Tra abbordaggi, foreste vergini e duelli furiosi, il temuto filibustiere si scontra con il proprio destino quando incontra la bella Honorata, costringendolo a scegliere tra l\u0027odio che lo consuma e un amore inatteso e travolgente.",
     "rating": 0,
-    "copieVendute": 24300
+    "copieVendute": 24300,
+    "observers": []
   },
   {
     "id": 17,
@@ -167,7 +183,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/61tQyhDll+L._SL1500_.jpg",
     "description": "La raccolta d\u0027esordio del futuro Premio Nobel, pubblicata nel 1925, che ha segnato una svolta decisiva nella lirica del Novecento italiano. Tra paesaggi liguri aridi e scabri, il mare visto come elemento insieme attraente e negato, Montale costruisce una poetica degli \u0027scarti\u0027 e dei residui, lontana da ogni retorica, capace di restituire il senso di smarrimento e di ricerca di un\u0027epoca intera attraverso immagini di rara essenzialità.",
     "rating": 0,
-    "copieVendute": 12300
+    "copieVendute": 12300,
+    "observers": []
   },
   {
     "id": 18,
@@ -177,7 +194,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/61XUwqBV-GL._SL1035_.jpg",
     "description": "L\u0027opera che raccoglie oltre quarant\u0027anni di scrittura poetica di uno dei grandi maestri dell\u0027Ermetismo italiano, dalle liriche brevi e folgoranti scritte nelle trincee della Prima guerra mondiale fino alle raccolte della maturità. Un percorso che attraversa dolore, guerra, fede e memoria, condensato in versi scarni e potentissimi che hanno rivoluzionato il linguaggio poetico del Novecento.",
     "rating": 0,
-    "copieVendute": 15400
+    "copieVendute": 15400,
+    "observers": []
   },
   {
     "id": 19,
@@ -187,7 +205,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/51hYdffOXGL._SL1500_.jpg",
     "description": "Due libri cardine della poetessa dei Navigli riuniti in un solo volume, nati dagli anni del ricovero al manicomio Paolo Pini. Versi che trasformano la sofferenza e l\u0027internamento in una lente per guardare il mondo da un altrove, tra figure dantesche, bibliche e mitologiche che si intrecciano a un linguaggio insieme visionario e carnale, capace di restituire dignità e voce a chi era stato ridotto al silenzio.",
     "rating": 0,
-    "copieVendute": 17200
+    "copieVendute": 17200,
+    "observers": []
   },
   {
     "id": 20,
@@ -197,7 +216,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/615CVR2in0L.SL1500_.jpg",
     "description": "Nella Macedonia del IV secolo a.C., il giovane Alessandro cresce all\u0027ombra di un padre ingombrante e di un destino già scritto nelle profezie. Allievo di Aristotele, addestrato alla guerra fin da ragazzo, sogna di unire il mondo greco e quello barbaro in un unico grande impero. Dalla congiura che uccide Filippo II fino alla conquista dell\u0027Asia, Manfredi ricostruisce con rigore archeologico la parabola dell\u0027uomo che si credette figlio degli dèi.",
     "rating": 0,
-    "copieVendute": 14500
+    "copieVendute": 14500,
+    "observers": []
   },
   {
     "id": 21,
@@ -207,7 +227,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/719HCRAxFVL.SL1500_.jpg",
     "description": "Anno 476 d.C.: l\u0027impero romano d\u0027Occidente sta crollando sotto i colpi dei barbari, e il piccolo imperatore Romolo Augusto viene esiliato su un\u0027isola sperduta. Un pugno di legionari fedeli, guidati dal centurione Aurelio, decide di non arrendersi e intraprende un viaggio disperato attraverso un continente in fiamme per salvare l\u0027ultimo erede di Roma, portando con sé un segreto capace di cambiare il corso della storia.",
     "rating": 0,
-    "copieVendute": 20300
+    "copieVendute": 20300,
+    "observers": []
   },
   {
     "id": 22,
@@ -217,7 +238,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/71HdOdCWntL.SL1500_.jpg",
     "description": "Ispirato all\u0027Anabasi di Senofonte, il romanzo racconta le vicende di diecimila mercenari greci che, dopo aver combattuto per un principe persiano sconfitto in battaglia, si ritrovano isolati nel cuore dell\u0027impero nemico, a migliaia di chilometri da casa. Guidati da un manipolo di generali coraggiosi, dovranno marciare attraverso deserti, montagne e popoli ostili in un\u0027epica ritirata verso la salvezza.",
     "rating": 0,
-    "copieVendute": 12300
+    "copieVendute": 12300,
+    "observers": []
   },
   {
     "id": 23,
@@ -227,7 +249,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/71vgqgI-7CL._SL1500_.jpg",
     "description": "Pubblicato nel 1637 come premessa metodologica a una serie di trattati scientifici, questo testo segna l\u0027avvento di un modo radicalmente nuovo di concepire la conoscenza, fondato sulla razionalità dell\u0027uomo. Attraverso una prosa lucida e quasi autobiografica, Cartesio racconta il cammino che lo ha condotto a formulare il celebre dubbio sistematico e il metodo per condurre correttamente la propria ragione, gettando le basi della filosofia e della scienza moderne.",
     "rating": 0,
-    "copieVendute": 10600
+    "copieVendute": 10600,
+    "observers": []
   },
   {
     "id": 24,
@@ -237,7 +260,8 @@
     "imageUrl": "https://m.media-amazon.com/images/I/71xu7odCppL._SL1500_.jpg",
     "description": "Scritto nel 1513 in un momento di crisi politica per l\u0027Italia, questo trattato disegna il ritratto di un uomo di Stato capace di dominare la sorte attraverso virtù e pragmatismo, separando per la prima volta con nettezza l\u0027agire politico dalla morale tradizionale. Un\u0027opera breve ma dirompente, che ha inaugurato il pensiero politico moderno e che continua a essere letta come chiave per comprendere i meccanismi del potere.",
     "rating": 0,
-    "copieVendute": 14500
+    "copieVendute": 14500,
+    "observers": []
   },
   {
     "id": 25,
@@ -247,6 +271,7 @@
     "imageUrl": "https://m.media-amazon.com/images/I/61xisA8svYL._SL1500_.jpg",
     "description": "Il racconto intimo e filosofico della conversione di uno degli spiriti più inquieti dell\u0027antichità tardiva, che ripercorre la propria giovinezza dissoluta, la ricerca affannosa della verità tra diverse scuole di pensiero e l\u0027incontro decisivo con la fede cristiana. Un\u0027opera che intreccia autobiografia, teologia e riflessione filosofica sul tempo, la memoria e il male, ponendo le basi per secoli di pensiero occidentale.",
     "rating": 0,
-    "copieVendute": 17300
+    "copieVendute": 17300,
+    "observers": []
   }
 ]

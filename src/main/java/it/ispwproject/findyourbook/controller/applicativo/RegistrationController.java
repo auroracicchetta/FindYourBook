@@ -31,6 +31,10 @@ public class RegistrationController {
             throw new RegistrationException("Username già in uso. Scegline un altro.");
         }
 
+        if (registrationDAO.emailExists(bean.getEmail())) {
+            throw new RegistrationException("Email già registrata. Effettua il login o usane un'altra.");
+        }
+
         String hashedPassword;
         try {
             hashedPassword = PasswordUtils.hash(bean.getPassword());
@@ -53,11 +57,7 @@ public class RegistrationController {
 
         registrationDAO.save(user);
 
-        RegistrationObserver observer = new RegistrationObserver(
-                email,
-                bean.getName(),
-                bean.getRole().name()
-        );
+        RegistrationObserver observer = new RegistrationObserver(user);
         user.attach(observer);
         user.completeRegistration();
         user.detach(observer);

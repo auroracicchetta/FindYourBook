@@ -46,25 +46,26 @@ public class SearchBooksCLIView {
 
     public String askAction() {
         CLIRenderer.sezione("Scegli un'azione");
-        CLIRenderer.voceMenu(1, "Imposta/Cambia Stato (Da leggere, In lettura, Letto, Rimuovi)");
+        CLIRenderer.voceMenu(1, "Imposta/Cambia Stato (Da leggere, In lettura, Letto)");
         CLIRenderer.voceMenu(2, "Lascia un Voto (1-5)");
         CLIRenderer.voceMenuZero("Torna ai risultati");
         return CLIRenderer.chiediSceltaStringa("Scelta");
     }
 
+    // "Rimuovi" non compare qui volutamente: la rimozione dai preferiti resta
+    // confinata alla sola sezione Libreria (UserLibraryCLI/UserLibraryCLIView),
+    // esattamente come nella GUI (vedi i commenti in DashboardGUIView).
     public String askStatus() {
         CLIRenderer.sezione("Scegli il nuovo stato");
         CLIRenderer.voceMenu(1, "Da leggere");
         CLIRenderer.voceMenu(2, "In lettura");
         CLIRenderer.voceMenu(3, "Letto");
-        CLIRenderer.voceMenu(4, "Rimuovi dai preferiti");
 
         String choice = CLIRenderer.chiediSceltaStringa("Scelta");
         return switch (choice) {
             case "1" -> "TO_READ";
             case "2" -> "READING";
             case "3" -> "READ";
-            case "4" -> "RIMUOVI";
             default -> null;
         };
     }

@@ -1,5 +1,6 @@
 package it.ispwproject.findyourbook.controller.gui;
 
+import it.ispwproject.findyourbook.dao.ConnectionFactory;
 import it.ispwproject.findyourbook.model.User;
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
 import it.ispwproject.findyourbook.view.gui.PublisherDashboardGUIView;
@@ -7,6 +8,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
+
+import java.sql.SQLException;
 
 public class PublisherDashboardGUI {
 
@@ -39,6 +42,11 @@ public class PublisherDashboardGUI {
     private void handleLogout() {
         AppLogger.logInfo("Logout Casa Editrice ed eliminazione sessione...");
         SessionManager.getInstance().clearSession();
+        try {
+            ConnectionFactory.clearRole();
+        } catch (SQLException e) {
+            AppLogger.logError("Errore durante il reset delle credenziali DB al logout: " + e.getMessage());
+        }
         MainGUI.showLogin();
     }
 
@@ -53,7 +61,7 @@ public class PublisherDashboardGUI {
     }
 
     private void handleViewStats() {
-        AppLogger.logInfo("Apertura pannello statistiche vendite corporate...");
+        AppLogger.logInfo("Apertura pannello statistiche di lettura...");
         new PublisherStatsGUI(stage, companyName, onLogout).show();
     }
 }

@@ -10,6 +10,12 @@ public class SessionManager {
     private User loggedUser;
     private SessionBean sessionBean;
 
+    // Vive per l'intera sessione (non per singola schermata): garantisce che il
+    // promemoria "letture inattive" venga inviato al massimo una volta per login,
+    // indipendentemente da quante volte il Reader entra/esce dalla libreria personale.
+    // Viene azzerato in clearSession(), cosi' un nuovo login puo' ricevere di nuovo il promemoria.
+    private boolean inactivityReminderSent = false;
+
     private SessionManager() {}
 
     private static class Holder {
@@ -40,16 +46,25 @@ public class SessionManager {
         return loggedUser != null;
     }
 
-    public boolean isLettore() {
-        return isLoggedIn() && loggedUser.getRole() == Role.READER;
+    public boolean isReader() {
+        return isLoggedIn() && loggedUser.hasRole(Role.READER);
     }
 
-    public boolean isCasaEditrice() {
-        return isLoggedIn() && loggedUser.getRole() == Role.PUBLISHER;
+    public boolean isPublisher() {
+        return isLoggedIn() && loggedUser.hasRole(Role.PUBLISHER);
     }
 
     public void clearSession() {
         this.loggedUser  = null;
         this.sessionBean = null;
+        this.inactivityReminderSent = false;
+    }
+
+    public boolean isInactivityReminderSent() {
+        return inactivityReminderSent;
+    }
+
+    public void setInactivityReminderSent(boolean inactivityReminderSent) {
+        this.inactivityReminderSent = inactivityReminderSent;
     }
 }

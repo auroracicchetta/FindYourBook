@@ -59,7 +59,7 @@ public class SearchByGenreCLI extends AbstractCLIState {
 
         } catch (Exception e) {
             resultsView.showError("Errore durante la ricerca per genere: " + e.getMessage());
-            goNext(context, this);
+            repeat(context);
         }
     }
 
@@ -86,23 +86,17 @@ public class SearchByGenreCLI extends AbstractCLIState {
             }
         }
 
-        goNext(context, this);
+        repeat(context);
     }
 
     private void handleBookAction(BookBean book) {
         String statusStr = resultsView.askStatus();
         if (statusStr != null) {
             try {
-                if (statusStr.equals("RIMUOVI")) {
-                    userLibraryController.removeBookFromLibrary(book);
-                    resultsView.showMessage("Libro rimosso dalla tua libreria.");
-                    book.setStatus(null);
-                } else {
-                    ReadingStatus newStatus = ReadingStatus.valueOf(statusStr);
-                    userLibraryController.saveBookToLibrary(book, newStatus);
-                    resultsView.showMessage("Stato aggiornato con successo a: " + newStatus.getDisplayName());
-                    book.setStatus(newStatus);
-                }
+                ReadingStatus newStatus = ReadingStatus.valueOf(statusStr);
+                userLibraryController.saveBookToLibrary(book, newStatus);
+                resultsView.showMessage("Stato aggiornato con successo a: " + newStatus.getDisplayName());
+                book.setStatus(newStatus);
             } catch (Exception e) {
                 resultsView.showError("Errore nell'aggiornamento: " + e.getMessage());
             }

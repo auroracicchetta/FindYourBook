@@ -64,7 +64,6 @@ public class BookController {
             for (Book b : searchDb) {
                 results.add(new BookBean(b.getTitle(), b.getAuthor(), b.getGenre(), b.getImageUrl(), b.getDescription()));
             }
-            AppLogger.logInfo("Ricerca locale completata per: " + query);
         } catch (Exception e) {
             AppLogger.logError("Errore durante la ricerca locale: " + e.getMessage());
         }

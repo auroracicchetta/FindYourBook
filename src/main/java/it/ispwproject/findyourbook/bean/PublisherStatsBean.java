@@ -5,20 +5,20 @@ import java.util.Map;
 public class PublisherStatsBean {
 
     private int totalBooksPublished;
-    private int totalCopiesSold;
-    private Map<String, Integer> topSellingBooks;
-    private Map<String, Integer> salesByGenre;
+    private int totalBooksRead;
+    private Map<String, Integer> topReadBooks;
+    private Map<String, Integer> readsByGenre;
 
-    public PublisherStatsBean(int totalBooksPublished, int totalCopiesSold,
-                              Map<String, Integer> topSellingBooks, Map<String, Integer> salesByGenre) {
+    public PublisherStatsBean(int totalBooksPublished, int totalBooksRead,
+                              Map<String, Integer> topReadBooks, Map<String, Integer> readsByGenre) {
         this.totalBooksPublished = totalBooksPublished;
-        this.totalCopiesSold     = totalCopiesSold;
-        this.topSellingBooks     = topSellingBooks;
-        this.salesByGenre        = salesByGenre;
+        this.totalBooksRead     = totalBooksRead;
+        this.topReadBooks     = topReadBooks;
+        this.readsByGenre        = readsByGenre;
     }
 
     public int getTotalBooksPublished() { return totalBooksPublished; }
-    public int getTotalCopiesSold()     { return totalCopiesSold; }
-    public Map<String, Integer> getTopSellingBooks() { return topSellingBooks; }
-    public Map<String, Integer> getSalesByGenre()    { return salesByGenre; }
+    public int getTotalBooksRead()     { return totalBooksRead; }
+    public Map<String, Integer> getTopReadBooks() { return topReadBooks; }
+    public Map<String, Integer> getReadsByGenre()    { return readsByGenre; }
 }

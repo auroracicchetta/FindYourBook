@@ -17,10 +17,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * ------------------------------------------------------------
  * Test Class : RegistrationControllerTest
  * Description: Verifica che il sistema impedisca la registrazione
- * di due account con lo stesso username/email.
+ * di due account con lo stesso username o la stessa email.
  * Dopo una prima registrazione avvenuta con successo,
- * un secondo tentativo con lo stesso username deve
- * lanciare una RegistrationException.
+ * un secondo tentativo con lo stesso username, oppure con
+ * la stessa email, deve lanciare una RegistrationException.
  * ------------------------------------------------------------
  */
 class RegistrationControllerTest {
@@ -53,7 +53,37 @@ class RegistrationControllerTest {
         duplicato.setName("Luigi");
         duplicato.setSurname("Verdi");
         duplicato.setUsername("mariorossi"); // Username già esistente
-        duplicato.setEmail("luigi@test.com");
+        duplicato.setEmail("luigi@test.com"); // Email diversa: qui si vuole isolare il controllo sull'username
+        duplicato.setPassword("Password123!");
+        duplicato.setConfirmPassword("Password123!");
+        duplicato.setRole(Role.READER);
+        duplicato.setBirthDate(LocalDate.now().minusYears(22));
+
+        assertThrows(RegistrationException.class, () ->
+                registrationController.register(duplicato)
+        );
+    }
+
+    @Test
+    void testRegistrazioneConEmailDuplicata() throws DAOException, RegistrationException {
+
+        RegistrationBean bean = new RegistrationBean();
+        bean.setName("Mario");
+        bean.setSurname("Rossi");
+        bean.setUsername("mariorossi");
+        bean.setEmail("mario@test.com");
+        bean.setPassword("Password123!");
+        bean.setConfirmPassword("Password123!");
+        bean.setRole(Role.READER);
+        bean.setBirthDate(LocalDate.now().minusYears(20));
+
+        registrationController.register(bean);
+
+        RegistrationBean duplicato = new RegistrationBean();
+        duplicato.setName("Luigi");
+        duplicato.setSurname("Verdi");
+        duplicato.setUsername("luigiverdi"); // Username diverso: qui si vuole isolare il controllo sull'email
+        duplicato.setEmail("mario@test.com"); // Email già esistente
         duplicato.setPassword("Password123!");
         duplicato.setConfirmPassword("Password123!");
         duplicato.setRole(Role.READER);

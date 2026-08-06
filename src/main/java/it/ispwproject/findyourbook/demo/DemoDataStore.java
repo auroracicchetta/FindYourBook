@@ -229,7 +229,7 @@ public class DemoDataStore {
         b.setImageUrl(imageUrl);
         b.setPublisherUsername(publisherUsername);
 
-        b.setCopieVendute(RANDOM.nextInt(1000));
+        b.setCopieLette(RANDOM.nextInt(1000));
         return b;
     }
 

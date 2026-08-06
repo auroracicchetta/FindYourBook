@@ -1,6 +1,7 @@
 package it.ispwproject.findyourbook.controller.applicativo;
 
 import it.ispwproject.findyourbook.bean.SessionBean;
+import it.ispwproject.findyourbook.dao.ConnectionFactory;
 import it.ispwproject.findyourbook.dao.DAOFactory;
 import it.ispwproject.findyourbook.exception.DAOException;
 import it.ispwproject.findyourbook.exception.LoginException;
@@ -9,6 +10,8 @@ import it.ispwproject.findyourbook.model.User;
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
 import it.ispwproject.findyourbook.util.PasswordUtils; // <-- AGGIUNTO IMPORT
 import it.ispwproject.findyourbook.util.logger.AppLogger;
+
+import java.sql.SQLException;
 
 public class LoginController {
 
@@ -46,6 +49,22 @@ public class LoginController {
         if (verificato == null) {
             AppLogger.logError("[LoginController] ERRORE CRITICO: Sessione non impostata!");
             throw new LoginException("Errore interno durante il login. Riprova.");
+        }
+
+        // ConnectionFactory.changeRole() e' eager: apre subito una connessione
+        // MySQL vera con le credenziali del ruolo appena autenticato. In
+        // modalita' Memory il login non tocca mai il database (vedi
+        // DAOFactory.getLoginDAO()/getUserDAO() sopra), quindi qui saltiamo
+        // volutamente il cambio di ruolo: chiamarlo comunque proverebbe ad
+        // aprire una connessione MySQL non necessaria, rompendo un login che
+        // altrimenti funzionerebbe anche senza database raggiungibile.
+        if (!DAOFactory.MEMORY.equalsIgnoreCase(DAOFactory.getPersistence())) {
+            try {
+                ConnectionFactory.changeRole(credentials.getRole());
+            } catch (SQLException e) {
+                AppLogger.logError("[LoginController] Errore nel cambio di credenziali database per ruolo: " + e.getMessage());
+                throw new LoginException("Errore di connessione al database durante il login. Riprova più tardi.");
+            }
         }
 
         return switch (credentials.getRole()) {

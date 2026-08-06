@@ -27,27 +27,27 @@ public class RegistrationCLI extends AbstractCLIState {
             RegistrationBean bean = new RegistrationBean();
 
             String nome = view.askField("Nome");
-            if (isBackChoice(nome)) { goNext(context, new LoginCLI()); return; }
+            if (isBackChoice(nome)) { goBack(context); return; }
             bean.setName(nome);
 
             String cognome = view.askField("Cognome");
-            if (isBackChoice(cognome)) { goNext(context, new LoginCLI()); return; }
+            if (isBackChoice(cognome)) { goBack(context); return; }
             bean.setSurname(cognome);
 
             String username = view.askField("Username");
-            if (isBackChoice(username)) { goNext(context, new LoginCLI()); return; }
+            if (isBackChoice(username)) { goBack(context); return; }
             bean.setUsername(username);
 
             String email = view.askField("Email");
-            if (isBackChoice(email)) { goNext(context, new LoginCLI()); return; }
+            if (isBackChoice(email)) { goBack(context); return; }
             bean.setEmail(email);
 
             String password = view.askPasswordField("Password");
-            if (isBackChoice(password)) { goNext(context, new LoginCLI()); return; }
+            if (isBackChoice(password)) { goBack(context); return; }
             bean.setPassword(password);
 
             String confirm = view.askPasswordField("Conferma password");
-            if (isBackChoice(confirm)) { goNext(context, new LoginCLI()); return; }
+            if (isBackChoice(confirm)) { goBack(context); return; }
             bean.setConfirmPassword(confirm);
 
             Role role = view.askRole();
@@ -55,25 +55,25 @@ public class RegistrationCLI extends AbstractCLIState {
 
             if (role == Role.READER) {
                 String dataString = view.askField("Data di nascita (formato: AAAA-MM-GG)");
-                if (isBackChoice(dataString)) { goNext(context, new LoginCLI()); return; }
+                if (isBackChoice(dataString)) { goBack(context); return; }
 
                 if (!impostaDataDiNascita(bean, dataString, context)) {
                     return;
                 }
             } else {
                 String desc = view.askField("Descrizione attività");
-                if (isBackChoice(desc)) { goNext(context, new LoginCLI()); return; }
+                if (isBackChoice(desc)) { goBack(context); return; }
                 bean.setDescription(desc);
             }
 
             registrationController.register(bean);
 
             view.showSuccess("Registrazione completata!");
-            goNext(context, new LoginCLI());
+            redirect(context, new LoginCLI());
 
         } catch (Exception e) {
             view.showError("Errore: " + e.getMessage());
-            goNext(context, this);
+            repeat(context);
         }
     }
 
@@ -83,7 +83,7 @@ public class RegistrationCLI extends AbstractCLIState {
             return true;
         } catch (DateTimeParseException e) {
             view.showError("Formato data non valido.");
-            goNext(context, this);
+            repeat(context);
             return false;
         }
     }

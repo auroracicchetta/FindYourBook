@@ -12,7 +12,7 @@ public class Main {
     public static void main(String[] args) {
 
         AppLogger.logInfo("Avvio di FindYourBook in corso...");
-        // Mantengo il tuo test del DB (ottima pratica)
+        // Il tuo test del DB
         try {
             ConnectionFactory.getConnection();
             AppLogger.logInfo("Connessione al database riuscita!");

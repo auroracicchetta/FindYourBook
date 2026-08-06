@@ -148,4 +148,11 @@ public class UserLibraryGUIView extends DashboardGUIView {
             booksGrid.getChildren().addAll(bookCards);
         }
     }
+
+    public void showChooseSectionPrompt() {
+        booksGrid.getChildren().clear();
+        Label promptLabel = new Label("Scegli quale sezione visualizzare.");
+        promptLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #7A7A7A; -fx-font-style: italic;");
+        booksGrid.getChildren().add(promptLabel);
+    }
 }
