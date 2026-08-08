@@ -57,4 +57,5 @@ public abstract class AbstractCLIState {
         return input.equals("0");
     }
 
+
 }

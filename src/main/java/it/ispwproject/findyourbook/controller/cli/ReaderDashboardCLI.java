@@ -1,15 +1,10 @@
 package it.ispwproject.findyourbook.controller.cli;
 
-import it.ispwproject.findyourbook.dao.ConnectionFactory;
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
-import it.ispwproject.findyourbook.pattern.state.AbstractCLIState;
 import it.ispwproject.findyourbook.pattern.state.CLIStateMachine;
-import it.ispwproject.findyourbook.util.logger.AppLogger;
 import it.ispwproject.findyourbook.view.cli.ReaderDashboardCLIView;
 
-import java.sql.SQLException;
-
-public class ReaderDashboardCLI extends AbstractCLIState {
+public class ReaderDashboardCLI extends DashboardCLI {
 
     private final ReaderDashboardCLIView view = new ReaderDashboardCLIView();
 
@@ -27,13 +22,7 @@ public class ReaderDashboardCLI extends AbstractCLIState {
             case "3" -> goNext(context, new UserLibraryCLI());
             case "4" -> goNext(context, new EditProfileCLI());
             case "0" -> {
-
-                SessionManager.getInstance().clearSession();
-                try {
-                    ConnectionFactory.clearRole();
-                } catch (SQLException e) {
-                    AppLogger.logError("Errore durante il reset delle credenziali DB al logout: " + e.getMessage());
-                }
+                logout();
                 redirect(context, new InitialCLI());
             }
             default  -> {
