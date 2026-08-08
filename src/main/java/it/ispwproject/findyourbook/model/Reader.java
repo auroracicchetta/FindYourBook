@@ -11,8 +11,8 @@ public class Reader extends User {
         super();
     }
 
-    public Reader(int id, String name, String surname, String username, String email, String password, LocalDate registrationDate, LocalDate birthDate) {
-        super(id, name, surname, username, email, password, registrationDate, Role.READER);
+    public Reader(int id, String name, String surname, String username, String email, String password, LocalDate birthDate) {
+        super(id, name, surname, username, email, password, Role.READER);
         this.birthDate = birthDate;
     }
 

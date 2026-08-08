@@ -46,14 +46,28 @@ public class DemoDataStore {
     }
 
     private void initData() {
+
         // 1. CARICHIAMO I LETTORI
-        users.add(new Reader(1, "Mario", "Rossi", "mario", "DEMO_EMAIL", null, LocalDate.now(java.time.ZoneId.systemDefault()), LocalDate.of(1995, Month.MAY, 20)));
+        Reader mario = new Reader(1, "Mario", "Rossi", "mario", "DEMO_EMAIL", null, LocalDate.of(1995, Month.MAY, 20));
+        mario.setRegistrationDate(LocalDate.now(java.time.ZoneId.systemDefault()));
+        users.add(mario);
 
         // 2. CARICHIAMO LE CASE EDITRICI
-        users.add(new Publisher(2, "Mondadori", "Editore", "mondadori", "DEMO_EMAIL", null, LocalDate.now(java.time.ZoneId.systemDefault()), "La più grande casa editrice italiana."));
-        users.add(new Publisher(3, "Feltrinelli", "Editore", "feltrinelli", "DEMO_EMAIL", null, LocalDate.now(java.time.ZoneId.systemDefault()), "Fondata nel 1954, specializzata in narrativa."));
-        users.add(new Publisher(4, "Newton", "Compton", "newton", "DEMO_EMAIL", null, LocalDate.now(java.time.ZoneId.systemDefault()), "Classici a prezzi popolari e gialli."));
-        users.add(new Publisher(5, "Einaudi", "Editore", "einaudi", "DEMO_EMAIL", null, LocalDate.now(java.time.ZoneId.systemDefault()), "Punto di riferimento per la cultura e i classici."));
+        Publisher mondadori = new Publisher(2, "Mondadori", "Editore", "mondadori", "DEMO_EMAIL", null, "La più grande casa editrice italiana.");
+        mondadori.setRegistrationDate(LocalDate.now(java.time.ZoneId.systemDefault()));
+        users.add(mondadori);
+
+        Publisher feltrinelli = new Publisher(3, "Feltrinelli", "Editore", "feltrinelli", "DEMO_EMAIL", null, "Fondata nel 1954, specializzata in narrativa.");
+        feltrinelli.setRegistrationDate(LocalDate.now(java.time.ZoneId.systemDefault()));
+        users.add(feltrinelli);
+
+        Publisher newton = new Publisher(4, "Newton", "Compton", "newton", "DEMO_EMAIL", null, "Classici a prezzi popolari e gialli.");
+        newton.setRegistrationDate(LocalDate.now(java.time.ZoneId.systemDefault()));
+        users.add(newton);
+
+        Publisher einaudi = new Publisher(5, "Einaudi", "Editore", "einaudi", "DEMO_EMAIL", null, "Punto di riferimento per la cultura e i classici.");
+        einaudi.setRegistrationDate(LocalDate.now(java.time.ZoneId.systemDefault()));
+        users.add(einaudi);
 
         // ==========================================
         // 3. CATALOGO DEMO

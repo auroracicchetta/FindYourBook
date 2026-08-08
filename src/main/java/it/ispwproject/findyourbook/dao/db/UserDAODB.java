@@ -82,13 +82,13 @@ public class UserDAODB implements UserDAO {
     }
 
     private User buildUser(UserData data) {
-        return switch (data.role()) {
-            case READER ->
-                    new Reader(data.id(), data.name(), data.surname(), data.username(), data.email(), data.password(), data.regDate(), data.birthDate());
-            case PUBLISHER ->
-                    new Publisher(data.id(), data.name(), data.surname(), data.username(), data.email(), data.password(), data.regDate(), data.description());
+        User user = switch (data.role()) {
+            case READER -> new Reader(data.id(), data.name(), data.surname(), data.username(), data.email(), data.password(), data.birthDate());
+            case PUBLISHER -> new Publisher(data.id(), data.name(), data.surname(), data.username(), data.email(), data.password(), data.description());
             default -> throw new IllegalStateException("Ruolo non riconosciuto: " + data.role());
         };
+        user.setRegistrationDate(data.regDate());
+        return user;
     }
 
     @Override

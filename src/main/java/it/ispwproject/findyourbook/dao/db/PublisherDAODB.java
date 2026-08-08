@@ -36,16 +36,17 @@ public class PublisherDAODB implements PublisherDAO {
                 if (rs.next()) {
                     LocalDate regDate = rs.getDate("data_registrazione") != null ? rs.getDate("data_registrazione").toLocalDate() : LocalDate.now(java.time.ZoneId.systemDefault());
 
-                    return new Publisher(
+                    Publisher publisher = new Publisher(
                             rs.getInt("id"),
                             rs.getString("nome"),
                             rs.getString("cognome"),
                             rs.getString("username"),
                             rs.getString("email"),
                             rs.getString("password"),
-                            regDate,
                             rs.getString("descrizione")
                     );
+                    publisher.setRegistrationDate(regDate);
+                    return publisher;
                 }
             }
         } catch (SQLException e) {

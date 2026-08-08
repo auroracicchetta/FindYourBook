@@ -1,7 +1,6 @@
 package it.ispwproject.findyourbook.model;
 
 import it.ispwproject.findyourbook.enumerator.Role;
-import java.time.LocalDate;
 
 public class Publisher extends User {
 
@@ -11,8 +10,8 @@ public class Publisher extends User {
         super();
     }
 
-    public Publisher(int id, String name, String surname, String username, String email, String password, LocalDate registrationDate, String description) {
-        super(id, name, surname, username, email, password, registrationDate, Role.PUBLISHER);
+    public Publisher(int id, String name, String surname, String username, String email, String password, String description) {
+        super(id, name, surname, username, email, password, Role.PUBLISHER);
         this.description = description;
     }
 

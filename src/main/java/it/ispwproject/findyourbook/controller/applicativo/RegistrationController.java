@@ -48,12 +48,11 @@ public class RegistrationController {
         String email = bean.getEmail();
 
         if (bean.getRole() == Role.PUBLISHER) {
-            user = new Publisher(0, bean.getName(), bean.getSurname(), bean.getUsername(),
-                    email, hashedPassword, regDate, bean.getDescription());
+            user = new Publisher(0, bean.getName(), bean.getSurname(), bean.getUsername(), email, hashedPassword, bean.getDescription());
         } else {
-            user = new Reader(0, bean.getName(), bean.getSurname(), bean.getUsername(),
-                    email, hashedPassword, regDate, bean.getBirthDate());
+            user = new Reader(0, bean.getName(), bean.getSurname(), bean.getUsername(), email, hashedPassword, bean.getBirthDate());
         }
+        user.setRegistrationDate(regDate);
 
         registrationDAO.save(user);
 

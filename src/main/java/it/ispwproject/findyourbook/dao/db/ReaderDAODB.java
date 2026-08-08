@@ -32,16 +32,17 @@ public class ReaderDAODB implements ReaderDAO {
                     LocalDate regDate = rs.getDate("data_registrazione") != null ? rs.getDate("data_registrazione").toLocalDate() : LocalDate.now(java.time.ZoneId.systemDefault());
                     LocalDate birthDate = rs.getDate("data_nascita") != null ? rs.getDate("data_nascita").toLocalDate() : null;
 
-                    return new Reader(
+                    Reader reader = new Reader(
                             rs.getInt("id"),
                             rs.getString("nome"),
                             rs.getString("cognome"),
                             rs.getString("username"),
                             rs.getString("email"),
                             rs.getString("password"),
-                            regDate,
                             birthDate
                     );
+                    reader.setRegistrationDate(regDate);
+                    return reader;
                 }
             }
         } catch (SQLException e) {

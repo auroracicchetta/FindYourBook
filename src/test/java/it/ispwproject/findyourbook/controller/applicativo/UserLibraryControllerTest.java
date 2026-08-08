@@ -41,7 +41,8 @@ class UserLibraryControllerTest {
         DemoDataStore.reset();
         DAOFactory.setPersistence(DAOFactory.MEMORY);
 
-        reader = new Reader(1, "Mario", "Rossi", "mario", "mario@test.it", "hash", LocalDate.now(), LocalDate.of(1995, Month.MAY, 20));
+        reader = new Reader(1, "Mario", "Rossi", "mario", "mario@test.it", "hash", LocalDate.of(1995, Month.MAY, 20));
+        reader.setRegistrationDate(LocalDate.now());
         SessionManager.getInstance().setLoggedUser(reader);
 
         userLibraryController = new UserLibraryController();
