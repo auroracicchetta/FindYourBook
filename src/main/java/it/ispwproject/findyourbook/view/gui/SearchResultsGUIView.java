@@ -89,8 +89,7 @@ public class SearchResultsGUIView extends DashboardGUIView {
                 try {
                     statusEnum = ReadingStatus.valueOf(newStatusStr);
                 } catch (IllegalArgumentException ignored) {
-
-
+                    // Stringa non riconosciuta: statusEnum resta null, gestito come fallback dal chiamante.
                 }
             }
         }
