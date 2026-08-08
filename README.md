@@ -1,6 +1,10 @@
-## FindYourBook
-Developed for the Software Engineering and Web Design course, University of Rome Tor Vergata.
+<p align="center">
+  <img src="src/main/resources/icons/findyourbook_icon_256.png" width="160">
+</p>
 
+<h1 align="center">FindYourBook</h1>
+
+<p align="center">Developed for the Software Engineering and Web Design course, University of Rome Tor Vergata.</p>
 
 ## Description
 FindYourBook is a Java-based educational and book-management platform that connects readers, allows them to search for books by various criteria, manage their personal library statuses (To Read, Reading, Read), and track reading activities.
