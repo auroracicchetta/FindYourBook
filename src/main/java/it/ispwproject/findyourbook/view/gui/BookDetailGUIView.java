@@ -17,6 +17,14 @@ import static java.io.File.separator;
 
 public class BookDetailGUIView extends DashboardGUIView {
 
+
+    // Tutti gli 11 parametri sono usati davvero (nessuno morto/inutile): sono le
+    // callback delle azioni disponibili su questa schermata (navbar, rating,
+    // cambio stato, navigazione indietro) piu' i dati del libro da mostrare.
+    // Stesso caso di Event nel progetto NightFlow di una collega: parametri
+    // genuinamente necessari, nessun refactoring li riduce senza aggiungere
+    // complessita' sproporzionata al problema.
+    @SuppressWarnings("java:S107")
     public VBox buildRoot(String username, BookBean book, ReadingStatus currentStatus,
                           Consumer<String> onStatusChange, IntConsumer onRate,
                           Runnable onBack, Runnable onHomeClick,
