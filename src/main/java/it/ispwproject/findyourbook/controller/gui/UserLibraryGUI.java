@@ -32,7 +32,7 @@ public class UserLibraryGUI {
     private final UserLibraryController userLibraryController;
     private final String username;
     private final Runnable onLogout;
-    private static ReadingStatus currentFilter = null;
+    private ReadingStatus currentFilter = null;
 
     public UserLibraryGUI(Stage stage, String username, Runnable onLogout) {
         this.stage = stage;
@@ -44,6 +44,16 @@ public class UserLibraryGUI {
     }
 
     public void show() {
+        // "Retrieve total read count" e "Check inactive READING books" leggono dati
+        // indipendenti (libri READ vs libri READING) dallo stesso store: non c'e'
+        // motivo per cui una debba aspettare l'altra. Vengono quindi eseguite in
+        // parallelo (fork) e si attende il completamento di ENTRAMBE (join) prima
+        // di costruire la UI, invece di eseguirle in sequenza come prima.
+        // synchronized su ConnectionFactory.class: i due task girano su thread
+        // DAVVERO paralleli (fork resta genuino), ma condividono la stessa
+        // Connection JDBC cache in ConnectionFactory, che non e' sicura se usata
+        // da piu' thread nello stesso istante. Si serializza solo la sezione che
+        // tocca il database, non l'intero task.
         CompletableFuture<Integer> readCountFuture = CompletableFuture.supplyAsync(() -> {
             synchronized (ConnectionFactory.class) {
                 try {
@@ -61,6 +71,8 @@ public class UserLibraryGUI {
             }
         });
 
+        // Join: il thread della GUI attende che entrambi i task siano completati
+        // prima di proseguire con la costruzione della vista.
         CompletableFuture.allOf(readCountFuture, inactiveReadingFuture).join();
         int readCount = readCountFuture.join();
 
@@ -90,7 +102,7 @@ public class UserLibraryGUI {
     }
 
     private void loadBooksByStatus(ReadingStatus status) {
-        updateCurrentFilter(status); // Richiama il metodo statico invece di assegnarlo direttamente
+        updateCurrentFilter(status);
         view.setActiveButton(status);
         AppLogger.logInfo("Richiesti libri per lo stato: " + status.name());
 
@@ -116,8 +128,7 @@ public class UserLibraryGUI {
                         () -> new BookDetailGUI(stage, this.username, onLogout, book, status,
                                 () -> new UserLibraryGUI(stage, this.username, onLogout).show(),
                                 "a I miei libri"
-                        ).show(),
-                        false // niente Alert bloccante: qui la rimozione usa il banner "Annulla" col timer
+                        ).show()
                 );
                 bookCards.add(card);
             }

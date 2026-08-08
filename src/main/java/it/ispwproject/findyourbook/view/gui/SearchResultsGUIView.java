@@ -62,7 +62,6 @@ public class SearchResultsGUIView extends DashboardGUIView {
                         book.setRating(rating);
                     },
                     () -> onBookClick.accept(book),
-                    true,
                     false
             );
             grid.getChildren().add(card);

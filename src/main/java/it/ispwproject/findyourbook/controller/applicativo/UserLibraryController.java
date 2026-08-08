@@ -1,7 +1,6 @@
 package it.ispwproject.findyourbook.controller.applicativo;
 
 import it.ispwproject.findyourbook.bean.BookBean;
-import it.ispwproject.findyourbook.bean.ReaderBean;
 import it.ispwproject.findyourbook.dao.DAOFactory;
 import it.ispwproject.findyourbook.dao.ReaderDAO;
 import it.ispwproject.findyourbook.enumerator.ReadingStatus;

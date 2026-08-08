@@ -58,17 +58,15 @@ public abstract class DashboardGUIView {
     }
 
     public VBox buildBookCard(String sectionTitle, BookBean book, String currentStatus, Consumer<String> onStatusChange, IntConsumer onRate, Runnable onClick) {
-        return buildBookCard(sectionTitle, book, currentStatus, onStatusChange, onRate, onClick, true, true);
+        return buildBookCard(sectionTitle, book, currentStatus, onStatusChange, onRate, onClick, true);
     }
 
-    // confirmBeforeRemove = false: niente Alert bloccante, "Rimuovi libro" chiama
-    // subito onStatusChange (usato dalla schermata con popup+timer di annullamento).
-    public VBox buildBookCard(String sectionTitle, BookBean book, String currentStatus, Consumer<String> onStatusChange, IntConsumer onRate, Runnable onClick, boolean confirmBeforeRemove) {
-        return buildBookCard(sectionTitle, book, currentStatus, onStatusChange, onRate, onClick, confirmBeforeRemove, true);
-    }
-
-    public VBox buildBookCard(String sectionTitle, BookBean book, String currentStatus, Consumer<String> onStatusChange, IntConsumer onRate, Runnable onClick, boolean confirmBeforeRemove, boolean showRemoveOption) {
-        VBox card = new VBox(10);
+    // showRemoveOption = false: la voce "Rimuovi libro" non compare proprio nel menu
+    // (usato dalle schermate diverse dalla Libreria personale, dove la rimozione
+    // protetta dal timer non deve essere raggiungibile). La rimozione passa sempre
+    // dall'icona dedicata (mai dal menu di stato), quindi non serve piu' distinguere
+    // un "confirmBeforeRemove": e' rimasto solo showRemoveOption.
+    public VBox buildBookCard(String sectionTitle, BookBean book, String currentStatus, Consumer<String> onStatusChange, IntConsumer onRate, Runnable onClick, boolean showRemoveOption) {    VBox card = new VBox(10);
         card.setStyle("-fx-background-color: #FFFFFF; -fx-background-radius: 12; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 3);");
         card.setPrefWidth(320);
         card.setMaxWidth(320);
