@@ -82,6 +82,14 @@ public class UserLibraryCLIView {
         return CLIRenderer.chiediScelta("Inserisci un voto", 1, 5);
     }
 
+    // Equivalente CLI del countdown di conferma della GUI (confirmRemovalWithCountdown):
+    // in un terminale un vero timer non è praticabile, quindi la conferma esplicita
+    // richiesta dall'estensione 9b diventa una domanda sì/no bloccante (stesso
+    // pattern usato dalle colleghe per le loro conferme in CLI, es. chiediConferma).
+    public boolean askConfirmRemoval(String title) {
+        return CLIRenderer.chiediConferma("Confermi la rimozione di \"" + title + "\" dalla libreria?");
+    }
+
     public void showMessage(String msg) {
         CLIRenderer.messaggio(msg);
     }

@@ -6,6 +6,7 @@ import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
 
 import java.sql.SQLException;
 
@@ -24,6 +25,7 @@ public class MainGUI extends Application {
     public void start(Stage stage) {
         setPrimaryStage(stage);
         stage.setTitle("Find Your Book");
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/findyourbook_icon_256.png")));
         stage.setWidth(WINDOW_WIDTH);
         stage.setHeight(WINDOW_HEIGHT);
         stage.setMinWidth(WINDOW_WIDTH);
