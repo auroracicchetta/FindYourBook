@@ -4,8 +4,6 @@
 
 <h1 align="center">FindYourBook</h1>
 
-<p align="center"><i>La tua libreria a portata di terminale!</i></p>
-
 <p align="center">Developed for the Software Engineering and Web Design course, University of Rome Tor Vergata.</p>
 
 ## Description
