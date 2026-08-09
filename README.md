@@ -4,12 +4,15 @@
 
 <h1 align="center">FindYourBook</h1>
 
+<p align="center"><i>La tua libreria a portata di terminale!</i></p>
+
 <p align="center">Developed for the Software Engineering and Web Design course, University of Rome Tor Vergata.</p>
 
 ## Description
-FindYourBook is a Java-based educational and book-management platform that connects readers, allows them to search for books by various criteria, manage their personal library statuses (To Read, Reading, Read), and track reading activities.
-Readers can search for books, manage their personal library and reading statuses, and track reading progress.
-Publishing House (Casa Editrice) can manage the catalogue, publish new books, and view statistics on how many times the books in their catalogue have been read by application users.
+FindYourBook is a Java-based book-management platform that connects readers and publishing houses. Readers can search the catalogue by title, author or genre, manage their personal library (To Read / Reading / Read), rate books, and track their reading progress. Publishing houses can manage their catalogue, publish new books, and view statistics on how many times their books have been read. The application supports both a graphical interface (JavaFX) and a command-line interface, with email notifications sent on registration, new book publications, reading goals achieved and reading-inactivity reminders.
+
+* Readers can search for books, manage their personal library and reading statuses, and receive email notifications
+* Publishing houses can manage their catalogue, publish new books and monitor reading statistics
 
 ## Tecnologies
 * Java 17
@@ -19,7 +22,7 @@ Publishing House (Casa Editrice) can manage the catalogue, publish new books, an
 * SendGrid API (notifiche email)
 
 ## Architecture
-BCE (Boundary-Control-Entity)- **MVC** (Model-View-Controller) pattern with clear separation between:
+BCE (Boundary-Control-Entity) - **MVC** (Model-View-Controller) pattern with clear separation between:
 * `controller/applicativo` — business logic
 * `controller/cli` — CLI user interface
 * `controller/gui` — GUI user interface
@@ -30,41 +33,47 @@ BCE (Boundary-Control-Entity)- **MVC** (Model-View-Controller) pattern with clea
 * `bean` — data transfer objects
 * `pattern` — GoF patterns (Singleton, Observer, State)
 
-The system supports three persistence mode:
+The system supports three persistence modes:
 * **DATABASE** — MySQL (full-version)
-* **FILE/JSON** — full-version
-* **MEMORY** — in-memory / demo-version (used in unit tests as well)
-
+* **FILE** — JSON (full-version)
+* **MEMORY** — in-memory (demo-version)
 
 ## Getting started
 At startup, the application asks to select the persistence mode:
 
-** Demo → simulated in-memory data
-** Database → MySQL persistence
-** File → JSON file persistence
+* Demo → simulated in-memory data
+* Database → MySQL persistence
+* File → JSON file persistence
 
-** Then, the interface must be selected:
+Then, the interface must be selected:
 
-** CLI → text-based interface
-** GUI → graphical interface
-**To use the database mode, create and configure the following file: 
+* CLI → text-based interface
+* GUI → graphical interface
 
-`src/main/resources/db.properties` 
-with the following structure:
+To use the database mode:
+
+1. Run `database/findyourbook.sql` on MySQL. It creates the `findyourbookdb` schema, seeds the demo accounts and catalogue, and creates two scoped MySQL users (`fyb_reader`, `fyb_publisher`) used after login. **Before running it**, replace the two placeholder passwords in the script (`CAMBIAMI_reader` / `CAMBIAMI_publisher`) with passwords of your choice.
+2. Create and configure `src/main/resources/db.properties` with the following structure, using the **same** reader/publisher passwords chosen in step 1:
 
 ```properties
 CONNECTION_URL=jdbc:mysql://localhost:3306/findyourbookdb
 LOGIN_USER=root
 LOGIN_PASS=
+
+READER_USER=fyb_reader
+READER_PASS=reader123
+PUBLISHER_USER=fyb_publisher
+PUBLISHER_PASS=publisher123
+
 SENDGRID_API_KEY=TUA_API_KEY
 SENDGRID_FROM_EMAIL=findyourbook.support@gmail.com
 ```
 
-⚠️ The db.properties file includes database credentials and a placeholder for the SendGrid API key. Email notifications in action can be seen in the project demo video.
+⚠️ The `db.properties` file includes database credentials and a placeholder for the SendGrid API key. Email notifications in action can be seen in the project demo video.
 
 ## Demo credentials
 
-| Role | Email | Password |
+| Role | Username | Password |
 | :--- | :--- | :--- |
 | Reader | `mario` | qualsiasi |
 | Publisher | `mondadori` | qualsiasi |
@@ -76,9 +85,7 @@ SENDGRID_FROM_EMAIL=findyourbook.support@gmail.com
 | Reader | `mario` | Password123! |
 | Publisher | `mondadori` | Password123! |
 
-Other test accounts available, see findyourbook_db.sql for the full list.
+Other test accounts available, see `database/findyourbook.sql` for the full list.
 
 ## Author
 Cicchetta Aurora
-
-  
