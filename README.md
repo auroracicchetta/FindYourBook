@@ -48,21 +48,19 @@ Then, the interface must be selected:
 * CLI → text-based interface
 * GUI → graphical interface
 
-To use the database mode:
+To use the database mode, create and configure the following file:
 
-1. Run `database/findyourbook.sql` on MySQL. It creates the `findyourbookdb` schema, seeds the demo accounts and catalogue, and creates two scoped MySQL users (`fyb_reader`, `fyb_publisher`) used after login. **Before running it**, replace the two placeholder passwords in the script (`CAMBIAMI_reader` / `CAMBIAMI_publisher`) with passwords of your choice.
-2. Create and configure `src/main/resources/db.properties` with the following structure, using the **same** reader/publisher passwords chosen in step 1:
+`src/main/resources/db.properties`
+with the following content:
 
 ```properties
 CONNECTION_URL=jdbc:mysql://localhost:3306/findyourbookdb
 LOGIN_USER=root
 LOGIN_PASS=
-
 READER_USER=fyb_reader
 READER_PASS=reader123
 PUBLISHER_USER=fyb_publisher
 PUBLISHER_PASS=publisher123
-
 SENDGRID_API_KEY=TUA_API_KEY
 SENDGRID_FROM_EMAIL=findyourbook.support@gmail.com
 ```
