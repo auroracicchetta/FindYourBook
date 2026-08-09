@@ -156,6 +156,7 @@ public class NotificationService {
         // Il template HTML grafico (Sfondo beige EFE8D8)
         String htmlBody = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.05);\">" +
                 "<div style=\"background-color: #EFE8D8; color: #2c3e50; padding: 20px; text-align: center;\">" +
+                "<img src=\"https://raw.githubusercontent.com/auroracicchetta/FindYourBook/main/src/main/resources/icons/findyourbook_icon_256.png\" width=\"60\" style=\"display:block; margin:0 auto 10px;\">" +
                 "<h1 style=\"margin: 0;\">FindYourBook</h1>" +
                 "</div>" +
                 "<div style=\"padding: 30px; color: #333333; line-height: 1.6; font-size: 16px;\">" +
