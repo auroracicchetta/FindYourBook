@@ -84,4 +84,4 @@ SENDGRID_FROM_EMAIL=findyourbook.support@gmail.com
 Other test accounts available, see `database/findyourbook.sql` for the full list.
 
 ## Author
-Cicchetta Aurora
+Aurora Cicchetta
