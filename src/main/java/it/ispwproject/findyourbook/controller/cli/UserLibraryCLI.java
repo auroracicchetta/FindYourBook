@@ -94,39 +94,8 @@ public class UserLibraryCLI extends AbstractCLIState {
 
             switch (action) {
                 case "1" -> back = handleBookAction(book, currentList);
-                case "2" -> {
-                    int rating = view.askRating();
-                    if (rating >= 1 && rating <= 5) {
-                        try {
-                            userLibraryController.rateBook(book, rating);
-                            book.setRating(rating);
-                            view.showMessage("Voto inserito con successo!");
-                        } catch (Exception e) {
-                            view.showMessage("Errore: " + e.getMessage());
-                        }
-                    } else {
-                        view.showMessage("Voto non valido. Deve essere compreso tra 1 e 5.");
-                    }
-                }
-                case "3" -> {
-                    // Estensione 9b della relazione: la rimozione richiede una conferma
-                    // esplicita. In CLI non c'è un countdown vero (non praticabile in
-                    // terminale), quindi la conferma è una domanda sì/no bloccante:
-                    // se il Reader risponde "no" il libro resta in libreria e si torna
-                    // al menu di gestione, esattamente come nel timeout della GUI.
-                    if (view.askConfirmRemoval(book.getTitle())) {
-                        try {
-                            userLibraryController.removeBookFromLibrary(book);
-                            view.showMessage("Libro rimosso dalla libreria.");
-                            currentList.remove(book);
-                            back = true;
-                        } catch (Exception e) {
-                            view.showMessage("Errore durante la rimozione: " + e.getMessage());
-                        }
-                    } else {
-                        view.showMessage("Rimozione annullata: il libro resta nella libreria.");
-                    }
-                }
+                case "2" -> handleRating(book);
+                case "3" -> back = handleRemoval(book, currentList);
                 case "0" -> back = true;
                 default -> view.showMessage("Azione non riconosciuta.");
             }
@@ -149,5 +118,41 @@ public class UserLibraryCLI extends AbstractCLIState {
             view.showMessage("Stato non valido.");
         }
         return false;
+    }
+
+    private void handleRating(BookBean book) {
+        int rating = view.askRating();
+        if (rating < 1 || rating > 5) {
+            view.showMessage("Voto non valido. Deve essere compreso tra 1 e 5.");
+            return;
+        }
+        try {
+            userLibraryController.rateBook(book, rating);
+            book.setRating(rating);
+            view.showMessage("Voto inserito con successo!");
+        } catch (Exception e) {
+            view.showMessage("Errore: " + e.getMessage());
+        }
+    }
+
+    private boolean handleRemoval(BookBean book, List<BookBean> currentList) {
+        // Estensione 9b della relazione: la rimozione richiede una conferma
+        // esplicita. In CLI non c'è un countdown vero (non praticabile in
+        // terminale), quindi la conferma è una domanda sì/no bloccante:
+        // se il Reader risponde "no" il libro resta in libreria e si torna
+        // al menu di gestione, esattamente come nel timeout della GUI.
+        if (!view.askConfirmRemoval(book.getTitle())) {
+            view.showMessage("Rimozione annullata: il libro resta nella libreria.");
+            return false;
+        }
+        try {
+            userLibraryController.removeBookFromLibrary(book);
+            view.showMessage("Libro rimosso dalla libreria.");
+            currentList.remove(book);
+            return true;
+        } catch (Exception e) {
+            view.showMessage("Errore durante la rimozione: " + e.getMessage());
+            return false;
+        }
     }
 }
