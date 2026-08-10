@@ -11,7 +11,6 @@ import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
 import it.ispwproject.findyourbook.util.PasswordUtils; // <-- AGGIUNTO IMPORT
 import it.ispwproject.findyourbook.util.logger.AppLogger;
 
-import java.sql.SQLException;
 
 public class LoginController {
 
@@ -59,12 +58,7 @@ public class LoginController {
         // aprire una connessione MySQL non necessaria, rompendo un login che
         // altrimenti funzionerebbe anche senza database raggiungibile.
         if (!DAOFactory.MEMORY.equalsIgnoreCase(DAOFactory.getPersistence())) {
-            try {
-                ConnectionFactory.changeRole(credentials.getRole());
-            } catch (SQLException e) {
-                AppLogger.logError("[LoginController] Errore nel cambio di credenziali database per ruolo: " + e.getMessage());
-                throw new LoginException("Errore di connessione al database durante il login. Riprova più tardi.");
-            }
+            ConnectionFactory.changeRole(credentials.getRole());
         }
 
         return switch (credentials.getRole()) {

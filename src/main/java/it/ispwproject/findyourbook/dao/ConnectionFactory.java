@@ -60,11 +60,11 @@ public class ConnectionFactory {
         return DriverManager.getConnection(url, user, pass);
     }
 
-    public static synchronized void changeRole(Role role) throws SQLException {
+    public static synchronized void changeRole(Role role){
         currentRole = role;
     }
 
-    public static synchronized void clearRole() throws SQLException {
+    public static synchronized void clearRole(){
         currentRole = null;
     }
 }

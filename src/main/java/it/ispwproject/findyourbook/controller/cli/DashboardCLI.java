@@ -3,9 +3,7 @@ package it.ispwproject.findyourbook.controller.cli;
 import it.ispwproject.findyourbook.dao.ConnectionFactory;
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
 import it.ispwproject.findyourbook.pattern.state.AbstractCLIState;
-import it.ispwproject.findyourbook.util.logger.AppLogger;
 
-import java.sql.SQLException;
 
 /**
  * Classe base comune alle dashboard CLI con sessione utente attiva
@@ -20,10 +18,6 @@ public abstract class DashboardCLI extends AbstractCLIState {
 
     protected void logout() {
         SessionManager.getInstance().clearSession();
-        try {
-            ConnectionFactory.clearRole();
-        } catch (SQLException e) {
-            AppLogger.logError("Errore durante il reset delle credenziali DB al logout: " + e.getMessage());
-        }
+        ConnectionFactory.clearRole();
     }
 }

@@ -8,7 +8,6 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
 
-import java.sql.SQLException;
 
 public class MainGUI extends Application {
 
@@ -64,11 +63,7 @@ public class MainGUI extends Application {
 
         Runnable onLogout = () -> {
             SessionManager.getInstance().clearSession();
-            try {
-                ConnectionFactory.clearRole();
-            } catch (SQLException e) {
-                AppLogger.logError("Errore durante il reset delle credenziali DB al logout: " + e.getMessage());
-            }
+            ConnectionFactory.clearRole();
             showLogin();
         };
 
@@ -101,11 +96,7 @@ public class MainGUI extends Application {
 
         Runnable onLogout = () -> {
             SessionManager.getInstance().clearSession();
-            try {
-                ConnectionFactory.clearRole();
-            } catch (SQLException e) {
-                AppLogger.logError("Errore durante il reset delle credenziali DB al logout: " + e.getMessage());
-            }
+            ConnectionFactory.clearRole();
             showLogin();
         };
 
