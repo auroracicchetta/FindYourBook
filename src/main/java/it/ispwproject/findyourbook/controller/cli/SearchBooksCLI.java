@@ -43,23 +43,22 @@ public class SearchBooksCLI extends AbstractCLIState {
 
             userLibraryController.syncBooksWithDatabase(results);
 
-            view.showResults(results);
-            int choice = view.askBookChoice(results.size());
+            boolean newSearch = false;
+            while (!newSearch) {
+                view.showResults(results);
+                int choice = view.askBookChoice(results.size());
 
-            if (choice == 0) {
-                repeat(context);
-                return;
+                if (choice == 0) {
+                    newSearch = true;
+                } else if (choice < 1 || choice > results.size()) {
+                    view.showMessage("Scelta non valida.");
+                } else {
+                    BookBean selectedBook = results.get(choice - 1);
+                    manageBook(selectedBook);
+                }
             }
 
-            if (choice < 1 || choice > results.size()) {
-                view.showMessage("Scelta non valida.");
-                repeat(context);
-                return;
-            }
-
-            BookBean selectedBook = results.get(choice - 1);
-
-            manageBook(selectedBook, context);
+            repeat(context);
 
         } catch (Exception e) {
             view.showMessage("Errore durante la ricerca: " + e.getMessage());
@@ -67,7 +66,7 @@ public class SearchBooksCLI extends AbstractCLIState {
         }
     }
 
-    private void manageBook(BookBean book, CLIStateMachine context) {
+    private void manageBook(BookBean book) {
         boolean back = false;
         while (!back) {
             view.showBookDetails(book);
@@ -77,23 +76,22 @@ public class SearchBooksCLI extends AbstractCLIState {
                 case "1" -> handleBookAction(book);
                 case "2" -> {
                     int rating = view.askRating();
-                    if (rating >= 1 && rating <= 5) {
+                    if (rating == 0) {
+                        view.showMessage("Operazione annullata.");
+                    } else {
                         try {
                             userLibraryController.rateBook(book, rating);
+                            book.setRating(rating);
                             view.showMessage("Voto inserito con successo!");
                         } catch (Exception e) {
                             view.showMessage("Errore nell'inserimento del voto: " + e.getMessage());
                         }
-                    } else {
-                        view.showMessage("Voto non valido. Deve essere compreso tra 1 e 5.");
                     }
                 }
                 case "0" -> back = true;
                 default -> view.showMessage("Azione non riconosciuta.");
             }
         }
-
-        repeat(context);
     }
 
     private void handleBookAction(BookBean book) {
@@ -108,7 +106,7 @@ public class SearchBooksCLI extends AbstractCLIState {
                 view.showMessage("Errore nell'aggiornamento: " + e.getMessage());
             }
         } else {
-            view.showMessage("Stato non valido.");
+            view.showMessage("Operazione annullata.");
         }
     }
 }

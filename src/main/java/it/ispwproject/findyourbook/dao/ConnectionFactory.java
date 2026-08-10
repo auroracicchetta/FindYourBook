@@ -16,7 +16,6 @@ public class ConnectionFactory {
 
     private static final Properties props = new Properties();
 
-    private static Connection connection;
     private static Role currentRole;
 
     static {
@@ -30,7 +29,18 @@ public class ConnectionFactory {
         }
     }
 
-    private static void initConnection() throws SQLException {
+    // Prima questo metodo restituiva sempre la STESSA connessione statica
+    // condivisa, riaperta solo se risultava chiusa. I DAO la chiudono sempre
+    // in try-with-resources a fine query: va bene se le chiamate sono
+    // sequenziali, ma se due thread (es. il fork+join di UserLibraryCLI/GUI,
+    // fatto apposta per rispecchiare il vero parallelismo dell'Activity
+    // Diagram) la usano insieme, uno la chiude mentre l'altro la sta ancora
+    // usando ("No operations allowed after connection closed"). Ora ogni
+    // chiamata apre una connessione MySQL nuova e indipendente: costa una
+    // connessione fisica in piu' per query invece di riusarne una sola, ma
+    // elimina la race condition e permette al fork+join di restare davvero
+    // parallelo senza rischi.
+    public static synchronized Connection getConnection() throws SQLException {
         String url = props.getProperty("CONNECTION_URL");
         String user;
         String pass;
@@ -47,28 +57,14 @@ public class ConnectionFactory {
             throw new SQLException("Credenziali mancanti per il ruolo: " + currentRole);
         }
 
-        connection = DriverManager.getConnection(url, user, pass);
-    }
-
-    public static synchronized Connection getConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            initConnection();
-        }
-        return connection;
+        return DriverManager.getConnection(url, user, pass);
     }
 
     public static synchronized void changeRole(Role role) throws SQLException {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
-        }
         currentRole = role;
-        initConnection();
     }
 
     public static synchronized void clearRole() throws SQLException {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
-        }
         currentRole = null;
     }
 }

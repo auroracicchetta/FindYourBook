@@ -46,16 +46,22 @@ public class SearchByGenreCLI extends AbstractCLIState {
 
             userLibraryController.syncBooksWithDatabase(results);
 
-            resultsView.showResults(results);
-            int choice = resultsView.askBookChoice(results.size());
+            boolean exitResults = false;
+            while (!exitResults) {
+                resultsView.showResults(results);
+                int choice = resultsView.askBookChoice(results.size());
 
-            if (choice == 0) {
-                goBack(context);
-                return;
+                if (choice == 0) {
+                    exitResults = true;
+                } else if (choice < 1 || choice > results.size()) {
+                    resultsView.showError("Scelta non valida.");
+                } else {
+                    BookBean selectedBook = results.get(choice - 1);
+                    manageBook(selectedBook);
+                }
             }
 
-            BookBean selectedBook = results.get(choice - 1);
-            manageBook(selectedBook, context);
+            repeat(context);
 
         } catch (Exception e) {
             resultsView.showError("Errore durante la ricerca per genere: " + e.getMessage());
@@ -63,7 +69,7 @@ public class SearchByGenreCLI extends AbstractCLIState {
         }
     }
 
-    private void manageBook(BookBean book, CLIStateMachine context) {
+    private void manageBook(BookBean book) {
         boolean back = false;
         while (!back) {
             resultsView.showBookDetails(book);
@@ -73,20 +79,22 @@ public class SearchByGenreCLI extends AbstractCLIState {
                 case "1" -> handleBookAction(book);
                 case "2" -> {
                     int rating = resultsView.askRating();
-                    try {
-                        userLibraryController.rateBook(book, rating);
-                        resultsView.showMessage("Voto inserito con successo!");
-                        book.setRating(rating);
-                    } catch (Exception e) {
-                        resultsView.showError("Errore nell'inserimento del voto: " + e.getMessage());
+                    if (rating == 0) {
+                        resultsView.showMessage("Operazione annullata.");
+                    } else {
+                        try {
+                            userLibraryController.rateBook(book, rating);
+                            resultsView.showMessage("Voto inserito con successo!");
+                            book.setRating(rating);
+                        } catch (Exception e) {
+                            resultsView.showError("Errore nell'inserimento del voto: " + e.getMessage());
+                        }
                     }
                 }
                 case "0" -> back = true;
                 default -> resultsView.showError("Azione non riconosciuta.");
             }
         }
-
-        repeat(context);
     }
 
     private void handleBookAction(BookBean book) {
@@ -100,6 +108,8 @@ public class SearchByGenreCLI extends AbstractCLIState {
             } catch (Exception e) {
                 resultsView.showError("Errore nell'aggiornamento: " + e.getMessage());
             }
+        } else {
+            resultsView.showMessage("Operazione annullata.");
         }
     }
 }

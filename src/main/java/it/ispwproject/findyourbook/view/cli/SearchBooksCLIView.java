@@ -34,8 +34,6 @@ public class SearchBooksCLIView {
         CLIRenderer.campo("Titolo", book.getTitle());
         CLIRenderer.campo("Autore", book.getAuthor());
         CLIRenderer.campo("Genere", book.getGenre());
-
-        // ECCO LA TRAMA CHE MANCAVA!
         CLIRenderer.campo("Trama", book.getDescription());
 
         String status = book.getStatus() != null ? book.getStatus().getDisplayName() : "Nessuno";
@@ -52,26 +50,24 @@ public class SearchBooksCLIView {
         return CLIRenderer.chiediSceltaStringa("Scelta");
     }
 
-    // "Rimuovi" non compare qui volutamente: la rimozione dai preferiti resta
-    // confinata alla sola sezione Libreria (UserLibraryCLI/UserLibraryCLIView),
-    // esattamente come nella GUI (vedi i commenti in DashboardGUIView).
     public String askStatus() {
         CLIRenderer.sezione("Scegli il nuovo stato");
         CLIRenderer.voceMenu(1, "Da leggere");
         CLIRenderer.voceMenu(2, "In lettura");
         CLIRenderer.voceMenu(3, "Letto");
+        CLIRenderer.voceMenuZero("Annulla");
 
-        String choice = CLIRenderer.chiediSceltaStringa("Scelta");
+        int choice = CLIRenderer.chiediScelta("Scelta", 0, 3);
         return switch (choice) {
-            case "1" -> "TO_READ";
-            case "2" -> "READING";
-            case "3" -> "READ";
-            default -> null;
+            case 1 -> "TO_READ";
+            case 2 -> "READING";
+            case 3 -> "READ";
+            default -> null; // choice == 0, annullamento esplicito
         };
     }
 
     public int askRating() {
-        return CLIRenderer.chiediScelta("Inserisci un voto", 1, 5);
+        return CLIRenderer.chiediScelta("Inserisci un voto (0 per annullare)", 0, 5);
     }
 
     public void showMessage(String msg) {

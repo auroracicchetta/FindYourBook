@@ -22,11 +22,6 @@ public class UserLibraryCLI extends AbstractCLIState {
     public void entry(CLIStateMachine context) {
         String username = SessionManager.getInstance().getLoggedUser().getUsername();
 
-        // Stesso fork+join genuino della GUI (UserLibraryGUI.show()): "Retrieve total
-        // read count" e "Check inactive reading" leggono dati indipendenti, vengono
-        // eseguiti in parallelo (fork) e si attende il completamento di ENTRAMBI (join)
-        // prima di mostrare l'header. Cosi' anche la realizzazione CLI del caso d'uso
-        // esegue davvero il passo previsto dall'Activity Diagram, non solo la GUI.
         CompletableFuture<Integer> readCountFuture = CompletableFuture.supplyAsync(() -> {
             try {
                 return bookController.getFavoriteBooks(username, ReadingStatus.READ).size();
@@ -115,15 +110,15 @@ public class UserLibraryCLI extends AbstractCLIState {
                 view.showMessage("Errore aggiornamento: " + e.getMessage());
             }
         } else {
-            view.showMessage("Stato non valido.");
+            view.showMessage("Operazione annullata.");
         }
         return false;
     }
 
     private void handleRating(BookBean book) {
         int rating = view.askRating();
-        if (rating < 1 || rating > 5) {
-            view.showMessage("Voto non valido. Deve essere compreso tra 1 e 5.");
+        if (rating == 0) {
+            view.showMessage("Operazione annullata.");
             return;
         }
         try {
@@ -136,11 +131,6 @@ public class UserLibraryCLI extends AbstractCLIState {
     }
 
     private boolean handleRemoval(BookBean book, List<BookBean> currentList) {
-        // Estensione 9b della relazione: la rimozione richiede una conferma
-        // esplicita. In CLI non c'è un countdown vero (non praticabile in
-        // terminale), quindi la conferma è una domanda sì/no bloccante:
-        // se il Reader risponde "no" il libro resta in libreria e si torna
-        // al menu di gestione, esattamente come nel timeout della GUI.
         if (!view.askConfirmRemoval(book.getTitle())) {
             view.showMessage("Rimozione annullata: il libro resta nella libreria.");
             return false;

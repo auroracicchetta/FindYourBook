@@ -18,11 +18,11 @@ public class UserLibraryCLIView {
         CLIRenderer.voceMenu(3, ReadingStatus.READ.getDisplayName());
         CLIRenderer.voceMenuZero("Torna indietro");
 
-        String choice = CLIRenderer.chiediSceltaStringa("Scelta");
+        int choice = CLIRenderer.chiediScelta("Scelta", 0, 3);
         return switch (choice) {
-            case "1" -> ReadingStatus.TO_READ;
-            case "2" -> ReadingStatus.READING;
-            case "3" -> ReadingStatus.READ;
+            case 1 -> ReadingStatus.TO_READ;
+            case 2 -> ReadingStatus.READING;
+            case 3 -> ReadingStatus.READ;
             default -> null;
         };
     }
@@ -43,7 +43,6 @@ public class UserLibraryCLIView {
     }
 
     public int askBookChoice(int max) {
-        // Usa la protezione di CLIRenderer per accettare solo numeri tra 0 e il massimo
         return CLIRenderer.chiediScelta("Seleziona il numero del libro per gestirlo (0 per tornare ai filtri)", 0, max);
     }
 
@@ -68,24 +67,22 @@ public class UserLibraryCLIView {
         CLIRenderer.voceMenu(1, "Da Leggere");
         CLIRenderer.voceMenu(2, "In Lettura");
         CLIRenderer.voceMenu(3, "Letto");
+        CLIRenderer.voceMenuZero("Annulla");
 
-        String choice = CLIRenderer.chiediSceltaStringa("Scelta");
+        int choice = CLIRenderer.chiediScelta("Scelta", 0, 3);
         return switch (choice) {
-            case "1" -> ReadingStatus.TO_READ;
-            case "2" -> ReadingStatus.READING;
-            case "3" -> ReadingStatus.READ;
+            case 1 -> ReadingStatus.TO_READ;
+            case 2 -> ReadingStatus.READING;
+            case 3 -> ReadingStatus.READ;
             default -> null;
         };
     }
 
     public int askRating() {
-        return CLIRenderer.chiediScelta("Inserisci un voto", 1, 5);
+        // 0 per annullare, stesso pattern di askNewStatus.
+        return CLIRenderer.chiediScelta("Inserisci un voto (0 per annullare)", 0, 5);
     }
 
-    // Equivalente CLI del countdown di conferma della GUI (confirmRemovalWithCountdown):
-    // in un terminale un vero timer non è praticabile, quindi la conferma esplicita
-    // richiesta dall'estensione 9b diventa una domanda sì/no bloccante (stesso
-    // pattern usato dalle colleghe per le loro conferme in CLI, es. chiediConferma).
     public boolean askConfirmRemoval(String title) {
         return CLIRenderer.chiediConferma("Confermi la rimozione di \"" + title + "\" dalla libreria?");
     }
