@@ -48,7 +48,7 @@ Then, the interface must be selected:
 * CLI → text-based interface
 * GUI → graphical interface
 
-To use the database mode, create and configure the following file:
+To use the database mode, first run `database/findyourbook.sql` on MySQL to create the schema and seed data. Then create and configure the following file:
 
 `src/main/resources/db.properties`
 with the following content:
