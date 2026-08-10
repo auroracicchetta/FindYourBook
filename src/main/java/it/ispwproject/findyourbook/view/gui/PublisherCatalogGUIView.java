@@ -60,7 +60,7 @@ public class PublisherCatalogGUIView extends DashboardGUIView {
         topBar.getChildren().addAll(backBtn, title, catalogSearchBar, spacer, profileMenu);
         root.setTop(topBar);
 
-        // 2. CENTRO (Griglia dei Libri)
+        // CENTRO (Griglia dei Libri)
         catalogGrid.setHgap(30);
         catalogGrid.setVgap(30);
         catalogGrid.setPadding(new Insets(20, 30, 30, 30));
@@ -80,10 +80,9 @@ public class PublisherCatalogGUIView extends DashboardGUIView {
     public void addCatalogCard(String title, String author, String imageUrl, Runnable onClick) {
         VBox card = new VBox(15);
         card.setStyle(FX_BACKGROUND_COLOR + CARD_BG + "; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5); -fx-cursor: hand; -fx-padding: 20;");
-        card.setPrefSize(200, 320); // Dimensioni fisse per evitare griglie disordinate
+        card.setPrefSize(200, 320);
         card.setAlignment(Pos.TOP_CENTER);
 
-        // Effetto Hover (si solleva e aumenta l'ombra)
         card.setOnMouseEntered(e -> card.setStyle(FX_BACKGROUND_COLOR + CARD_BG + "; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 8); -fx-cursor: hand; -fx-padding: 20;"));
         card.setOnMouseExited(e -> card.setStyle(FX_BACKGROUND_COLOR + CARD_BG + "; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5); -fx-cursor: hand; -fx-padding: 20;"));
         card.setOnMouseClicked(e -> onClick.run());
@@ -96,7 +95,6 @@ public class PublisherCatalogGUIView extends DashboardGUIView {
 
         if (imageUrl != null && !imageUrl.isEmpty()) {
             try {
-                // I booleani (true, true, true) indicano che l'immagine viene caricata in background!
                 coverView.setImage(new Image(imageUrl, 120, 180, true, true, true));
             } catch (Exception e) {
                 AppLogger.logError("Immagine non caricata: " + imageUrl);

@@ -129,7 +129,6 @@ public class DemoDataStore {
         books.add(createDemoBook("Il senso del dolore", "Maurizio de Giovanni", "gialli", "Napoli, anni Trenta: il celebre tenore Arnaldo Vezzi, convinto della propria intoccabilità, viene trovato assassinato nel suo camerino poco prima di uno spettacolo. Il commissario Ricciardi, capace di percepire gli spettri delle vittime e le loro ultime parole, dovrà muoversi tra superstizione, potere e gelosie per svelare la verità. Il romanzo che apre la saga delle stagioni del commissario più enigmatico della narrativa italiana.", "https://m.media-amazon.com/images/I/71HiNwZQDGL._SL1385_.jpg", "einaudi"));
         books.add(createDemoBook("Il codice da Vinci", "Dan Brown", "gialli", "Un omicidio all'interno del Museo del Louvre trascina il symbologista Robert Langford e la crittologa Sophie Neveu in una corsa rocambolesca tra Parigi e Londra. Seguendo una scia di indizi nascosti nelle opere di Leonardo da Vinci, i due scoprono un segreto religioso millenario custodito da una società segreta, braccati da un implacabile sicario dell'Opus Dei.", "https://m.media-amazon.com/images/I/71WlWEKzX8L._SL1500_.jpg", "mondadori"));
 
-
         // --- 5. AVVENTURA ---
         books.add(createDemoBook("Sandokan", "Emilio Salgari", "avventura", "Sull'isola inespugnabile di Mompracem vive Sandokan, la Tigre della Malesia, principe spodestato dagli inglesi che gli hanno sterminato la famiglia. Circondato dai suoi fedeli tigrotti e affiancato dall'inseparabile Yanez, si getta in una vita fatta di arrembaggi e battaglie, finché una ferita lo porta sulle coste di Labuan, dove incontra la bellissima Marianna. Da quel momento sarà disposto a rischiare tutto pur di farla sua regina.", "https://m.media-amazon.com/images/I/716zPhFO8cL._SL1500_.jpg", "mondadori"));
         books.add(createDemoBook("Tutti i particolari in cronaca", "Antonio Manzini", "avventura", "Walter Andretti è un giornalista precipitato dallo sport alla cronaca nera, l'ultimo posto dove avrebbe voluto lavorare. Quando il suo capo gli affida la copertura di due omicidi apparentemente slegati, Andretti si ritrova suo malgrado a indagare, inciampando in goffaggini e passi falsi. Ma dietro quelle morti si cela un legame inquietante, una stessa mano che nessuno aveva saputo vedere, e che lo costringerà a mettere in gioco più di quanto avrebbe voluto.", "https://m.media-amazon.com/images/I/71+yJKKElRL._SL1359_.jpg", "mondadori"));
@@ -169,8 +168,8 @@ public class DemoDataStore {
         books.add(createDemoBook("La biblioteca perduta dell'alchimista", "Marcello Simoni", "storici", "Sulle tracce di un'antica biblioteca alchemica scomparsa da secoli, Ignazio da Toledo si addentra in un intrigo che attraversa monasteri, corti e città portuali del Mediterraneo medievale. Tra manoscritti proibiti e società segrete, il mercante di libri dovrà affrontare nemici spietati pur di svelare un sapere che qualcuno è disposto a uccidere per proteggere.", "https://m.media-amazon.com/images/I/713sSEQCKnL.SL1499.jpg", "newton"));
         books.add(createDemoBook("L'isola dei monaci senza nome", "Marcello Simoni", "storici", "In un monastero remoto e dimenticato, un ordine di monaci privi di identità custodisce da generazioni un segreto capace di sconvolgere gli equilibri della cristianità medievale. Quando un enigmatico visitatore giunge sull'isola, antiche verità sepolte cominciano a riaffiorare, trascinando i protagonisti in un vortice di fede, potere e inganni che affonda le radici nei secoli più bui del Medioevo.", "https://m.media-amazon.com/images/I/81JLr6D+xgL.SL1500.jpg", "newton"));
         books.add(createDemoBook("La Storia", "Elsa Morante", "storici", "Roma, 1941: la maestra Ida Ramundo, vedova e mezza ebrea, viene violentata da un giovane soldato tedesco durante un rastrellamento, e da quell'incontro nascerà Useppe, bambino fragile e luminoso. Attraverso gli occhi di madre e figlio, Morante racconta gli anni della guerra e del dopoguerra italiano, in un affresco corale che intreccia la grande Storia alle vite minime e dimenticate di chi la subisce senza comprenderla.", "https://m.media-amazon.com/images/I/81kiXDJiMVL.SL1500.jpg", "einaudi"));
-        books.add(createDemoBook("Q", "Luther Blissett (Wu Ming)", "storici", "Nell'Europa sconvolta dalle guerre di religione del Cinquecento, un rivoluzionario senza nome attraversa decenni di rivolte contadine, eresie messianiche e battaglie sanguinose, sempre inseguito dall'ombra di un agente segreto del Vaticano conosciuto solo con la lettera Q. Un affresco corale che intreccia storia e finzione lungo tutto il continente, tra utopie di libertà e feroci repressioni.", "https://m.media-amazon.com/images/I/415MVK74HnL.SL1500.jpg", "einaudi"));
-        books.add(createDemoBook("Manituana", "Wu Ming", "storici", "Nord America, 1775: mentre scoppia la guerra d'indipendenza americana, il popolo Mohawk guidato da Joseph Brant si trova costretto a scegliere da che parte schierarsi in un conflitto che deciderà il destino di un intero continente. Tra foreste sconfinate e alleanze fragili tra coloni e nativi, un romanzo corale che racconta la nascita degli Stati Uniti dal punto di vista di chi rischiava di scomparire per sempre dalla Storia.", "https://m.media-amazon.com/images/I/61-AdlGcr9L.SL1291.jpg", "einaudi"));
+        books.add(createDemoBook("Il nome della rosa", "Umberto Eco", "storici", "Nell'inverno del 1327, il frate francescano Guglielmo da Baskerville giunge insieme al giovane novizio Adso da Melk in una ricca e misteriosa abbazia benedettina dell'Italia settentrionale per un incontro teologico. Ma la quiete del monastero viene sconvolta da una serie di omicidi inspiegabili che si susseguono tra le celle e gli scriptoria, tutti apparentemente legati a un libro proibito custodito nella labirintica biblioteca dell'abbazia. Tra eresie, inquisitori spietati e un sapere che qualcuno è disposto a uccidere pur di tenere segreto, Guglielmo dovrà affidarsi alla logica e all'osservazione per svelare la verità prima che il fuoco della censura consumi ogni cosa.", "https://www.ibs.it/images/9788845296833_0_0_536_0_75.jpg", "newton"));
+        books.add(createDemoBook("Memorie di Adriano", "Marguerite Yourcenar", "storici", "Nel II secolo d.C., ormai anziano e consapevole della morte ormai vicina, l'imperatore Adriano scrive una lunga lettera al giovane Marco Aurelio, futuro erede al trono, ripercorrendo l'intera parabola della propria esistenza. Tra campagne militari, viaggi ai confini sconfinati dell'impero, la costruzione di templi e città, e il dolore mai sopito per la perdita dell'amato Antinoo, Adriano riflette con lucidità impietosa sul potere, la bellezza, la solitudine del comando e il tentativo umano di dare un senso e un ordine al caos della storia.", "https://www.ibs.it/images/9788806219710_0_0_200_0_75.jpg", "einaudi"));
 
         // --- 8. FILOSOFICI ---
         books.add(createDemoBook("Discorso sul metodo", "Cartesio", "filosofici", "Pubblicato nel 1637 come premessa metodologica a una serie di trattati scientifici, questo testo segna l'avvento di un modo radicalmente nuovo di concepire la conoscenza, fondato sulla razionalità dell'uomo. Attraverso una prosa lucida e quasi autobiografica, Cartesio racconta il cammino che lo ha condotto a formulare il celebre dubbio sistematico e il metodo per condurre correttamente la propria ragione, gettando le basi della filosofia e della scienza moderne.", "https://m.media-amazon.com/images/I/71vgqgI-7CL._SL1500_.jpg", "mondadori"));
@@ -199,7 +198,7 @@ public class DemoDataStore {
             List<Book> marioLibrary = new ArrayList<>();
             marioLibrary.add(libroVecchio);
 
-            // 2. DA LEGGERE
+            // 2 DA LEGGERE
             Book libroDaLeggere = books.stream()
                     .filter(b -> b.getTitle().equalsIgnoreCase("Dieci piccoli indiani"))
                     .findFirst()
@@ -210,7 +209,7 @@ public class DemoDataStore {
                 marioLibrary.add(libroDaLeggere);
             }
 
-            // 3. LETTI
+            // 3 LETTI
             String[] titoliLetti = {"Orgoglio e pregiudizio", "Moby Dick", "Le cronache di Narnia"};
             for (String titolo : titoliLetti) {
                 Book libroLetto = books.stream()
@@ -230,8 +229,6 @@ public class DemoDataStore {
 
     /**
      * Metodo helper per creare velocemente i libri finti per la Demo.
-     * NOTA: Controlla che i nomi di questi SETTER combacino esattamente
-     * con quelli che hai scritto nella tua classe "Book" (es. setTitle, setPublisherUsername ecc.)
      */
     private Book createDemoBook(String title, String author, String genre, String description, String imageUrl, String publisherUsername) {
         Book b = new Book();

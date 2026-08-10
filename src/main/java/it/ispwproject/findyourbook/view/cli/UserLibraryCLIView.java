@@ -79,7 +79,6 @@ public class UserLibraryCLIView {
     }
 
     public int askRating() {
-        // 0 per annullare, stesso pattern di askNewStatus.
         return CLIRenderer.chiediScelta("Inserisci un voto (0 per annullare)", 0, 5);
     }
 

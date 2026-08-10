@@ -20,8 +20,7 @@ public class SearchResultsGUIView extends DashboardGUIView {
 
     // Tutti i 10 parametri sono usati davvero: dati dei risultati di ricerca
     // piu' le callback delle azioni disponibili in questa schermata (navbar,
-    // click su un libro, cambio stato, voto). Stesso caso di Event nel
-    // progetto NightFlow di una collega: parametri genuinamente necessari.
+    // click su un libro, cambio stato, voto).
     @SuppressWarnings("java:S107")
     public VBox buildRoot(String username, List<BookBean> books, String lastQuery,
                           Runnable onBack, Consumer<String> onSearch,
@@ -56,8 +55,6 @@ public class SearchResultsGUIView extends DashboardGUIView {
         grid.setPrefColumns(2);
 
         for (BookBean book : books) {
-            // showRemoveOption = false: dai risultati di ricerca si può solo valutare
-            // e categorizzare il libro; "Rimuovi" resta riservato alla Libreria personale.
             VBox card = super.buildBookCard(
                     null,
                     book,

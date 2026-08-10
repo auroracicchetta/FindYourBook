@@ -22,11 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-// Niente cache d'istanza: books.json e' "posseduto" da BookDAOFile (la ricerca
-// generale libri), qui lo trattiamo come le colleghe trattano il file di
-// un'altra entita' (es. updateSlotAvailability/updateEventTickets) - si
-// rilegge fresco a ogni chiamata, si applica la modifica, si riscrive subito.
-// Cosi' due DAO diversi non si contendono piu' la stessa cache in memoria.
+
 public class PublisherDAOFile implements PublisherDAO {
 
     private static final String FILE_PATH = "books.json";
@@ -53,11 +49,6 @@ public class PublisherDAOFile implements PublisherDAO {
 
         int totalBooksPublished = catalog.size();
 
-        // In modalita' Database, ogni volta che un lettore segna un libro come
-        // "Letto" viene incrementato il contatore copie_lette (ReaderDAODB).
-        // In modalita' File non esiste una colonna persistita da incrementare:
-        // il dato equivalente si ricava contando, ad ogni richiesta, quante
-        // librerie personali (favorites.json) hanno quel titolo in stato READ.
         Map<String, Integer> readCountByTitle = countReadsByTitle();
 
         List<Book> sortedByReads = catalog.stream()

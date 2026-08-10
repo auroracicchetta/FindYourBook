@@ -5,7 +5,6 @@ import it.ispwproject.findyourbook.view.gui.ReaderDashboardGUIView;
 import it.ispwproject.findyourbook.controller.applicativo.BookController;
 import it.ispwproject.findyourbook.bean.BookBean;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
-import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;

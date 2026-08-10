@@ -25,10 +25,7 @@ public final class CLIRenderer {
     public static final String BULLET  = "•";
     public static final String STAR    = "★";
     public static final String CLOCK   = "📅";
-    public static final String AVAIL   = "○";   // slot disponibile
-    public static final String BOOKED  = "●";   // slot prenotato
-    public static final String PENDING = "◌";   // attività in sospeso
-    public static final String DONE    = "◉";   // attività completata
+
 
     /** Scanner condiviso nell'intera applicazione CLI. */
     public static final Scanner SCANNER = new Scanner(System.in);

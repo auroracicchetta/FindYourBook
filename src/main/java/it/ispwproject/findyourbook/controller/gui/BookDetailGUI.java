@@ -29,9 +29,6 @@ public class BookDetailGUI {
         this(stage, username, onLogout, book, currentStatus, onBack, null);
     }
 
-    // originLabel: nome della schermata di provenienza (es. "I miei libri",
-    // "Risultati ricerca"), mostrato nel bottone Indietro cosi' l'utente capisce
-    // sempre il contesto anche se il dettaglio libro non e' ne' Home ne' I miei libri.
     public BookDetailGUI(Stage stage, String username, Runnable onLogout, BookBean book, ReadingStatus currentStatus, Runnable onBack, String originLabel) {
         this.stage = stage;
         this.username = username;

@@ -54,7 +54,7 @@ public class PublishBookGUIView extends DashboardGUIView {
         headerBox.setAlignment(Pos.CENTER);
         VBox.setMargin(headerBox, new Insets(10, 0, 10, 0));
 
-        // 2. Form (Card centrale)
+        // Form (Card centrale)
         HBox formContainer = new HBox(40);
         formContainer.setPadding(new Insets(30));
         formContainer.setStyle(STYLE_BG_COLOR + CARD_BG + "; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 4);");

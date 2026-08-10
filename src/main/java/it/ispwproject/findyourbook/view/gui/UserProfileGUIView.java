@@ -15,7 +15,7 @@ public class UserProfileGUIView {
         VBox root = new VBox(20);
         root.setPadding(new Insets(40));
         root.setAlignment(Pos.TOP_CENTER);
-        root.setStyle("-fx-background-color: #EFE8D8;"); // Il tuo colore panna/nocciola
+        root.setStyle("-fx-background-color: #EFE8D8;");
 
         Label title = new Label("Il mio profilo");
         title.setStyle("-fx-font-family: 'Georgia'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #3A352F;");

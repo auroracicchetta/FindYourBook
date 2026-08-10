@@ -9,8 +9,6 @@ import it.ispwproject.findyourbook.service.NotificationService;
 import it.ispwproject.findyourbook.exception.NotificationException;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
 
-// Tiene le Entity (User, Book), come le colleghe: i Bean per la mail
-// vengono costruiti solo al momento della notifica, dentro update().
 public class BookPublishedObserver implements Observer {
     private final User publisher;
     private final Book book;

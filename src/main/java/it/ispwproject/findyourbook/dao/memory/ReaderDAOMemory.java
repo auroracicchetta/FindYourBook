@@ -29,8 +29,6 @@ public class ReaderDAOMemory implements ReaderDAO {
         favorites.computeIfAbsent(username, k -> new ArrayList<>());
         List<Book> userFavorites = favorites.get(username);
 
-        // Stato precedente PRIMA di rimuovere la vecchia voce: serve per capire se
-        // il contatore copie_lette va incrementato, decrementato o lasciato invariato.
         ReadingStatus previousStatus = userFavorites.stream()
                 .filter(b -> b.getTitle().equalsIgnoreCase(book.getTitle()))
                 .map(Book::getStatus)
@@ -79,8 +77,8 @@ public class ReaderDAOMemory implements ReaderDAO {
             List<Book> userFavorites = store.getFavorites().get(username);
 
             // Se il libro rimosso era segnato come Letto, il contatore va
-            // decrementato: altrimenti resterebbe gonfiato anche se il lettore
-            // toglie del tutto il libro dalla libreria.
+            // decrementato: altrimenti resterebbe invariato anche se il lettore
+            // togliesse del tutto il libro dalla libreria.
             ReadingStatus previousStatus = userFavorites.stream()
                     .filter(b -> b.getTitle().equalsIgnoreCase(title))
                     .map(Book::getStatus)

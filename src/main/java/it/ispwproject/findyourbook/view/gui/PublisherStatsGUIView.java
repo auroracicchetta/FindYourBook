@@ -36,11 +36,6 @@ public class PublisherStatsGUIView extends DashboardGUIView {
 
     private final Label totalBooksLbl = new Label("0");
     private final Label totalReadLbl = new Label("0");
-
-    // Pannello trasparente sovrapposto al grafico solo per le etichette dei
-    // valori: non dipende dalla struttura interna del BarChart (che e'
-    // privata/di libreria e puo' variare), le posizioniamo convertendo le
-    // coordinate della barra in coordinate di questo pannello.
     private final Pane labelOverlay = new Pane();
 
     public PublisherStatsGUIView() {
@@ -69,7 +64,7 @@ public class PublisherStatsGUIView extends DashboardGUIView {
             AppLogger.logError("CSS non trovato in PublisherStatsGUIView");
         }
 
-        // ─── TOP BAR CON AVATAR ───
+        // Top Bar con avatar
         HBox topBar = new HBox(20);
         topBar.setAlignment(Pos.CENTER_LEFT);
 
@@ -94,7 +89,7 @@ public class PublisherStatsGUIView extends DashboardGUIView {
         title.setStyle("-fx-font-family: 'Georgia'; -fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: " + TEXT_DARK + ";");
         VBox.setMargin(title, new Insets(10, 0, 20, 0));
 
-        // ─── HEADER (TopBar + Titolo) ───
+        // ─── HEADER ───
         VBox header = new VBox(topBar, title);
         header.setAlignment(Pos.TOP_LEFT);
         root.setTop(header);
@@ -153,13 +148,7 @@ public class PublisherStatsGUIView extends DashboardGUIView {
         }
     }
 
-    // Mostra il numero esatto di letture sopra ogni barra. Non ci affidiamo
-    // alla struttura interna del BarChart (di libreria, privata, rischiosa da
-    // assumere) per attaccarci un figlio: l'etichetta vive invece in
-    // labelOverlay, un pannello trasparente sovrapposto al grafico, e la
-    // posizioniamo convertendo i bound della barra (locali al suo nodo) prima
-    // in coordinate di Scene e poi in coordinate di labelOverlay. Funziona a
-    // prescindere da quando/come JavaFX crea e posiziona il nodo della barra.
+
     private void addValueLabel(XYChart.Data<String, Number> data) {
         Label valueLbl = new Label(String.valueOf(data.getYValue()));
         valueLbl.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: " + TEXT_DARK + ";");

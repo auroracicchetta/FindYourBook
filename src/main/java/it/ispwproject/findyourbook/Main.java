@@ -12,20 +12,13 @@ public class Main {
     public static void main(String[] args) {
 
         AppLogger.logInfo("Avvio di FindYourBook in corso...");
-        // Il tuo test del DB
-        try {
-            ConnectionFactory.getConnection();
-            AppLogger.logInfo("Connessione al database riuscita!");
-        } catch (Exception e) {
-            AppLogger.logError(" Attenzione: Impossibile connettersi al database!");
-        }
 
-        // 1. Selezione Modalità Database
+        // Selezione Modalità Database
         ModeSelectorCLI modeSelector = new ModeSelectorCLI();
         boolean proceed = modeSelector.start();
         if (!proceed) return;
 
-        // 2. Selezione Interfaccia
+        // Selezione Interfaccia
         String scelta = "";
 
         while (!scelta.equals("1") && !scelta.equals("2")) {

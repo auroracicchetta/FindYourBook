@@ -40,9 +40,6 @@ public class NotificationService {
     private static final String TEMPLATE_GOAL_REACHED = "d-goal-template-id-fittizio";
     private static final String TEMPLATE_READING_REMINDER = "d-reminder-template-id-fittizio";
 
-    private static final String KEY_USER_NAME  = "userName";
-    private static final String KEY_BOOK_TITLE = "bookTitle";
-    private static final String KEY_ROLE       = "userRole";
 
     private NotificationService() {}
 
@@ -56,8 +53,6 @@ public class NotificationService {
         try {
             Personalization p = new Personalization();
             p.addTo(new Email(toEmail));
-            p.addDynamicTemplateData(KEY_USER_NAME, bean.getName());
-            p.addDynamicTemplateData(KEY_ROLE, bean.getRole().name());
             sendTemplateEmail(TEMPLATE_REGISTRATION, p);
         } catch (Exception e) {
             throw new NotificationException("Errore invio mail registrazione: " + e.getMessage(), e);
@@ -74,8 +69,6 @@ public class NotificationService {
         try {
             Personalization p = new Personalization();
             p.addTo(new Email(toEmail));
-            p.addDynamicTemplateData(KEY_USER_NAME, publisherBean.getName());
-            p.addDynamicTemplateData(KEY_BOOK_TITLE, bookBean.getTitle());
             sendTemplateEmail(TEMPLATE_NEW_BOOK, p);
         } catch (Exception e) {
             throw new NotificationException("Errore invio mail pubblicazione libro: " + e.getMessage(), e);
@@ -92,14 +85,13 @@ public class NotificationService {
         try {
             Personalization p = new Personalization();
             p.addTo(new Email(toEmail));
-            p.addDynamicTemplateData(KEY_USER_NAME, readerBean.getUsername());
-            p.addDynamicTemplateData(KEY_BOOK_TITLE, bookBean.getTitle());
             sendTemplateEmail(TEMPLATE_GOAL_REACHED, p);
         } catch (Exception e) {
             throw new NotificationException("Errore invio mail obiettivo raggiunto: " + e.getMessage(), e);
         }
     }
 
+    // 4. Email Lettura Inattiva da 30 giorni (Lettore)
     public static void sendReadingReminder(ReaderBean readerBean, BookBean bookBean) throws NotificationException {
         String toEmail = readerBean.getEmail();
         if (API_KEY == null || API_KEY.isBlank()) {
@@ -109,8 +101,6 @@ public class NotificationService {
         try {
             Personalization p = new Personalization();
             p.addTo(new Email(toEmail));
-            p.addDynamicTemplateData(KEY_USER_NAME, readerBean.getName());
-            p.addDynamicTemplateData(KEY_BOOK_TITLE, bookBean.getTitle());
             sendTemplateEmail(TEMPLATE_READING_REMINDER, p);
         } catch (Exception e) {
             throw new NotificationException("Errore invio mail promemoria: " + e.getMessage(), e);
@@ -129,7 +119,7 @@ public class NotificationService {
         cleanPersonalization.addTo(new Email(toAddress));
         mail.addPersonalization(cleanPersonalization);
 
-        // Prepariamo i testi in base al tipo di operazione (usando il templateId fittizio come discriminante)
+        // Prepariamo i testi in base al tipo di operazione
         String subjectText = "Notifica ufficiale da FindYourBook";
         String headerText = "Operazione completata!";
         String bodyText = "Ti confermiamo che la tua operazione su <b>FindYourBook</b> è andata a buon fine.";
@@ -153,7 +143,7 @@ public class NotificationService {
             bodyText = "Abbiamo notato che hai un libro bloccato nella tua libreria nella sezione 'In Lettura' da più di 30 giorni. Non mollare, continua a leggere! Se l'hai già finito, ricordati di aggiornare lo stato in 'Letto'.";
         }
 
-        // Il template HTML grafico (Sfondo beige EFE8D8)
+        // Il template HTML grafico
         String htmlBody = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.05);\">" +
                 "<div style=\"background-color: #EFE8D8; color: #2c3e50; padding: 20px; text-align: center;\">" +
                 "<img src=\"https://raw.githubusercontent.com/auroracicchetta/FindYourBook/main/src/main/resources/icons/findyourbook_icon_256.png\" width=\"60\" style=\"display:block; margin:0 auto 10px;\">" +

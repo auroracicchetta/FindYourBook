@@ -8,7 +8,7 @@ import it.ispwproject.findyourbook.exception.LoginException;
 import it.ispwproject.findyourbook.model.Credentials;
 import it.ispwproject.findyourbook.model.User;
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
-import it.ispwproject.findyourbook.util.PasswordUtils; // <-- AGGIUNTO IMPORT
+import it.ispwproject.findyourbook.util.PasswordUtils;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
 
 
@@ -50,13 +50,6 @@ public class LoginController {
             throw new LoginException("Errore interno durante il login. Riprova.");
         }
 
-        // ConnectionFactory.changeRole() e' eager: apre subito una connessione
-        // MySQL vera con le credenziali del ruolo appena autenticato. In
-        // modalita' Memory il login non tocca mai il database (vedi
-        // DAOFactory.getLoginDAO()/getUserDAO() sopra), quindi qui saltiamo
-        // volutamente il cambio di ruolo: chiamarlo comunque proverebbe ad
-        // aprire una connessione MySQL non necessaria, rompendo un login che
-        // altrimenti funzionerebbe anche senza database raggiungibile.
         if (!DAOFactory.MEMORY.equalsIgnoreCase(DAOFactory.getPersistence())) {
             ConnectionFactory.changeRole(credentials.getRole());
         }

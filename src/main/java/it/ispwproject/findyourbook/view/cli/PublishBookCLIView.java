@@ -1,9 +1,6 @@
 package it.ispwproject.findyourbook.view.cli;
 
-import java.util.Scanner;
-
 public class PublishBookCLIView {
-    private final Scanner scanner = new Scanner(System.in);
 
     public void showHeader() {
         CLIRenderer.messaggio("\n=== PUBBLICA UN NUOVO LIBRO ===");
@@ -12,7 +9,7 @@ public class PublishBookCLIView {
 
     public String askField(String prompt) {
         showGlobalPrompt(prompt + ": ");
-        return scanner.nextLine().trim();
+        return CLIRenderer.SCANNER.nextLine().trim();
     }
 
     public void showMessage(String msg) {

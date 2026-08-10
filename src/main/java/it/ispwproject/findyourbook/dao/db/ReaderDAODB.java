@@ -131,10 +131,6 @@ public class ReaderDAODB implements ReaderDAO {
 
         try (Connection conn = ConnectionFactory.getConnection()) {
 
-            // Se il libro rimosso era segnato come Letto, il contatore va
-            // decrementato: altrimenti resterebbe gonfiato anche se il lettore
-            // toglie del tutto il libro dalla libreria (bug distinto da quello
-            // sulla semplice modifica di stato, gia' corretto sopra).
             String previousStatus = null;
             try (PreparedStatement selectStmt = conn.prepareStatement(selectCurrent)) {
                 selectStmt.setString(1, username);

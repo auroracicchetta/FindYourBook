@@ -28,16 +28,21 @@ public class Book extends Observable {
         this.imageUrl = imageUrl;
     }
 
-
+    // Evento: il Reader ha segnato il libro come Letto -> notifica
+    // "obiettivo di lettura raggiunto" (BookCompletedObserver).
     public void markAsRead() {
         this.status = ReadingStatus.READ;
         notifyObservers();
     }
 
+    // Evento: una Casa Editrice ha pubblicato un nuovo libro -> notifica
+    // ai Reader interessati (BookPublishedObserver).
     public void markAsPublished() {
         notifyObservers();
     }
 
+    // Evento: il libro risulta "In lettura" da oltre 30 giorni senza essere
+    // stato completato -> promemoria di inattività (ReadingReminderObserver).
     public void triggerReminder() {
         notifyObservers();
     }

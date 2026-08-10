@@ -13,7 +13,6 @@ import javafx.scene.layout.VBox;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
-import static java.io.File.separator;
 
 public class BookDetailGUIView extends DashboardGUIView {
 
@@ -21,9 +20,6 @@ public class BookDetailGUIView extends DashboardGUIView {
     // Tutti gli 11 parametri sono usati davvero (nessuno morto/inutile): sono le
     // callback delle azioni disponibili su questa schermata (navbar, rating,
     // cambio stato, navigazione indietro) piu' i dati del libro da mostrare.
-    // Stesso caso di Event nel progetto NightFlow di una collega: parametri
-    // genuinamente necessari, nessun refactoring li riduce senza aggiungere
-    // complessita' sproporzionata al problema.
     @SuppressWarnings("java:S107")
     public VBox buildRoot(String username, BookBean book, ReadingStatus currentStatus,
                           Consumer<String> onStatusChange, IntConsumer onRate,
@@ -43,8 +39,6 @@ public class BookDetailGUIView extends DashboardGUIView {
         homeLabel.setOnMouseClicked(e -> onHomeClick.run());
 
         // 2. Bottone Indietro: mostra esplicitamente da dove si e' arrivati
-        // (es. "I miei libri" o "Risultati ricerca"), cosi' l'utente capisce
-        // sempre il contesto della schermata anche se non e' ne' Home ne' I miei libri.
         Button backBtn = createBackButton(onBack, originLabel);
 
         // 3. Contenitore Principale
@@ -62,9 +56,6 @@ public class BookDetailGUIView extends DashboardGUIView {
         return root;
     }
 
-    // originLabel arriva gia' completo di preposizione corretta (es. "a I miei
-    // libri", "alla sezione Romance", "alla ricerca generale"), cosi' la stessa
-    // frase funziona in italiano per contesti di origine diversi.
     private Button createBackButton(Runnable onBack, String originLabel) {
         String label = (originLabel == null || originLabel.isBlank()) ? "Indietro" : "Torna " + originLabel;
         Button backBtn = new Button("< " + label);
@@ -98,8 +89,6 @@ public class BookDetailGUIView extends DashboardGUIView {
     }
 
 
-    // "Rimuovi libro" non compare qui: la rimozione, essendo un'azione distruttiva
-    // protetta dal timer di annullamento, resta disponibile solo nella Libreria personale.
     private MenuButton createStatusButton(ReadingStatus currentStatus, Consumer<String> onStatusChange) {
         String statusText = "Aggiungi a...";
         if (currentStatus == ReadingStatus.TO_READ) statusText = ReadingStatus.TO_READ.getDisplayName();

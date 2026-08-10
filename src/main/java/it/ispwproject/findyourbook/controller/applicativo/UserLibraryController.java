@@ -43,8 +43,7 @@ public class UserLibraryController {
 
         if (status == ReadingStatus.READ) {
 
-            // Invio asincrono, stesso pattern di checkInactiveReading(): la mail
-            // "obiettivo di lettura raggiunto" non deve bloccare il thread della GUI.
+            // Invio asincrono
             BookCompletedObserver observer = new BookCompletedObserver(reader, book);
             NOTIFICATION_EXECUTOR.submit(() -> {
                 book.attach(observer);
@@ -59,8 +58,7 @@ public class UserLibraryController {
         readerDAO.removeFavoriteBook(reader.getUsername(), bookBean.getTitle());
     }
 
-    // Punto unico di parsing/dispatch: sostituisce la logica duplicata
-    // che prima stava in UserLibraryGUI e BookDetailGUI.
+
     public void updateReadingStatus(BookBean bookBean, String rawStatus) throws DAOException {
         if (rawStatus == null || rawStatus.equals("Rimuovi libro") || rawStatus.equals("RIMUOVI")) {
             removeBookFromLibrary(bookBean);
@@ -69,7 +67,7 @@ public class UserLibraryController {
         }
 
         ReadingStatus targetStatus = parseReadingStatus(rawStatus);
-        if (targetStatus == null) return; // stringa non riconosciuta, nessuna azione
+        if (targetStatus == null) return;
 
         saveBookToLibrary(bookBean, targetStatus);
         bookBean.setStatus(targetStatus);
@@ -123,9 +121,7 @@ public class UserLibraryController {
     }
 
     public void checkInactiveReading() {
-        // Flag a livello di SESSIONE (non d'istanza): cosi' resta valido anche
-        // quando il Reader naviga via e ricostruisce UserLibraryController entrando
-        // di nuovo nella libreria personale nella stessa sessione di login.
+
         if (SessionManager.getInstance().isInactivityReminderSent()) return;
 
         Reader reader = (Reader) SessionManager.getInstance().getLoggedUser();

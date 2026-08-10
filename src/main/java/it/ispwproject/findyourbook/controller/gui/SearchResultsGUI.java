@@ -5,7 +5,6 @@ import it.ispwproject.findyourbook.controller.applicativo.BookController;
 import it.ispwproject.findyourbook.controller.applicativo.UserLibraryController;
 import it.ispwproject.findyourbook.view.gui.SearchResultsGUIView;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
-import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -23,15 +22,10 @@ public class SearchResultsGUI {
     private final BookController bookController;
     private final UserLibraryController userLibraryController;
 
-    // Costruttore di comodo: ricerca testuale generale (isGenreSearch = false).
     public SearchResultsGUI(Stage stage, String username, Runnable onLogout, List<BookBean> results, String lastQuery) {
         this(stage, username, onLogout, results, lastQuery, false);
     }
 
-    // isGenreSearch distingue se questi risultati vengono da una selezione per
-    // genere (Home) o da una ricerca testuale, cosi' il bottone Indietro nel
-    // dettaglio libro puo' dire "Torna alla sezione X" invece di "Torna alla
-    // ricerca generale" quando serve davvero.
     public SearchResultsGUI(Stage stage, String username, Runnable onLogout, List<BookBean> results, String lastQuery, boolean isGenreSearch) {
         this.stage = stage;
         this.username = username;
@@ -55,9 +49,6 @@ public class SearchResultsGUI {
                 this::handleSearch,
                 onLogout,
                 () -> new UserLibraryGUI(stage, this.username, onLogout).show(),
-                // Etichetta dinamica: questa schermata serve sia per la ricerca testuale
-                // sia per la selezione per genere, quindi il testo del bottone Indietro
-                // deve distinguere i due contesti reali invece di usarne uno fisso.
                 book -> new BookDetailGUI(stage, this.username, onLogout, book, book.getStatus(),
                         () -> new SearchResultsGUI(stage, this.username, onLogout, this.results, this.lastQuery, this.isGenreSearch).show(),
                         this.isGenreSearch ? "alla sezione " + this.lastQuery : "alla ricerca generale"

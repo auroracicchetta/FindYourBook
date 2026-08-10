@@ -62,7 +62,7 @@ public class SearchBooksCLIView {
             case 1 -> "TO_READ";
             case 2 -> "READING";
             case 3 -> "READ";
-            default -> null; // choice == 0, annullamento esplicito
+            default -> null;
         };
     }
 

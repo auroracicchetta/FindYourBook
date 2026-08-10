@@ -10,10 +10,6 @@ public class SessionManager {
     private User loggedUser;
     private SessionBean sessionBean;
 
-    // Vive per l'intera sessione (non per singola schermata): garantisce che il
-    // promemoria "letture inattive" venga inviato al massimo una volta per login,
-    // indipendentemente da quante volte il Reader entra/esce dalla libreria personale.
-    // Viene azzerato in clearSession(), cosi' un nuovo login puo' ricevere di nuovo il promemoria.
     private boolean inactivityReminderSent = false;
 
     private SessionManager() {}

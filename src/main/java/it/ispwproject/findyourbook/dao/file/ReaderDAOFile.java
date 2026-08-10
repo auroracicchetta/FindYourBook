@@ -28,13 +28,6 @@ public class ReaderDAOFile implements ReaderDAO {
                 .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
                 .setPrettyPrinting()
                 .create();
-        // Niente piu' favoritesMap caricata una volta sola nel costruttore: ogni
-        // metodo pubblico ricarica fresco da favorites.json (vedi loadFromFile()),
-        // stesso pattern gia' applicato a PublisherDAOFile. Cosi' anche se un
-        // controller (es. BookController/UserLibraryController in una schermata
-        // GUI a lunga vita) tiene la stessa istanza per piu' azioni, ogni singola
-        // lettura/scrittura vede sempre lo stato più recente su disco, invece di
-        // restare bloccata su una copia in memoria caricata all'inizio.
     }
 
     @Override
@@ -56,12 +49,6 @@ public class ReaderDAOFile implements ReaderDAO {
 
     @Override
     public void addFavoriteBook(String username, Book book, String status) throws DAOException {
-        // Rimuove l'eventuale voce gia' presente per lo stesso libro prima di
-        // riaggiungerlo con il nuovo stato, come fa ReaderDAOMemory: altrimenti
-        // un cambio di stato (es. TO_READ -> READING) duplica il libro invece
-        // di spostarlo. Rilegge da file a ogni chiamata (vedi commento nel
-        // costruttore) cosi' non sovrascrive mai dati scritti nel frattempo da
-        // un'altra istanza dello stesso DAO.
         Map<String, List<Book>> favoritesMap = loadFromFile();
         List<Book> userBooks = favoritesMap.computeIfAbsent(username, k -> new ArrayList<>());
         userBooks.removeIf(b -> b.getTitle().equalsIgnoreCase(book.getTitle()));

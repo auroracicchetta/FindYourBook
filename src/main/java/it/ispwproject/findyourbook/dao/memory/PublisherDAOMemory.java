@@ -81,7 +81,7 @@ public class PublisherDAOMemory implements PublisherDAO {
                         Book::getTitle,
                         Book::getCopieLette,
                         (oldValue, newValue) -> oldValue,
-                        LinkedHashMap::new // Mantiene l'ordinamento inserito!
+                        LinkedHashMap::new
                 ));
 
         Map<String, Integer> byGenre = publisherBooks.stream()

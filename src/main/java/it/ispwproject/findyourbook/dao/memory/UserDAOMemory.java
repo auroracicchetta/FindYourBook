@@ -18,14 +18,6 @@ public class UserDAOMemory implements UserDAO {
                 .orElseThrow(() -> new DAOException("Utente non trovato: " + username));
     }
 
-    public void updatePassword(int id, String newPassword) throws DAOException {
-        store.getUsers().stream()
-                .filter(u -> u.getId() == id)
-                .findFirst()
-                .orElseThrow(() -> new DAOException("Utente non trovato (ID: " + id + ")"))
-                .setPassword(newPassword);
-    }
-
     @Override
     public List<User> getAll() throws DAOException {
         return List.copyOf(store.getUsers());

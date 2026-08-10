@@ -49,11 +49,6 @@ public class UserLibraryGUI {
         // motivo per cui una debba aspettare l'altra. Vengono quindi eseguite in
         // parallelo (fork) e si attende il completamento di ENTRAMBE (join) prima
         // di costruire la UI, invece di eseguirle in sequenza come prima.
-        // synchronized su ConnectionFactory.class: i due task girano su thread
-        // DAVVERO paralleli (fork resta genuino), ma condividono la stessa
-        // Connection JDBC cache in ConnectionFactory, che non e' sicura se usata
-        // da piu' thread nello stesso istante. Si serializza solo la sezione che
-        // tocca il database, non l'intero task.
         CompletableFuture<Integer> readCountFuture = CompletableFuture.supplyAsync(() -> {
             synchronized (ConnectionFactory.class) {
                 try {
@@ -150,9 +145,6 @@ public class UserLibraryGUI {
         }
 
         try {
-            // L'invio della mail "libro completato" e' gia' gestito dentro
-            // updateReadingStatus -> saveBookToLibrary tramite il BookCompletedObserver:
-            // non va duplicato qui con una seconda chiamata diretta a NotificationService.
             userLibraryController.updateReadingStatus(book, newStatus);
             this.show();
 
@@ -161,13 +153,10 @@ public class UserLibraryGUI {
         }
     }
 
-    // Timer vero (stesso pattern del Timeline usato nel checkout, ora con la
-    // stessa polarita' delle colleghe): il countdown corre in parallelo
+    // Timer vero: il countdown corre in parallelo
     // all'attesa di un click su "Rimuovi ora" o "Annulla". Se il tempo scade
     // senza un click esplicito su "Rimuovi ora", la richiesta viene annullata
-    // di default (deny-by-default) - stesso comportamento del pagamento di
-    // NightFlow (mostraSimulazioneGateway) e della prenotazione di BrainBank
-    // (showCountdownDialog): solo una conferma esplicita porta a termine l'azione.
+    // di default (deny-by-default): solo una conferma esplicita porta a termine l'azione.
     private void confirmRemovalWithCountdown(BookBean book) {
         Alert alert = new Alert(Alert.AlertType.NONE);
         alert.setTitle("Rimuovi Libro");

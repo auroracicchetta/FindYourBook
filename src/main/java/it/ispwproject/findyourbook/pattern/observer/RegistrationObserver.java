@@ -6,9 +6,6 @@ import it.ispwproject.findyourbook.service.NotificationService;
 import it.ispwproject.findyourbook.exception.NotificationException;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
 
-// Il Subject e' User (non Book): la registrazione riguarda l'utente
-// appena creato. Tiene l'Entity, come le colleghe, e costruisce il Bean
-// per la mail solo al momento della notifica.
 public class RegistrationObserver implements Observer {
     private final User user;
 

@@ -17,11 +17,7 @@ public abstract class User extends Observable {
 
     protected User() {}
 
-    // registrationDate resta fuori dal costruttore ed e' impostata dopo con
-    // setRegistrationDate(): stesso approccio della collega di NightFlow, che
-    // tiene nel costruttore solo i campi sempre indispensabili alla creazione
-    // e sposta gli altri sui setter gia' esistenti, invece di introdurre una
-    // classe di supporto in piu' solo per accorciare la firma.
+    // registrationDate resta fuori dal costruttore ed e' impostata dopo con setRegistrationDate()
     protected User(int id, String name, String surname, String username, String email, String password, Role role) {
         this.id = id;
         this.name = name;

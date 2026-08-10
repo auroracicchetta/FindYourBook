@@ -8,7 +8,7 @@ import javafx.scene.layout.*;
 
 public class LoginGUIView {
 
-    // Fields
+
     public final TextField usernameField = new TextField();
     public final PasswordField passwordField = new PasswordField();
     public final TextField visiblePasswordField = new TextField();
@@ -46,7 +46,6 @@ public class LoginGUIView {
         try {
             root.getStylesheets().add(getClass().getResource("/styles/style.css").toExternalForm());
         } catch (Exception e) {
-            // Risolto code smell: Usato il logger al posto di System.err
             AppLogger.logError("CSS non trovato nel Login");
         }
         root.getStyleClass().add("fyb-background");

@@ -8,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
 
-import java.sql.SQLException;
 
 public class PublisherDashboardGUI {
 

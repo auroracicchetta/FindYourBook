@@ -24,10 +24,6 @@ public class BookDAOFile implements BookDAO {
                 .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
                 .setPrettyPrinting()
                 .create();
-        // Nessuna cache caricata una volta sola nel costruttore: ogni metodo
-        // ricarica fresco da books.json (stesso motivo di ReaderDAOFile) cosi'
-        // un controller che tiene questa istanza a lungo (es. BookController in
-        // una schermata GUI) vede sempre lo stato più recente su disco.
     }
 
     @Override

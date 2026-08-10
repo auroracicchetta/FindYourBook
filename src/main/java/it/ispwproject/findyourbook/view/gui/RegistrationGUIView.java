@@ -83,7 +83,6 @@ public class RegistrationGUIView {
         try {
             root.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
         } catch (Exception e) {
-            // Risolto code smell: Logger invece di System.err
             AppLogger.logError("CSS non trovato nella Registrazione");
         }
 
@@ -126,7 +125,7 @@ public class RegistrationGUIView {
         dobContainer.visibleProperty().bind(lettoreRadio.selectedProperty());
         dobContainer.managedProperty().bind(dobContainer.visibleProperty());
 
-        // --- CREAZIONE DESCRIZIONE (Spostata qui per metterla nella griglia) ---
+        // --- CREAZIONE DESCRIZIONE ---
         VBox descBox = createFieldBox("Descrizione (solo Case Editrici)", descrizioneField);
         descrizioneField.visibleProperty().bind(casaEditriceRadio.selectedProperty());
         descBox.visibleProperty().bind(casaEditriceRadio.selectedProperty());
@@ -137,18 +136,18 @@ public class RegistrationGUIView {
         grid.add(createFieldBox("Nome", nameField), 0, 0);
         grid.add(createFieldBox("Username", usernameField), 0, 1);
         grid.add(createFieldBox("Password", passBox), 0, 2);
-        grid.add(dobContainer, 0, 3); // Si sovrappone a descBox
-        grid.add(descBox, 0, 3);      // Si sovrappone a dobContainer
+        grid.add(dobContainer, 0, 3);
+        grid.add(descBox, 0, 3);
 
         // Colonna 1 (Destra)
         grid.add(createFieldBox("Cognome", surnameField), 1, 0);
-        grid.add(createFieldBox("Email", emailField), 1, 1); // NUOVO CAMPO
+        grid.add(createFieldBox("Email", emailField), 1, 1);
         grid.add(createFieldBox("Conferma Password", confPassBox), 1, 2);
 
-        // --- AGGIUNTA ISTRUZIONI PASSWORD ---
+        // --- ISTRUZIONI PASSWORD ---
         VBox passwordInstructionsBox = new VBox(5);
         Label instructionsHeader = new Label("La password deve contenere:");
-        instructionsHeader.setStyle("-fx-font-size: 13px; -fx-text-fill: #3A352F; -fx-font-weight: bold;"); // Sostituito #4A3F35 con #3A352F
+        instructionsHeader.setStyle("-fx-font-size: 13px; -fx-text-fill: #3A352F; -fx-font-weight: bold;");
 
         Label instruction1 = new Label("• Almeno 8 caratteri");
         Label instruction2 = new Label("• Almeno un carattere numerico");
@@ -162,10 +161,8 @@ public class RegistrationGUIView {
         passwordInstructionsBox.getChildren().addAll(instructionsHeader, instruction1, instruction2, instruction3);
         passwordInstructionsBox.setPadding(new Insets(10, 0, 0, 10));
 
-        // Aggiunta alla griglia (Destra, Riga 3)
         grid.add(passwordInstructionsBox, 1, 3);
 
-        // --- RIGA 4: RUOLO (Sinx) e MOSTRA PASS (Destra) ---
         HBox roleBox = new HBox(20, new Label("Ruolo:"), lettoreRadio, casaEditriceRadio);
         roleBox.setAlignment(Pos.CENTER_LEFT);
         grid.add(roleBox, 0, 4);
@@ -179,7 +176,7 @@ public class RegistrationGUIView {
         registerBtn.setOnAction(e -> onRegister.run());
         registerBtn.setPrefWidth(300);
 
-        // BottomBox ora è pulitissimo
+
         VBox bottomBox = new VBox(15, errorLabel, registerBtn);
         bottomBox.setAlignment(Pos.CENTER);
         VBox.setMargin(bottomBox, new Insets(30, 0, 0, 0));
@@ -190,7 +187,6 @@ public class RegistrationGUIView {
 
     private VBox createFieldBox(String labelText, Node field) {
         Label l = new Label(labelText);
-        // Usa la costante definita in cima alla classe invece della stringa "field-label"
         l.getStyleClass().add(CSS_FIELD_LABEL);
 
         if (field instanceof Control) {
