@@ -3,7 +3,6 @@ package it.ispwproject.findyourbook;
 import it.ispwproject.findyourbook.controller.cli.MainCLI;
 import it.ispwproject.findyourbook.controller.cli.ModeSelectorCLI;
 import it.ispwproject.findyourbook.controller.gui.MainGUI;
-import it.ispwproject.findyourbook.dao.ConnectionFactory;
 import it.ispwproject.findyourbook.view.cli.CLIRenderer;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
 

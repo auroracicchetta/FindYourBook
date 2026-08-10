@@ -95,7 +95,7 @@ public class NotificationService {
     public static void sendReadingReminder(ReaderBean readerBean, BookBean bookBean) throws NotificationException {
         String toEmail = readerBean.getEmail();
         if (API_KEY == null || API_KEY.isBlank()) {
-            AppLogger.logInfo("[DEMO EMAIL] Promemoria 'Stai ancora leggendo?' inviato a: " + toEmail);
+            AppLogger.logInfo("[DEMO EMAIL] Promemoria 'Stai ancora leggendo?' per '" + bookBean.getTitle() + "' inviato a: " + toEmail);
             return;
         }
         try {
