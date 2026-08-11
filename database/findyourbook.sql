@@ -75,10 +75,7 @@ DELIMITER ;
 
 -- ==========================================
 -- UTENTI MYSQL A PERMESSI LIMITATI (usati da ConnectionFactory.changeRole
--- dopo il login, uno per ruolo READER/PUBLISHER). Non toccano ne' cancellano
--- nessuna tabella o dato: creano solo due nuovi utenti MySQL con permessi
--- scoped alle operazioni che READER e PUBLISHER fanno davvero nel codice.
---
+-- dopo il login, uno per ruolo READER/PUBLISHER).
 -- PRIMA di eseguire questo script: sostituisci CAMBIAMI_reader e
 -- CAMBIAMI_publisher qui sotto con due password vere a tua scelta, poi
 -- riportale identiche in db.properties (READER_PASS/PUBLISHER_PASS).

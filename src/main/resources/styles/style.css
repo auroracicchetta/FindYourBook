@@ -16,7 +16,7 @@
     -fx-background-color: #EFE8D8; /* Sfondo beige caldo */
 }
 
-/* Questa è la classe che usavi nel LoginGUIView */
+/* Sfondo beige riutilizzato in più schermate */
 .fyb-background {
     -fx-background-color: #EFE8D8;
 }
@@ -55,18 +55,13 @@
     -fx-text-fill: #C0392B;
 }
 
-.register-label {
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #3A352F;
-}
 
 /* ── Inputs (TextFields & PasswordFields) ───────────── */
 
 .text-field,
 .password-field {
     -fx-background-color: #FFFFFF;
-    -fx-background-radius: 12; /* Molto arrotondati come da design */
+    -fx-background-radius: 12;
     -fx-border-radius: 12;
     -fx-border-color: transparent;
     -fx-padding: 12 15;
@@ -77,7 +72,7 @@
 
 .text-field:focused,
 .password-field:focused {
-    -fx-border-color: #3A352F; /* Bordo marrone scuro al focus */
+    -fx-border-color: #3A352F;
     -fx-border-width: 1.5;
 }
 
@@ -104,7 +99,6 @@
 }
 
 /* 2. Bottone secondario (es. Registrati nel Login) - Bianco */
-/* Modifica queste due classi nel tuo style.css */
 
 .secondary-button {
     -fx-background-color: #FFFFFF;
@@ -114,7 +108,7 @@
     -fx-font-size: 16px;
     -fx-font-family: "Georgia", serif;
     -fx-padding: 10 20;
-    -fx-alignment: center; /* <--- ECCO LA MAGIA CHE CENTRA IL TESTO */
+    -fx-alignment: center;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);
 }
 
@@ -124,7 +118,7 @@
     -fx-underline: true;
 }
 
-/* 3. Bottone testuale per tornare indietro (Sostituisce il vecchio ovale nero) */
+/* 3. Bottone testuale per tornare indietro */
 .back-link-button,
 .back-link-button:hover,
 .back-link-button:pressed,
@@ -178,17 +172,6 @@
     -fx-border-radius: 20;
 }
 
-/* Hyperlink (es. "Registrati qui" nel login, se ancora usato) */
-.hyperlink {
-    -fx-text-fill: #3A352F;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-border-color: transparent;
-}
-
-.hyperlink:hover {
-    -fx-text-fill: #8AAB8F;
-}
 
 /* ── Aggiunte per la User Library ─────────────────────── */
 
@@ -210,30 +193,32 @@
     -fx-text-fill: #8AAB8F;
 }
 
-/* Stile per le "card" bianche che contengono i libri */
-.book-card {
+/* Bottoni filtro User Library (Da leggere / In lettura / Letti) */
+.library-status-btn {
     -fx-background-color: #FFFFFF;
-    -fx-padding: 20;
-    -fx-background-radius: 15;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
-}
-
-/* Stile base del bottone Filtro Libreria (Sfondo bianco, testo marrone) */
-.library-filter-btn {
-    -fx-background-color: #FFFFFF;
-    -fx-text-fill: #4A3F35;
-    -fx-font-size: 16px;
-    -fx-font-family: 'Arial', sans-serif;
-    -fx-font-weight: bold;
-    -fx-padding: 10 30;
-    -fx-background-radius: 20;
+    -fx-text-fill: #3A352F;
+    -fx-background-radius: 40;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
+    -fx-font-family: 'Georgia';
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 40;
 }
 
-/* Stile Hover (Sfondo marrone, testo bianco, via l'ombra) */
-.library-filter-btn:hover {
-    -fx-background-color: #4A3F35;
+.library-status-btn-active {
+    -fx-background-color: #3A352F;
     -fx-text-fill: #FFFFFF;
-    -fx-effect: none;
+    -fx-background-radius: 40;
+    -fx-cursor: hand;
+    -fx-font-family: 'Georgia';
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 40;
+}
+
+/* Messaggio placeholder quando la griglia libri è vuota */
+.empty-state-label {
+    -fx-font-size: 18px;
+    -fx-text-fill: #7A7A7A;
+    -fx-font-style: italic;
 }

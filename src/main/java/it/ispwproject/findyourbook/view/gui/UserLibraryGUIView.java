@@ -20,13 +20,13 @@ public class UserLibraryGUIView extends DashboardGUIView {
 
     private ReadingStatus currentActiveStatus = null;
 
-    private static final String COLOR_INACTIVE_STYLE = "-fx-background-color: #FFFFFF; -fx-text-fill: #3A352F; -fx-background-radius: 40; -fx-cursor: hand; -fx-font-family: 'Georgia'; -fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 12 40;";
-    private static final String COLOR_ACTIVE_STYLE = "-fx-background-color: #3A352F; -fx-text-fill: #FFFFFF; -fx-background-radius: 40; -fx-cursor: hand; -fx-font-family: 'Georgia'; -fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 12 40;";
+    private static final String STYLE_INACTIVE = "library-status-btn";
+    private static final String STYLE_ACTIVE = "library-status-btn-active";
 
     public VBox buildRoot(String username, int readBooksCount, Runnable onHomeClick, Runnable onLogout, Consumer<String> onSearch, Consumer<ReadingStatus> onFilterClick) {
         VBox root = new VBox(30);
         root.setPadding(new Insets(20, 50, 40, 50));
-        root.setStyle("-fx-background-color: " + BG_COLOR + ";");
+        root.getStyleClass().add("fyb-background");
 
         HBox navbar = super.buildNavbar(username, null, onLogout, onSearch);
 
@@ -107,23 +107,28 @@ public class UserLibraryGUIView extends DashboardGUIView {
         return root;
     }
 
+    private void setButtonState(Button btn, boolean active) {
+        btn.getStyleClass().removeAll(STYLE_INACTIVE, STYLE_ACTIVE);
+        btn.getStyleClass().add(active ? STYLE_ACTIVE : STYLE_INACTIVE);
+    }
+
     private void setupHover(Button btn, ReadingStatus status) {
         btn.setOnMouseEntered(e -> {
             if (currentActiveStatus != status) {
-                btn.setStyle(COLOR_ACTIVE_STYLE);
+                setButtonState(btn, true);
             }
         });
         btn.setOnMouseExited(e -> {
             if (currentActiveStatus != status) {
-                btn.setStyle(COLOR_INACTIVE_STYLE);
+                setButtonState(btn, false);
             }
         });
     }
 
     private void resetButtonColors() {
-        btnToRead.setStyle(COLOR_INACTIVE_STYLE);
-        btnReading.setStyle(COLOR_INACTIVE_STYLE);
-        btnRead.setStyle(COLOR_INACTIVE_STYLE);
+        setButtonState(btnToRead, false);
+        setButtonState(btnReading, false);
+        setButtonState(btnRead, false);
     }
 
     public void setActiveButton(ReadingStatus status) {
@@ -132,11 +137,11 @@ public class UserLibraryGUIView extends DashboardGUIView {
         if (status == null) return;
 
         if (status == ReadingStatus.TO_READ) {
-            btnToRead.setStyle(COLOR_ACTIVE_STYLE);
+            setButtonState(btnToRead, true);
         } else if (status == ReadingStatus.READING) {
-            btnReading.setStyle(COLOR_ACTIVE_STYLE);
+            setButtonState(btnReading, true);
         } else if (status == ReadingStatus.READ) {
-            btnRead.setStyle(COLOR_ACTIVE_STYLE);
+            setButtonState(btnRead, true);
         }
     }
 
@@ -144,7 +149,7 @@ public class UserLibraryGUIView extends DashboardGUIView {
         booksGrid.getChildren().clear();
         if (bookCards.isEmpty()) {
             Label emptyLabel = new Label("Nessun libro trovato in questa sezione.");
-            emptyLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #7A7A7A; -fx-font-style: italic;");
+            emptyLabel.getStyleClass().add("empty-state-label");
             booksGrid.getChildren().add(emptyLabel);
         } else {
             booksGrid.getChildren().addAll(bookCards);
@@ -154,7 +159,7 @@ public class UserLibraryGUIView extends DashboardGUIView {
     public void showChooseSectionPrompt() {
         booksGrid.getChildren().clear();
         Label promptLabel = new Label("Scegli quale sezione visualizzare.");
-        promptLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #7A7A7A; -fx-font-style: italic;");
+        promptLabel.getStyleClass().add("empty-state-label");
         booksGrid.getChildren().add(promptLabel);
     }
 
