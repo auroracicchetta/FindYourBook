@@ -22,7 +22,7 @@ public class BookDetailGUIView extends DashboardGUIView {
     // cambio stato, navigazione indietro) piu' i dati del libro da mostrare.
     @SuppressWarnings("java:S107")
     public VBox buildRoot(String username, BookBean book, ReadingStatus currentStatus,
-                          Consumer<String> onStatusChange, IntConsumer onRate,
+                          Consumer<ReadingStatus> onStatusChange, IntConsumer onRate,
                           Runnable onBack, Runnable onHomeClick,
                           Runnable onMyBooksClick, Runnable onLogout, Consumer<String> onSearch,
                           String originLabel) {
@@ -64,7 +64,7 @@ public class BookDetailGUIView extends DashboardGUIView {
         return backBtn;
     }
 
-    private VBox createLeftColumn(BookBean book, ReadingStatus currentStatus, Consumer<String> onStatusChange, IntConsumer onRate) {
+    private VBox createLeftColumn(BookBean book, ReadingStatus currentStatus, Consumer<ReadingStatus> onStatusChange, IntConsumer onRate) {
         VBox leftColumn = new VBox(15);
         leftColumn.setAlignment(Pos.TOP_CENTER);
         leftColumn.setPrefWidth(200);
@@ -89,7 +89,7 @@ public class BookDetailGUIView extends DashboardGUIView {
     }
 
 
-    private MenuButton createStatusButton(ReadingStatus currentStatus, Consumer<String> onStatusChange) {
+    private MenuButton createStatusButton(ReadingStatus currentStatus, Consumer<ReadingStatus> onStatusChange) {
         String statusText = "Aggiungi a...";
         if (currentStatus == ReadingStatus.TO_READ) statusText = ReadingStatus.TO_READ.getDisplayName();
         else if (currentStatus == ReadingStatus.READING) statusText = ReadingStatus.READING.getDisplayName();
@@ -108,17 +108,17 @@ public class BookDetailGUIView extends DashboardGUIView {
 
         optWantToRead.setOnAction(e -> {
             statusBtn.setText(ReadingStatus.TO_READ.getDisplayName());
-            onStatusChange.accept(ReadingStatus.TO_READ.getDisplayName());
+            onStatusChange.accept(ReadingStatus.TO_READ);
         });
 
         optReading.setOnAction(e -> {
             statusBtn.setText(ReadingStatus.READING.getDisplayName());
-            onStatusChange.accept(ReadingStatus.READING.getDisplayName());
+            onStatusChange.accept(ReadingStatus.READING);
         });
 
         optRead.setOnAction(e -> {
             statusBtn.setText(ReadingStatus.READ.getDisplayName());
-            onStatusChange.accept(ReadingStatus.READ.getDisplayName());
+            onStatusChange.accept(ReadingStatus.READ);
         });
 
         statusBtn.getItems().addAll(optWantToRead, optReading, optRead);

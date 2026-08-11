@@ -107,10 +107,10 @@ public class UserLibraryGUI {
 
             for (BookBean book : libriTrovati) {
                 VBox card = view.buildBookCard(
-                        null,
                         book,
-                        status.name(),
+                        status,
                         newStatus -> changeBookStatus(book, newStatus),
+                        () -> confirmRemovalWithCountdown(book),
                         rating -> {
                             try {
                                 userLibraryController.rateBook(book, rating);
@@ -135,17 +135,11 @@ public class UserLibraryGUI {
         }
     }
 
-    private void changeBookStatus(BookBean book, String newStatus) {
+    private void changeBookStatus(BookBean book, ReadingStatus newStatus) {
         AppLogger.logInfo("Richiesto spostamento del libro '" + book.getTitle() + "' in " + newStatus);
 
-        boolean isRemoval = "Rimuovi libro".equals(newStatus) || "RIMUOVI".equals(newStatus);
-        if (isRemoval) {
-            confirmRemovalWithCountdown(book);
-            return;
-        }
-
         try {
-            userLibraryController.updateReadingStatus(book, newStatus);
+            userLibraryController.saveBookToLibrary(book, newStatus);
             this.show();
 
         } catch (Exception e) {

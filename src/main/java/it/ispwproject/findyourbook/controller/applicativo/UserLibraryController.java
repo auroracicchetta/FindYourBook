@@ -58,30 +58,6 @@ public class UserLibraryController {
         readerDAO.removeFavoriteBook(reader.getUsername(), bookBean.getTitle());
     }
 
-
-    public void updateReadingStatus(BookBean bookBean, String rawStatus) throws DAOException {
-        if (rawStatus == null || rawStatus.equals("Rimuovi libro") || rawStatus.equals("RIMUOVI")) {
-            removeBookFromLibrary(bookBean);
-            bookBean.setStatus(null);
-            return;
-        }
-
-        ReadingStatus targetStatus = parseReadingStatus(rawStatus);
-        if (targetStatus == null) return;
-
-        saveBookToLibrary(bookBean, targetStatus);
-        bookBean.setStatus(targetStatus);
-    }
-
-    private ReadingStatus parseReadingStatus(String rawStatus) {
-        for (ReadingStatus status : ReadingStatus.values()) {
-            if (rawStatus.equals(status.name()) || rawStatus.equals(status.getDisplayName())) {
-                return status;
-            }
-        }
-        return null;
-    }
-
     public void rateBook(BookBean bookBean, int rating) throws DAOException {
         Reader reader = (Reader) SessionManager.getInstance().getLoggedUser();
 
@@ -114,7 +90,6 @@ public class UserLibraryController {
             bean.setStatus(match.getStatus());
             bean.setDescription(match.getDescription());
         } else {
-
             bean.setRating(0);
             bean.setStatus(null);
         }

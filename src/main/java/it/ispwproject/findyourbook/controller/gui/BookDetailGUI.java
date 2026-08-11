@@ -69,9 +69,9 @@ public class BookDetailGUI {
         stage.show();
     }
 
-    private void handleStatusChange(String selectedOption) {
+    private void handleStatusChange(ReadingStatus selectedStatus) {
         try {
-            userLibraryController.updateReadingStatus(this.book, selectedOption);
+            userLibraryController.saveBookToLibrary(this.book, selectedStatus);
         } catch (Exception e) {
             AppLogger.logError("Errore aggiornamento libreria: " + e.getMessage());
         }

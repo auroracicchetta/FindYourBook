@@ -1,5 +1,6 @@
 package it.ispwproject.findyourbook.view.gui;
 
+import it.ispwproject.findyourbook.bean.BookBean;
 import it.ispwproject.findyourbook.enumerator.ReadingStatus;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -8,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 public class UserLibraryGUIView extends DashboardGUIView {
 
@@ -154,5 +156,37 @@ public class UserLibraryGUIView extends DashboardGUIView {
         Label promptLabel = new Label("Scegli quale sezione visualizzare.");
         promptLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #7A7A7A; -fx-font-style: italic;");
         booksGrid.getChildren().add(promptLabel);
+    }
+
+    public VBox buildBookCard(BookBean book, ReadingStatus currentStatus,
+                              Consumer<ReadingStatus> onStatusChange, Runnable onRemove,
+                              IntConsumer onRate, Runnable onClick) {
+        return super.buildBookCard(
+                null,
+                book,
+                currentStatus != null ? currentStatus.name() : null,
+                rawStatus -> handleStatusChange(rawStatus, onStatusChange, onRemove),
+                onRate,
+                onClick,
+                true
+        );
+    }
+
+    private void handleStatusChange(String rawStatus, Consumer<ReadingStatus> onStatusChange, Runnable onRemove) {
+        if (rawStatus == null || rawStatus.equals("RIMUOVI") || rawStatus.equals("Rimuovi libro")) {
+            onRemove.run();
+            return;
+        }
+
+        ReadingStatus status = null;
+        if (rawStatus.equals(ReadingStatus.TO_READ.name()) || rawStatus.equals(ReadingStatus.TO_READ.getDisplayName())) {
+            status = ReadingStatus.TO_READ;
+        } else if (rawStatus.equals(ReadingStatus.READING.name()) || rawStatus.equals(ReadingStatus.READING.getDisplayName())) {
+            status = ReadingStatus.READING;
+        } else if (rawStatus.equals(ReadingStatus.READ.name()) || rawStatus.equals(ReadingStatus.READ.getDisplayName())) {
+            status = ReadingStatus.READ;
+        }
+
+        if (status != null) onStatusChange.accept(status);
     }
 }
