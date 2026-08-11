@@ -4,16 +4,15 @@ import it.ispwproject.findyourbook.bean.BookBean;
 import it.ispwproject.findyourbook.bean.PublisherBean;
 import it.ispwproject.findyourbook.model.Book;
 import it.ispwproject.findyourbook.model.Publisher;
-import it.ispwproject.findyourbook.model.User;
 import it.ispwproject.findyourbook.service.NotificationService;
 import it.ispwproject.findyourbook.exception.NotificationException;
 import it.ispwproject.findyourbook.util.logger.AppLogger;
 
 public class BookPublishedObserver implements Observer {
-    private final User publisher;
+    private final Publisher publisher;
     private final Book book;
 
-    public BookPublishedObserver(User publisher, Book book) {
+    public BookPublishedObserver(Publisher publisher, Book book) {
         this.publisher = publisher;
         this.book = book;
     }
@@ -31,7 +30,7 @@ public class BookPublishedObserver implements Observer {
         return new PublisherBean(
                 publisher.getUsername(), publisher.getName(), publisher.getSurname(),
                 publisher.getEmail(), publisher.getRegistrationDate(),
-                ((Publisher) publisher).getDescription());
+                publisher.getDescription());
     }
 
     private BookBean buildBookBean() {

@@ -5,7 +5,7 @@ import it.ispwproject.findyourbook.dao.DAOFactory;
 import it.ispwproject.findyourbook.dao.PublisherDAO;
 import it.ispwproject.findyourbook.exception.DAOException;
 import it.ispwproject.findyourbook.model.Book;
-import it.ispwproject.findyourbook.model.User;
+import it.ispwproject.findyourbook.model.Publisher;
 import it.ispwproject.findyourbook.pattern.observer.BookPublishedObserver;
 import it.ispwproject.findyourbook.pattern.singleton.SessionManager;
 
@@ -22,7 +22,7 @@ public class PublisherController {
 
     public void publishNewBook(BookBean bookBean) throws DAOException {
 
-        User loggedUser = SessionManager.getInstance().getLoggedUser();
+        Publisher loggedUser = (Publisher) SessionManager.getInstance().getLoggedUser();
         String publisherUsername = loggedUser.getUsername();
 
         publisherDAO.publishBook(bookBean, publisherUsername);
