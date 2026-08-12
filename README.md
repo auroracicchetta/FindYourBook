@@ -65,7 +65,7 @@ SENDGRID_API_KEY=TUA_API_KEY
 SENDGRID_FROM_EMAIL=findyourbook.support@gmail.com
 ```
 
-⚠️ The `db.properties` file includes database credentials and a placeholder for the SendGrid API key. Email notifications in action can be seen in the project demo video.
+⚠️ The `db.properties` file includes database credentials and a placeholder for the SendGrid API key. Email notifications in action can be seen in the [project demo video](https://youtu.be/Hi_BrdKDSmU).
 
 ## Demo credentials
 
