@@ -17,9 +17,6 @@ public class LoginDAOMemory implements LoginDAO {
                 .findFirst()
                 .orElseThrow(() -> new LoginException("Credenziali non valide. Riprova."));
 
-        if (plainPassword == null || plainPassword.isBlank()) {
-            throw new LoginException("Credenziali non valide. Riprova.");
-        }
 
         if (user.getPassword() == null) {
             return new Credentials(username, plainPassword, user.getRole());

@@ -21,6 +21,10 @@ public class LoginController {
 
     public LoginResult login(String username, String password) throws LoginException, DAOException {
 
+        if (password == null || password.isBlank()) {
+            throw new LoginException("Credenziali non valide. Riprova.");
+        }
+
         String hashedPassword = PasswordUtils.hash(password);
 
         Credentials credentials = DAOFactory.getLoginDAO().execute(username, hashedPassword);

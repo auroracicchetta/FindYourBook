@@ -35,4 +35,11 @@ class LoginControllerTest {
                 loginController.login("nonregistrato@demo", "password123")
         );
     }
+
+    @Test
+    void testLoginConPasswordVuota() {
+        assertThrows(LoginException.class, () ->
+                loginController.login("mario", "")
+        );
+    }
 }
