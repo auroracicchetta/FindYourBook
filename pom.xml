@@ -14,6 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>23.0.1</javafx.version>
         <sonar.exclusions>**/view/**,**/controller/cli/**,**/controller/gui/**,**/*.css</sonar.exclusions>
+        <sonar.organization>auroracicchetta</sonar.organization>
     </properties>
 
     <dependencies>
